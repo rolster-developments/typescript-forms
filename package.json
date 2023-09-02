@@ -8,6 +8,9 @@
   "unpkg": "dist/lib.js",
   "author": "Daniel Andrés Castillo Pedroza",
   "license": "MIT",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "clean": "rimraf ./dist",
     "build": "npm run clean && tsc -p tsconfig.json && rollup -c rollup.config.js",
