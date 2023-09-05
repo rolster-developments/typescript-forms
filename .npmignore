@@ -11,4 +11,5 @@ test
 .prettierrc
 .prettierignore
 package-lock.json
+rollup.config.json
 tsconfig.json
