@@ -15,7 +15,8 @@
     "clean": "rimraf ./dist",
     "build": "npm run clean && tsc -p tsconfig.json && rollup -c rollup.config.js",
     "test": "jest --coverage",
-    "test:watch": "jest --coverage --watch"
+    "test:watch": "jest --coverage --watch",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@types/jest": "^29.5.1",

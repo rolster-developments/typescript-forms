@@ -13,6 +13,7 @@ type Subscriber<T> = (state?: FormState<T>) => void;
 export interface AbstractControl<T> {
   active: boolean;
   dirty: boolean;
+  disabled: boolean
   errors: ValidatorError[];
   invalid: boolean;
   valid: boolean;
@@ -22,6 +23,7 @@ export interface AbstractControl<T> {
   reset: () => void;
   setActive: (active: boolean) => void;
   setDirty: (dirty: boolean) => void;
+  setDisabled: (disabled: boolean) => void;
   setState: (state?: FormState<T>) => void;
   setValidators: (validators: ValidatorFn<T>[]) => void;
   subscribe: (subscriber: Subscriber<T>) => void;
@@ -37,6 +39,8 @@ export class FormControl<T = any> implements AbstractControl<T> {
   private activeValue = false;
 
   private dirtyValue = false;
+
+  private disabledValue = false;
 
   private validValue = true;
 
@@ -71,6 +75,10 @@ export class FormControl<T = any> implements AbstractControl<T> {
 
   public get dirty(): boolean {
     return this.dirtyValue;
+  }
+
+  public get disabled(): boolean {
+    return this.disabledValue;
   }
 
   public get invalid(): boolean {
@@ -108,6 +116,10 @@ export class FormControl<T = any> implements AbstractControl<T> {
 
   public setDirty(dirty: boolean): void {
     this.dirtyValue = dirty;
+  }
+
+  public setDisabled(disabled: boolean): void {
+    this.disabledValue = disabled;
   }
 
   public setState(state?: FormState<T>): void {
