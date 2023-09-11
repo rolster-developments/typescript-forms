@@ -10,7 +10,7 @@ export type ValidatorFn<T> = (state?: FormState<T>) => ValidatorResult;
 
 type Subscriber<T> = (state?: FormState<T>) => void;
 
-export interface AbstractControl<T> {
+export interface AbstractControl<T = any> {
   active: boolean;
   dirty: boolean;
   disabled: boolean

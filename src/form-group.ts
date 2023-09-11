@@ -1,6 +1,6 @@
-import { FormControl, FormState } from './form-control';
+import { AbstractControl, FormState } from './form-control';
 
-export type FormControls = Record<string, FormControl>;
+export type FormControls = Record<string, AbstractControl>;
 
 type Subscriber = (abstractGroup?: AbstractGroup) => void;
 type JsonResult = Record<string, any>;
@@ -15,25 +15,25 @@ export interface AbstractGroup {
 }
 
 export class FormGroup<T extends FormControls> implements AbstractGroup {
-  private formControls: FormControl[];
+  private abstractControls: AbstractControl[];
 
   private validValue = true;
 
   private subscribers: Set<Subscriber>;
 
   constructor(public readonly controls: T) {
-    this.formControls = Object.values(controls);
+    this.abstractControls = Object.values(controls);
     this.subscribers = new Set();
 
-    const subscribeControl = (_state: FormState) => {
-      this.validValue = this.formControls.reduce(
-        (valid, control) => valid && control.valid,
+    const subscribe = (_: FormState) => {
+      this.validValue = this.abstractControls.reduce(
+        (validState, { valid }) => validState && valid,
         true
       );
     };
 
-    this.formControls.forEach((control) => {
-      control.subscribe(subscribeControl);
+    this.abstractControls.forEach((control) => {
+      control.subscribe(subscribe);
     });
   }
 
@@ -46,9 +46,7 @@ export class FormGroup<T extends FormControls> implements AbstractGroup {
   }
 
   public reset(): void {
-    this.formControls.forEach((control) => {
-      control.reset();
-    });
+    this.abstractControls.forEach((control) => control.reset());
   }
 
   public subscribe(subscriber: Subscriber): void {
@@ -66,7 +64,7 @@ export class FormGroup<T extends FormControls> implements AbstractGroup {
   }
 
   public updateValueAndValidity(): void {
-    this.formControls.forEach((control) => {
+    this.abstractControls.forEach((control) => {
       control.updateValueAndValidity();
     });
   }
