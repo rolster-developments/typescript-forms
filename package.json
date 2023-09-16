@@ -56,5 +56,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/rolster-developments/typescript-forms.git"
-  }
+  },
+  "keywords": ["rolster", "typescript", "forms"]
 }
