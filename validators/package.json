@@ -1,0 +1,8 @@
+{
+  "name": "@rolster/forms/validators",
+  "types": "../dist/esm/validators.d.ts",
+  "main": "../dist/cjs/validators.js",
+  "module": "../dist/esm/validators.js",
+  "unpkg": "../dist/es/validators.js",
+  "sideEffects": false
+}

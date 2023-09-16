@@ -1,19 +1,12 @@
-export type FormState<T = any> = T | undefined | null;
-
-export interface ValidatorError {
-  message: string;
-}
-
-type ValidatorResult = ValidatorError | undefined;
-
-export type ValidatorFn<T> = (state?: FormState<T>) => ValidatorResult;
+import { evalFormStateValid } from './helpers';
+import { FormState, ValidatorError, ValidatorFn } from './types';
 
 type Subscriber<T> = (state?: FormState<T>) => void;
 
 export interface AbstractControl<T = any> {
   active: boolean;
   dirty: boolean;
-  disabled: boolean
+  disabled: boolean;
   errors: ValidatorError[];
   invalid: boolean;
   valid: boolean;
@@ -142,23 +135,15 @@ export class FormControl<T = any> implements AbstractControl<T> {
   }
 
   public updateValueAndValidity(): void {
-    const { stateValue, validators } = this;
+    const { stateValue: state, validators } = this;
 
-    const errors = validators.reduce((errors: ValidatorError[], validator) => {
-      const error = validator(stateValue);
-
-      if (error) {
-        errors.push(error);
-      }
-
-      return errors;
-    }, []);
+    const { errors, valid } = evalFormStateValid({ state, validators });
 
     const [error] = errors;
 
-    this.errorsValue = errors;
     this.errorValue = error;
+    this.errorsValue = errors;
 
-    this.validValue = errors.length === 0;
+    this.validValue = valid;
   }
 }
