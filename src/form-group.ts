@@ -1,65 +1,49 @@
 import { AbstractControl } from './form-control';
-import { FormState } from './types';
 
 export type FormControls = Record<string, AbstractControl>;
 
-type Subscriber = (group?: AbstractGroup) => void;
-type JsonResult = Record<string, any>;
+type JsonControl<T extends FormControls> = Record<keyof T, any>;
 
-export interface AbstractGroup {
-  invalid: boolean;
-  valid: boolean;
-  json: () => JsonResult;
+export interface AbstractGroup<T extends FormControls> {
+  controls: T;
+  invalid: () => boolean;
+  json: () => JsonControl<T>;
   reset: () => void;
-  subscribe: (subscriber: Subscriber) => void;
   updateValueAndValidity: () => void;
+  valid: () => boolean;
 }
 
-export class FormGroup<T extends FormControls> implements AbstractGroup {
-  private abstracts: AbstractControl[];
+export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
+  constructor(public readonly controls: T) {}
 
-  private validValue = true;
-
-  private subscribers: Set<Subscriber>;
-
-  constructor(public readonly controls: T) {
-    this.abstracts = Object.values(controls);
-    this.subscribers = new Set();
-
-    const subscribe = (_state: FormState) => {
-      this.validValue = this.abstracts.reduce(
-        (validState, { valid }) => validState && valid,
-        true
-      );
-    };
-
-    this.abstracts.forEach((control) => control.subscribe(subscribe));
+  public valid(): boolean {
+    return Object.values(this.controls).reduce(
+      (validState, { valid }) => validState && valid,
+      true
+    );
   }
 
-  public get invalid(): boolean {
-    return !this.validValue;
-  }
-
-  public get valid(): boolean {
-    return this.validValue;
+  public invalid(): boolean {
+    return !this.valid();
   }
 
   public reset(): void {
-    this.abstracts.forEach((control) => control.reset());
+    Object.values(this.controls).forEach((control) => control.reset());
   }
 
-  public subscribe(subscriber: Subscriber): void {
-    this.subscribers.add(subscriber);
-  }
-
-  public json(): JsonResult {
-    return Object.entries(this.controls).reduce((json, [key, { value }]) => {
-      json[key] = value;
-      return json;
-    }, {} as JsonResult);
+  public json(): JsonControl<T> {
+    return Object.entries(this.controls).reduce<any>(
+      (json, [key, { state }]) => {
+        json[key] = state;
+        return json;
+      },
+      {}
+    );
   }
 
   public updateValueAndValidity(): void {
-    this.abstracts.forEach((control) => control.updateValueAndValidity());
+    Object.values(this.controls).forEach((control) =>
+      control.updateValueAndValidity()
+    );
   }
 }
