@@ -1,3 +1,4 @@
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { evalFormStateValid } from './helpers';
 import { FormState, ValidatorError, ValidatorFn } from './types';
 
@@ -19,11 +20,11 @@ export interface AbstractControl<T = any> {
   setDisabled: (disabled: boolean) => void;
   setState: (state?: FormState<T>) => void;
   setValidators: (validators: ValidatorFn<T>[]) => void;
-  subscribe: (subscriber: Subscriber<T>) => void;
+  subscribe: (subscriber: Subscriber<T>) => Subscription;
   updateValueAndValidity: () => void;
 }
 
-interface FormControlProps<T> {
+export interface FormControlProps<T> {
   state?: FormState<T>;
   validators?: ValidatorFn<T>[];
 }
@@ -47,10 +48,10 @@ export class FormControl<T = any> implements AbstractControl<T> {
 
   private validators: ValidatorFn<T>[] = [];
 
-  private subscribers: Set<Subscriber<T>>;
+  private subscribers: BehaviorSubject<FormState<T>>;
 
   constructor({ state, validators }: FormControlProps<T>) {
-    this.subscribers = new Set();
+    this.subscribers = new BehaviorSubject(state);
 
     this.initialState = state;
 
@@ -116,11 +117,9 @@ export class FormControl<T = any> implements AbstractControl<T> {
   }
 
   public setState(state?: FormState<T>): void {
-    this.stateValue = state;
+    this.subscribers.next(state);
 
-    this.subscribers.forEach((subscriber) => {
-      subscriber(state);
-    });
+    this.stateValue = state;
 
     this.updateValueAndValidity();
   }
@@ -130,8 +129,8 @@ export class FormControl<T = any> implements AbstractControl<T> {
     this.updateValueAndValidity();
   }
 
-  public subscribe(subscriber: Subscriber<T>): void {
-    this.subscribers.add(subscriber);
+  public subscribe(subscriber: Subscriber<T>): Subscription {
+    return this.subscribers.subscribe(subscriber);
   }
 
   public updateValueAndValidity(): void {
