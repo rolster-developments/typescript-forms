@@ -36,5 +36,6 @@ const createConfiguration = (file) => {
 
 export default [
   createConfiguration('index'),
+  createConfiguration('expressions'),
   createConfiguration('validators')
 ];
