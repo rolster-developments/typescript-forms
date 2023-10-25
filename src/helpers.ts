@@ -61,14 +61,18 @@ export const validateJSON = <T extends ObjectJSON>(
           return errors;
         }, [] as ValidatorError[]) || [];
 
-      const errors: ErrorsJSON = { ...result.errors };
-      errors[key] = errorsObject;
+      if (errorsObject.length) {
+        const errors: ErrorsJSON = { ...result.errors };
+        errors[key] = errorsObject;
 
-      return {
-        ...result,
-        errors,
-        valid: result.valid && errorsObject.length === 0
-      };
+        return {
+          ...result,
+          errors,
+          valid: result.valid && false
+        };
+      }
+
+      return result;
     },
     { valid: true, errors: {} } as ValidatorsResult
   );
