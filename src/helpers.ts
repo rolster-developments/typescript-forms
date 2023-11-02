@@ -1,20 +1,50 @@
-import { FormState, ValidatorError, ValidatorFn } from './types';
+import {
+  FormControls,
+  FormState,
+  ValidatorError,
+  ValidatorFn,
+  ValidatorGroupFn
+} from './types';
 
-interface EvalProps<T> {
+interface StateProps<T> {
   state: FormState<T>;
   validators: ValidatorFn<T>[];
 }
 
-interface EvalResult {
+interface ControlsProps {
+  controls: FormControls;
+  validators: ValidatorGroupFn[];
+}
+
+interface ValidResult {
   errors: ValidatorError[];
   valid: boolean;
 }
 
-export const evalFormStateValid = <T>(props: EvalProps<T>): EvalResult => {
+export const evalFormStateValid = <T>(props: StateProps<T>): ValidResult => {
   const { state, validators } = props;
 
   const errors = validators.reduce((errors, validator) => {
     const error = validator(state);
+
+    if (error) {
+      errors.push(error);
+    }
+
+    return errors;
+  }, [] as ValidatorError[]);
+
+  return {
+    errors,
+    valid: errors.length === 0
+  };
+};
+
+export const evalFormControlsValid = (props: ControlsProps): ValidResult => {
+  const { controls, validators } = props;
+
+  const errors = validators.reduce((errors, validator) => {
+    const error = validator(controls);
 
     if (error) {
       errors.push(error);

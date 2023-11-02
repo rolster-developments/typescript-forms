@@ -1,28 +1,13 @@
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { evalFormStateValid } from './helpers';
-import { FormState, ValidatorError, ValidatorFn } from './types';
-
-type Subscriber<T> = (state?: FormState<T>) => void;
-
-export interface AbstractControl<T = any> {
-  active: boolean;
-  dirty: boolean;
-  disabled: boolean;
-  errors: ValidatorError[];
-  invalid: boolean;
-  valid: boolean;
-  value: T;
-  error?: ValidatorError;
-  state?: FormState<T>;
-  reset: () => void;
-  setActive: (active: boolean) => void;
-  setDirty: (dirty: boolean) => void;
-  setDisabled: (disabled: boolean) => void;
-  setState: (state?: FormState<T>) => void;
-  setValidators: (validators: ValidatorFn<T>[]) => void;
-  subscribe: (subscriber: Subscriber<T>) => Subscription;
-  updateValueAndValidity: () => void;
-}
+import {
+  AbstractControl,
+  AbstractGroup,
+  FormState,
+  SubscriberControl,
+  ValidatorError,
+  ValidatorFn
+} from './types';
 
 export interface FormControlProps<T> {
   state?: FormState<T>;
@@ -46,18 +31,17 @@ export class FormControl<T = any> implements AbstractControl<T> {
 
   private errorsValue: ValidatorError[] = [];
 
-  private validators: ValidatorFn<T>[] = [];
+  private validators?: ValidatorFn<T>[];
 
   private subscribers: BehaviorSubject<FormState<T>>;
+
+  private abstractGroup?: AbstractGroup<any>;
 
   constructor({ state, validators }: FormControlProps<T>) {
     this.subscribers = new BehaviorSubject(state);
 
     this.initialState = state;
-
-    if (validators) {
-      this.validators = validators;
-    }
+    this.validators = validators;
 
     this.stateValue = state;
     this.updateValueAndValidity();
@@ -116,12 +100,18 @@ export class FormControl<T = any> implements AbstractControl<T> {
     this.disabledValue = disabled;
   }
 
+  public setGroup(group: AbstractGroup<any>): void {
+    this.abstractGroup = group;
+  }
+
   public setState(state?: FormState<T>): void {
     this.subscribers.next(state);
 
     this.stateValue = state;
 
     this.updateValueAndValidity();
+
+    this.abstractGroup?.updateValidity();
   }
 
   public setValidators(validators: ValidatorFn<T>[]): void {
@@ -129,14 +119,16 @@ export class FormControl<T = any> implements AbstractControl<T> {
     this.updateValueAndValidity();
   }
 
-  public subscribe(subscriber: Subscriber<T>): Subscription {
+  public subscribe(subscriber: SubscriberControl<T>): Subscription {
     return this.subscribers.subscribe(subscriber);
   }
 
   public updateValueAndValidity(): void {
     const { stateValue: state, validators } = this;
 
-    const { errors, valid } = evalFormStateValid({ state, validators });
+    const { errors, valid } = validators
+      ? evalFormStateValid({ state, validators })
+      : { errors: [], valid: true };
 
     const [error] = errors;
 
