@@ -7,5 +7,6 @@ export {
   FormControls,
   FormState,
   ValidatorError,
-  ValidatorFn
+  ValidatorFn,
+  ValidatorGroupFn
 } from './types';
