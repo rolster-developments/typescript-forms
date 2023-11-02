@@ -39,7 +39,9 @@ export type FormControls = Record<string, AbstractControl>;
 
 export type JsonControl<T extends FormControls> = Record<keyof T, any>;
 
-export type ValidatorGroupFn = (controls: FormControls) => ValidatorResult;
+export type ValidatorGroupFn<T extends FormControls> = (
+  controls: T
+) => ValidatorResult;
 
 export interface AbstractGroup<T extends FormControls> {
   controls: T;

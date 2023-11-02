@@ -16,7 +16,7 @@ export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
 
   constructor(
     public readonly controls: T,
-    private readonly validators?: ValidatorGroupFn[]
+    private readonly validators?: ValidatorGroupFn<T>[]
   ) {
     Object.values(this.controls).forEach((control) => {
       control.setGroup(this);
