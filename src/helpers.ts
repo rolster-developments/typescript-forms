@@ -16,15 +16,12 @@ interface ControlsProps {
   validators: ValidatorGroupFn[];
 }
 
-interface ValidResult {
-  errors: ValidatorError[];
-  valid: boolean;
-}
-
-export const evalFormStateValid = <T>(props: StateProps<T>): ValidResult => {
+export const evalFormStateValid = <T>(
+  props: StateProps<T>
+): ValidatorError[] => {
   const { state, validators } = props;
 
-  const errors = validators.reduce((errors, validator) => {
+  return validators.reduce((errors, validator) => {
     const error = validator(state);
 
     if (error) {
@@ -33,17 +30,14 @@ export const evalFormStateValid = <T>(props: StateProps<T>): ValidResult => {
 
     return errors;
   }, [] as ValidatorError[]);
-
-  return {
-    errors,
-    valid: errors.length === 0
-  };
 };
 
-export const evalFormControlsValid = (props: ControlsProps): ValidResult => {
+export const evalFormControlsValid = (
+  props: ControlsProps
+): ValidatorError[] => {
   const { controls, validators } = props;
 
-  const errors = validators.reduce((errors, validator) => {
+  return validators.reduce((errors, validator) => {
     const error = validator(controls);
 
     if (error) {
@@ -52,11 +46,6 @@ export const evalFormControlsValid = (props: ControlsProps): ValidResult => {
 
     return errors;
   }, [] as ValidatorError[]);
-
-  return {
-    errors,
-    valid: errors.length === 0
-  };
 };
 
 type ObjectJSON = Record<string, any>;

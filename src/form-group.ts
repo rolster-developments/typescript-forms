@@ -54,19 +54,17 @@ export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
   }
 
   public updateValidity(): void {
-    if (this.validators) {
+    if (!this.validators) {
+      this.validValue = true;
+    } else {
       const { controls, validators } = this;
 
-      const { errors, valid } = validators
-        ? evalFormControlsValid({ controls, validators })
-        : { errors: [], valid: true };
+      const errors = evalFormControlsValid({ controls, validators });
 
-      const [error] = errors;
-
-      this.errorValue = error;
+      this.errorValue = errors[0];
       this.errorsValue = errors;
 
-      this.validValue = valid;
+      this.validValue = errors.length === 0;
     }
   }
 

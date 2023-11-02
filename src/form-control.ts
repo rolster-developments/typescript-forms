@@ -124,17 +124,17 @@ export class FormControl<T = any> implements AbstractControl<T> {
   }
 
   public updateValueAndValidity(): void {
-    const { stateValue: state, validators } = this;
+    if (!this.validators) {
+      this.validValue = true;
+    } else {
+      const { stateValue: state, validators } = this;
 
-    const { errors, valid } = validators
-      ? evalFormStateValid({ state, validators })
-      : { errors: [], valid: true };
+      const errors = evalFormStateValid({ state, validators });
 
-    const [error] = errors;
+      this.errorValue = errors[0];
+      this.errorsValue = errors;
 
-    this.errorValue = error;
-    this.errorsValue = errors;
-
-    this.validValue = valid;
+      this.validValue = errors.length === 0;
+    }
   }
 }
