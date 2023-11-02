@@ -43,10 +43,12 @@ export type ValidatorGroupFn = (controls: FormControls) => ValidatorResult;
 
 export interface AbstractGroup<T extends FormControls> {
   controls: T;
+  errors: ValidatorError[];
   invalid: boolean;
   json: () => JsonControl<T>;
   reset: () => void;
   updateValidity: () => void;
   updateValueAndValidity: () => void;
   valid: boolean;
+  error?: ValidatorError;
 }
