@@ -1,13 +1,18 @@
-import { evalFormControlsValid } from './helpers';
+import { evalFormGroupValid } from './helpers';
 import {
-  AbstractGroup,
-  FormControls,
-  JsonControl,
+  AbstractFormGroup,
+  AbstractFormControls,
+  JsonControls,
   ValidatorError,
-  ValidatorGroupFn
+  ValidatorGroupFn,
+  FormGroupProps
 } from './types';
 
-export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
+export class FormGroup<T extends AbstractFormControls>
+  implements AbstractFormGroup<T>
+{
+  private controlsValue: T;
+
   private errorValue?: ValidatorError;
 
   private errorsValue: ValidatorError[] = [];
@@ -16,21 +21,24 @@ export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
 
   private validators?: ValidatorGroupFn<T>[];
 
-  constructor(
-    public readonly controls: T,
-    validators?: ValidatorGroupFn<T>[]
-  ) {
-    Object.values(this.controls).forEach((control) => {
+  constructor({ controls, validators }: FormGroupProps<T>) {
+    this.controlsValue = controls;
+
+    Object.values(this.controlsValue).forEach((control) => {
       control.setFormGroup(this);
     });
 
     this.validators = validators;
   }
 
+  public get controls(): T {
+    return this.controlsValue;
+  }
+
   public get valid(): boolean {
     return (
       this.validValue &&
-      Object.values(this.controls).reduce(
+      Object.values(this.controlsValue).reduce(
         (validState, { valid }) => validState && valid,
         true
       )
@@ -49,8 +57,8 @@ export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
     return this.errorsValue;
   }
 
-  public json(): JsonControl<T> {
-    return Object.entries(this.controls).reduce<any>(
+  public json(): JsonControls<T> {
+    return Object.entries(this.controlsValue).reduce<any>(
       (json, [key, { state }]) => {
         json[key] = state;
         return json;
@@ -60,7 +68,7 @@ export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
   }
 
   public reset(): void {
-    Object.values(this.controls).forEach((control) => control.reset());
+    Object.values(this.controlsValue).forEach((control) => control.reset());
   }
 
   public setValidators(validators: ValidatorGroupFn<T>[]): void {
@@ -70,7 +78,7 @@ export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
 
   public updateValueAndValidity(controls = true): void {
     if (controls) {
-      Object.values(this.controls).forEach((control) =>
+      Object.values(this.controlsValue).forEach((control) =>
         control.updateValueAndValidity()
       );
     }
@@ -80,7 +88,7 @@ export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
     } else {
       const { controls, validators } = this;
 
-      const errors = evalFormControlsValid({ controls, validators });
+      const errors = evalFormGroupValid({ controls, validators });
 
       this.errorsValue = errors;
       this.errorValue = errors[0];

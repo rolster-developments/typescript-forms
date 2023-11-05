@@ -1,5 +1,5 @@
 import {
-  FormControls,
+  AbstractControls,
   FormState,
   ValidatorError,
   ValidatorFn,
@@ -11,12 +11,12 @@ interface StateProps<T> {
   validators: ValidatorFn<T>[];
 }
 
-interface ControlsProps<T extends FormControls> {
+interface ControlsProps<T extends AbstractControls> {
   controls: T;
   validators: ValidatorGroupFn<T>[];
 }
 
-export const evalFormStateValid = <T>(
+export const evalFormControlValid = <T>(
   props: StateProps<T>
 ): ValidatorError[] => {
   const { state, validators } = props;
@@ -32,7 +32,7 @@ export const evalFormStateValid = <T>(
   }, [] as ValidatorError[]);
 };
 
-export const evalFormControlsValid = <T extends FormControls>(
+export const evalFormGroupValid = <T extends AbstractControls>(
   props: ControlsProps<T>
 ): ValidatorError[] => {
   const { controls, validators } = props;

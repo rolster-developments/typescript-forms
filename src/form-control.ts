@@ -1,20 +1,16 @@
 import { BehaviorSubject, Subscription } from 'rxjs';
-import { evalFormStateValid } from './helpers';
+import { evalFormControlValid } from './helpers';
 import {
-  AbstractControl,
-  AbstractGroup,
+  AbstractFormControl,
+  AbstractFormGroup,
+  FormControlProps,
   FormState,
   SubscriberControl,
   ValidatorError,
   ValidatorFn
 } from './types';
 
-export interface FormControlProps<T> {
-  state?: FormState<T>;
-  validators?: ValidatorFn<T>[];
-}
-
-export class FormControl<T = any> implements AbstractControl<T> {
+export class FormControl<T = any> implements AbstractFormControl<T> {
   private activeValue = false;
 
   private dirtyValue = false;
@@ -35,7 +31,7 @@ export class FormControl<T = any> implements AbstractControl<T> {
 
   private subscribers: BehaviorSubject<FormState<T>>;
 
-  private formGroup?: AbstractGroup<any>;
+  private formGroup?: AbstractFormGroup<any>;
 
   constructor({ state, validators }: FormControlProps<T>) {
     this.subscribers = new BehaviorSubject(state);
@@ -100,7 +96,7 @@ export class FormControl<T = any> implements AbstractControl<T> {
     this.disabledValue = disabled;
   }
 
-  public setFormGroup(formGroup: AbstractGroup<any>): void {
+  public setFormGroup(formGroup: AbstractFormGroup<any>): void {
     this.formGroup = formGroup;
   }
 
@@ -129,7 +125,7 @@ export class FormControl<T = any> implements AbstractControl<T> {
     } else {
       const { stateValue: state, validators } = this;
 
-      const errors = evalFormStateValid({ state, validators });
+      const errors = evalFormControlValid({ state, validators });
 
       this.errorValue = errors[0];
       this.errorsValue = errors;
