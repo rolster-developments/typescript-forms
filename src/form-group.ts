@@ -1,4 +1,4 @@
-import { evalFormGroupValid } from './helpers';
+import { controlsToJson, controlsToValid, evalFormGroupValid } from './helpers';
 import {
   AbstractFormGroup,
   AbstractFormControls,
@@ -36,13 +36,7 @@ export class FormGroup<T extends AbstractFormControls>
   }
 
   public get valid(): boolean {
-    return (
-      this.validValue &&
-      Object.values(this.controlsValue).reduce(
-        (validState, { valid }) => validState && valid,
-        true
-      )
-    );
+    return this.validValue && controlsToValid(this.controlsValue);
   }
 
   public get invalid(): boolean {
@@ -58,13 +52,7 @@ export class FormGroup<T extends AbstractFormControls>
   }
 
   public json(): JsonControls<T> {
-    return Object.entries(this.controlsValue).reduce<any>(
-      (json, [key, { state }]) => {
-        json[key] = state;
-        return json;
-      },
-      {}
-    );
+    return controlsToJson(this.controlsValue);
   }
 
   public reset(): void {

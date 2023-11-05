@@ -1,6 +1,8 @@
 import {
   AbstractControls,
+  AbstractFormControls,
   FormState,
+  JsonControls,
   ValidatorError,
   ValidatorFn,
   ValidatorGroupFn
@@ -46,6 +48,25 @@ export const evalFormGroupValid = <T extends AbstractControls>(
 
     return errors;
   }, [] as ValidatorError[]);
+};
+
+export const controlsToValid = <T extends AbstractFormControls>(
+  controls: T
+): boolean => {
+  return Object.values(controls).reduce(
+    (validState, { valid }) => validState && valid,
+    true
+  );
+};
+
+export const controlsToJson = <T extends AbstractFormControls>(
+  controls: T
+): JsonControls<T> => {
+  return Object.entries(controls).reduce((json, [key, { state }]) => {
+    json[key as keyof T] = state;
+
+    return json;
+  }, {} as JsonControls<T>);
 };
 
 type ObjectJSON = Record<string, any>;
