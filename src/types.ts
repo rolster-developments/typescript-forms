@@ -24,7 +24,7 @@ export interface AbstractControl<T = any> {
   setActive: (active: boolean) => void;
   setDirty: (dirty: boolean) => void;
   setDisabled: (disabled: boolean) => void;
-  setGroup: (group: AbstractGroup<any>) => void;
+  setFormGroup: (formGroup: AbstractGroup<any>) => void;
   setState: (state?: FormState<T>) => void;
   setValidators: (validators: ValidatorFn<T>[]) => void;
   subscribe: (subscriber: SubscriberControl<T>) => Subscription;
@@ -49,8 +49,8 @@ export interface AbstractGroup<T extends FormControls> {
   invalid: boolean;
   json: () => JsonControl<T>;
   reset: () => void;
-  updateValidity: () => void;
-  updateValueAndValidity: () => void;
+  setValidators: (validators: ValidatorGroupFn<T>[]) => void;
+  updateValueAndValidity: (controls?: boolean) => void;
   valid: boolean;
   error?: ValidatorError;
 }

@@ -14,17 +14,27 @@ export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
 
   private validValue = true;
 
+  private validators?: ValidatorGroupFn<T>[];
+
   constructor(
     public readonly controls: T,
-    private readonly validators?: ValidatorGroupFn<T>[]
+    validators?: ValidatorGroupFn<T>[]
   ) {
     Object.values(this.controls).forEach((control) => {
-      control.setGroup(this);
+      control.setFormGroup(this);
     });
+
+    this.validators = validators;
   }
 
   public get valid(): boolean {
-    return this.validControls && this.validValue;
+    return (
+      this.validValue &&
+      Object.values(this.controls).reduce(
+        (validState, { valid }) => validState && valid,
+        true
+      )
+    );
   }
 
   public get invalid(): boolean {
@@ -39,10 +49,6 @@ export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
     return this.errorsValue;
   }
 
-  public reset(): void {
-    Object.values(this.controls).forEach((control) => control.reset());
-  }
-
   public json(): JsonControl<T> {
     return Object.entries(this.controls).reduce<any>(
       (json, [key, { state }]) => {
@@ -53,7 +59,22 @@ export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
     );
   }
 
-  public updateValidity(): void {
+  public reset(): void {
+    Object.values(this.controls).forEach((control) => control.reset());
+  }
+
+  public setValidators(validators: ValidatorGroupFn<T>[]): void {
+    this.validators = validators;
+    this.updateValueAndValidity();
+  }
+
+  public updateValueAndValidity(controls = true): void {
+    if (controls) {
+      Object.values(this.controls).forEach((control) =>
+        control.updateValueAndValidity()
+      );
+    }
+
     if (!this.validators) {
       this.validValue = true;
     } else {
@@ -61,23 +82,10 @@ export class FormGroup<T extends FormControls> implements AbstractGroup<T> {
 
       const errors = evalFormControlsValid({ controls, validators });
 
-      this.errorValue = errors[0];
       this.errorsValue = errors;
+      this.errorValue = errors[0];
 
       this.validValue = errors.length === 0;
     }
-  }
-
-  public updateValueAndValidity(): void {
-    Object.values(this.controls).forEach((control) =>
-      control.updateValueAndValidity()
-    );
-  }
-
-  private get validControls(): boolean {
-    return Object.values(this.controls).reduce(
-      (validState, { valid }) => validState && valid,
-      true
-    );
   }
 }
