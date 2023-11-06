@@ -31,7 +31,7 @@ export class FormControl<T = any> implements AbstractFormControl<T> {
 
   private subscribers: BehaviorSubject<FormState<T>>;
 
-  private formGroup?: AbstractFormGroup<any>;
+  private groupValue?: AbstractFormGroup<any>;
 
   constructor({ state, validators }: FormControlProps<T>) {
     this.subscribers = new BehaviorSubject(state);
@@ -79,6 +79,14 @@ export class FormControl<T = any> implements AbstractFormControl<T> {
     return this.errorsValue;
   }
 
+  public set group(formGroup: AbstractFormGroup<any> | undefined) {
+    this.groupValue = formGroup;
+  }
+
+  public get group(): AbstractFormGroup<any> | undefined {
+    return this.groupValue;
+  }
+
   public reset(): void {
     this.setState(this.initialState);
     this.setDirty(false);
@@ -96,10 +104,6 @@ export class FormControl<T = any> implements AbstractFormControl<T> {
     this.disabledValue = disabled;
   }
 
-  public setFormGroup(formGroup: AbstractFormGroup<any>): void {
-    this.formGroup = formGroup;
-  }
-
   public setState(state?: FormState<T>): void {
     this.subscribers.next(state);
 
@@ -107,7 +111,7 @@ export class FormControl<T = any> implements AbstractFormControl<T> {
 
     this.updateValueAndValidity();
 
-    this.formGroup?.updateValueAndValidity(false);
+    this.groupValue?.updateValueAndValidity(false);
   }
 
   public setValidators(validators: ValidatorFn<T>[]): void {

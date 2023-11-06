@@ -24,28 +24,33 @@ export interface AbstractControl<T = any> {
   state?: FormState<T>;
 }
 
-export interface AbstractFormControl<T = any> extends AbstractControl<T> {
+export interface AbstractGroupControl<T = any> extends AbstractControl<T> {
+  reset: () => void;
+  updateValueAndValidity: () => void;
+  group?: AbstractGroup<any>;
+}
+
+export interface AbstractFormControl<T = any> extends AbstractGroupControl<T> {
   active: boolean;
   disabled: boolean;
-  reset: () => void;
   setActive: (active: boolean) => void;
   setDirty: (dirty: boolean) => void;
   setDisabled: (disabled: boolean) => void;
-  setFormGroup: (formGroup: AbstractFormGroup<any>) => void;
   setState: (state?: FormState<T>) => void;
   setValidators: (validators: ValidatorFn<T>[]) => void;
   subscribe: (subscriber: SubscriberControl<T>) => Subscription;
   updateValueAndValidity: () => void;
+  group?: AbstractFormGroup<any>;
 }
 
-export interface AbstractArrayControl<T = any> extends AbstractControl<T> {
+export interface AbstractArrayControl<T = any> extends AbstractGroupControl<T> {
   uuid: string;
   group?: AbstractArrayGroup<any>;
   validators?: ValidatorFn<T>[];
 }
 
 export type AbstractControls = Record<string, AbstractControl>;
-export type AbstractFormControls = Record<string, AbstractFormControl>;
+export type AbstractGroupControls = Record<string, AbstractGroupControl>;
 export type AbstractArrayControls = Record<string, AbstractArrayControl>;
 
 export type JsonControls<T extends AbstractControls> = Record<keyof T, any>;
@@ -62,7 +67,7 @@ export interface AbstractGroup<T extends AbstractControls> {
   error?: ValidatorError;
 }
 
-export interface AbstractFormGroup<T extends AbstractFormControls>
+export interface AbstractFormGroup<T extends AbstractGroupControls>
   extends AbstractGroup<T> {
   json: () => JsonControls<T>;
   reset: () => void;
@@ -70,7 +75,7 @@ export interface AbstractFormGroup<T extends AbstractFormControls>
   updateValueAndValidity: (controls?: boolean) => void;
 }
 
-export interface AbstractArrayGroup<T extends AbstractArrayControls>
+export interface AbstractArrayGroup<T extends AbstractGroupControls>
   extends AbstractGroup<T> {
   uuid: string;
   validators?: ValidatorGroupFn<T>[];
@@ -78,17 +83,12 @@ export interface AbstractArrayGroup<T extends AbstractArrayControls>
 
 export type ArrayState<T extends AbstractArrayControls> = Record<keyof T, any>;
 
-export interface AbstractArray<T extends AbstractArrayControls> {
-  errors: ValidatorError[];
+export interface AbstractArray<T extends AbstractArrayControls>
+  extends AbstractGroupControl<ArrayState<T>[]> {
   groups: AbstractArrayGroup<T>[];
-  invalid: boolean;
   push: (state: ArrayState<T>) => void;
-  reset: () => void;
-  state: ArrayState<T>[];
   update: (control: AbstractArrayControl, state: FormState) => void;
   remove: (group: AbstractArrayGroup<T>) => void;
-  valid: boolean;
-  error?: ValidatorError;
 }
 
 export interface FormControlProps<T = any> {

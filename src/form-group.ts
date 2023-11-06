@@ -1,14 +1,14 @@
 import { controlsToJson, controlsToValid, evalFormGroupValid } from './helpers';
 import {
   AbstractFormGroup,
-  AbstractFormControls,
+  AbstractGroupControls,
   JsonControls,
   ValidatorError,
   ValidatorGroupFn,
   FormGroupProps
 } from './types';
 
-export class FormGroup<T extends AbstractFormControls>
+export class FormGroup<T extends AbstractGroupControls>
   implements AbstractFormGroup<T>
 {
   private controlsValue: T;
@@ -25,7 +25,7 @@ export class FormGroup<T extends AbstractFormControls>
     this.controlsValue = controls;
 
     Object.values(this.controlsValue).forEach((control) => {
-      control.setFormGroup(this);
+      control.group = this;
     });
 
     this.validators = validators;
