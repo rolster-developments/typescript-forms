@@ -21,27 +21,27 @@ import { RolsterControl, RolsterControls, RolsterGroup } from './types.rolster';
 export class BaseFormControl<T = any, C extends RolsterControls = any>
   implements RolsterControl<T, C>
 {
-  private activeValue = false;
+  private currentActive = false;
 
-  private dirtyValue = false;
+  private currentDirty = false;
 
-  private disabledValue = false;
+  private currentDisabled = false;
 
-  private validValue = true;
+  private currentValid = true;
 
   private initialState: FormState<T>;
 
-  private stateValue?: FormState<T>;
+  private currentState?: FormState<T>;
 
-  private errorValue?: ValidatorError;
+  private currentError?: ValidatorError;
 
-  private errorsValue: ValidatorError[] = [];
+  private currentErrors: ValidatorError[] = [];
 
   private validators?: ValidatorFn<T>[];
 
   private subscribers: BehaviorSubject<FormState<T>>;
 
-  private groupValue?: RolsterGroup<C>;
+  private currentGroup?: RolsterGroup<C>;
 
   constructor({ state, validators }: FormControlProps<T>) {
     this.subscribers = new BehaviorSubject(state);
@@ -49,44 +49,44 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
     this.initialState = state;
     this.validators = validators;
 
-    this.stateValue = state;
+    this.currentState = state;
     this.updateValueAndValidity();
   }
 
   public get active(): boolean {
-    return this.activeValue;
+    return this.currentActive;
   }
 
   public get dirty(): boolean {
-    return this.dirtyValue;
+    return this.currentDirty;
   }
 
   public get disabled(): boolean {
-    return this.disabledValue;
+    return this.currentDisabled;
   }
 
   public get invalid(): boolean {
-    return !this.validValue;
+    return !this.currentValid;
   }
 
   public get valid(): boolean {
-    return this.validValue;
+    return this.currentValid;
   }
 
   public get state(): FormState<T> {
-    return this.stateValue;
+    return this.currentState;
   }
 
   public get value(): T {
-    return this.stateValue as T;
+    return this.currentState as T;
   }
 
   public get error(): ValidatorError | undefined {
-    return this.errorValue;
+    return this.currentError;
   }
 
   public get errors(): ValidatorError[] {
-    return this.errorsValue;
+    return this.currentErrors;
   }
 
   public reset(): void {
@@ -95,24 +95,24 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
   }
 
   public setActive(active: boolean): void {
-    this.activeValue = active;
+    this.currentActive = active;
   }
 
   public setDirty(dirty: boolean): void {
-    this.dirtyValue = dirty;
+    this.currentDirty = dirty;
   }
 
   public setDisabled(disabled: boolean): void {
-    this.disabledValue = disabled;
+    this.currentDisabled = disabled;
   }
 
   public setState(state?: FormState<T>): void {
     this.subscribers.next(state);
 
-    this.stateValue = state;
+    this.currentState = state;
 
     this.updateValueAndValidity();
-    this.groupValue?.updateValueAndValidity(false);
+    this.currentGroup?.updateValueAndValidity(false);
   }
 
   public setValidators(validators: ValidatorFn<T>[] = []): void {
@@ -121,7 +121,7 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
   }
 
   public setFormGroup(formGroup: RolsterGroup<C>): void {
-    this.groupValue = formGroup;
+    this.currentGroup = formGroup;
   }
 
   public subscribe(subscriber: SubscriberControl<T>): Subscription {
@@ -130,16 +130,16 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
 
   public updateValueAndValidity(): void {
     if (!this.validators) {
-      this.validValue = true;
+      this.currentValid = true;
     } else {
-      const { stateValue: state, validators } = this;
+      const { currentState: state, validators } = this;
 
       const errors = evalFormControlValid({ state, validators });
 
-      this.errorValue = errors[0];
-      this.errorsValue = errors;
+      this.currentError = errors[0];
+      this.currentErrors = errors;
 
-      this.validValue = errors.length === 0;
+      this.currentValid = errors.length === 0;
     }
   }
 }
@@ -147,20 +147,20 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
 export class BaseFormGroup<T extends RolsterControls>
   implements RolsterGroup<T>
 {
-  private controlsValue: T;
+  private currentControls: T;
 
-  private errorValue?: ValidatorError;
+  private currentError?: ValidatorError;
 
-  private errorsValue: ValidatorError[] = [];
+  private currentErrors: ValidatorError[] = [];
 
-  private validValue = true;
+  private currentValid = true;
 
   private validators?: ValidatorGroupFn<T>[];
 
   constructor({ controls, validators }: FormGroupProps<T>) {
-    this.controlsValue = controls;
+    this.currentControls = controls;
 
-    Object.values(this.controlsValue).forEach((control) => {
+    Object.values(this.currentControls).forEach((control) => {
       control.setFormGroup(this);
     });
 
@@ -168,15 +168,15 @@ export class BaseFormGroup<T extends RolsterControls>
   }
 
   public get controls(): T {
-    return this.controlsValue;
+    return this.currentControls;
   }
 
   public get dirty(): boolean {
-    return controlsToDirty(this.controlsValue);
+    return controlsToDirty(this.currentControls);
   }
 
   public get valid(): boolean {
-    return this.validValue && controlsToValid(this.controlsValue);
+    return this.currentValid && controlsToValid(this.currentControls);
   }
 
   public get invalid(): boolean {
@@ -184,19 +184,19 @@ export class BaseFormGroup<T extends RolsterControls>
   }
 
   public get error(): ValidatorError | undefined {
-    return this.errorValue;
+    return this.currentError;
   }
 
   public get errors(): ValidatorError[] {
-    return this.errorsValue;
+    return this.currentErrors;
   }
 
   public json(): JsonControls<T> {
-    return controlsToJson(this.controlsValue);
+    return controlsToJson(this.currentControls);
   }
 
   public reset(): void {
-    Object.values(this.controlsValue).forEach((control) => control.reset());
+    Object.values(this.currentControls).forEach((control) => control.reset());
   }
 
   public setValidators(validators: ValidatorGroupFn<T>[]): void {
@@ -206,22 +206,22 @@ export class BaseFormGroup<T extends RolsterControls>
 
   public updateValueAndValidity(controls = true): void {
     if (controls) {
-      Object.values(this.controlsValue).forEach((control) => {
+      Object.values(this.currentControls).forEach((control) => {
         control.updateValueAndValidity();
       });
     }
 
     if (!this.validators) {
-      this.validValue = true;
+      this.currentValid = true;
     } else {
       const { controls, validators } = this;
 
       const errors = evalFormGroupValid({ controls, validators });
 
-      this.errorsValue = errors;
-      this.errorValue = errors[0];
+      this.currentErrors = errors;
+      this.currentError = errors[0];
 
-      this.validValue = errors.length === 0;
+      this.currentValid = errors.length === 0;
     }
   }
 }

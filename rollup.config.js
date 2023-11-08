@@ -29,7 +29,7 @@ const createConfiguration = (file) => {
         inlineDynamicImports: true
       }
     ],
-    external: ['rxjs'],
+    external: ['rxjs', 'uuid'],
     plugins
   };
 };
