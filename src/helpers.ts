@@ -17,11 +17,10 @@ interface ControlsProps<T extends AbstractControls> {
   validators: ValidatorGroupFn<T>[];
 }
 
-export const evalFormControlValid = <T>(
-  props: StateProps<T>
-): ValidatorError[] => {
-  const { state, validators } = props;
-
+export const evalFormControlValid = <T>({
+  state,
+  validators
+}: StateProps<T>): ValidatorError[] => {
   return validators.reduce((errors, validator) => {
     const error = validator(state);
 
@@ -33,11 +32,10 @@ export const evalFormControlValid = <T>(
   }, [] as ValidatorError[]);
 };
 
-export const evalFormGroupValid = <T extends AbstractControls>(
-  props: ControlsProps<T>
-): ValidatorError[] => {
-  const { controls, validators } = props;
-
+export const evalFormGroupValid = <T extends AbstractControls>({
+  controls,
+  validators
+}: ControlsProps<T>): ValidatorError[] => {
   return validators.reduce((errors, validator) => {
     const error = validator(controls);
 

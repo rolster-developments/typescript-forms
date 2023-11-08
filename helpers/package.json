@@ -1,0 +1,8 @@
+{
+  "name": "@rolster/forms/helpers",
+  "types": "../dist/esm/helpers.d.ts",
+  "main": "../dist/cjs/helpers.js",
+  "module": "../dist/esm/helpers.js",
+  "unpkg": "../dist/es/helpers.js",
+  "sideEffects": false
+}

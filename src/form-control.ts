@@ -1,16 +1,18 @@
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { evalFormControlValid } from './helpers';
 import {
-  AbstractFormControl,
-  AbstractFormGroup,
+  AbstractControls,
   FormControlProps,
   FormState,
   SubscriberControl,
   ValidatorError,
   ValidatorFn
 } from './types';
+import { RolsterFormControl, RolsterFormGroup } from './types.rolster';
 
-export class FormControl<T = any> implements AbstractFormControl<T> {
+export class FormControl<T = any, C extends AbstractControls = any>
+  implements RolsterFormControl<T, C>
+{
   private activeValue = false;
 
   private dirtyValue = false;
@@ -31,7 +33,7 @@ export class FormControl<T = any> implements AbstractFormControl<T> {
 
   private subscribers: BehaviorSubject<FormState<T>>;
 
-  private groupValue?: AbstractFormGroup<any>;
+  private groupValue?: RolsterFormGroup<C>;
 
   constructor({ state, validators }: FormControlProps<T>) {
     this.subscribers = new BehaviorSubject(state);
@@ -79,14 +81,6 @@ export class FormControl<T = any> implements AbstractFormControl<T> {
     return this.errorsValue;
   }
 
-  public set group(formGroup: AbstractFormGroup<any> | undefined) {
-    this.groupValue = formGroup;
-  }
-
-  public get group(): AbstractFormGroup<any> | undefined {
-    return this.groupValue;
-  }
-
   public reset(): void {
     this.setState(this.initialState);
     this.setDirty(false);
@@ -110,13 +104,16 @@ export class FormControl<T = any> implements AbstractFormControl<T> {
     this.stateValue = state;
 
     this.updateValueAndValidity();
-
     this.groupValue?.updateValueAndValidity(false);
   }
 
-  public setValidators(validators: ValidatorFn<T>[]): void {
+  public setValidators(validators: ValidatorFn<T>[] = []): void {
     this.validators = validators;
     this.updateValueAndValidity();
+  }
+
+  public setFormGroup(formGroup: RolsterFormGroup<C>): void {
+    this.groupValue = formGroup;
   }
 
   public subscribe(subscriber: SubscriberControl<T>): Subscription {

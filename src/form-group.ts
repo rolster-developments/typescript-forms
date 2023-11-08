@@ -1,15 +1,14 @@
 import { controlsToJson, controlsToValid, evalFormGroupValid } from './helpers';
 import {
-  AbstractFormGroup,
-  AbstractGroupControls,
+  FormGroupProps,
   JsonControls,
   ValidatorError,
-  ValidatorGroupFn,
-  FormGroupProps
+  ValidatorGroupFn
 } from './types';
+import { RolsterControls, RolsterFormGroup } from './types.rolster';
 
-export class FormGroup<T extends AbstractGroupControls>
-  implements AbstractFormGroup<T>
+export class FormGroup<T extends RolsterControls>
+  implements RolsterFormGroup<T>
 {
   private controlsValue: T;
 
@@ -25,7 +24,7 @@ export class FormGroup<T extends AbstractGroupControls>
     this.controlsValue = controls;
 
     Object.values(this.controlsValue).forEach((control) => {
-      control.group = this;
+      control.setFormGroup(this);
     });
 
     this.validators = validators;
@@ -66,9 +65,9 @@ export class FormGroup<T extends AbstractGroupControls>
 
   public updateValueAndValidity(controls = true): void {
     if (controls) {
-      Object.values(this.controlsValue).forEach((control) =>
-        control.updateValueAndValidity()
-      );
+      Object.values(this.controlsValue).forEach((control) => {
+        control.updateValueAndValidity();
+      });
     }
 
     if (!this.validators) {
