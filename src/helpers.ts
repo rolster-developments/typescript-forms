@@ -1,5 +1,7 @@
 import {
+  AbstractControl,
   AbstractControls,
+  AbstractGroupControls,
   FormState,
   JsonControls,
   ValidatorError,
@@ -12,7 +14,7 @@ interface StateProps<T> {
   validators: ValidatorFn<T>[];
 }
 
-interface ControlsProps<T extends AbstractControls> {
+interface ControlsProps<T extends AbstractGroupControls> {
   controls: T;
   validators: ValidatorGroupFn<T>[];
 }
@@ -32,7 +34,7 @@ export const evalFormControlValid = <T>({
   }, [] as ValidatorError[]);
 };
 
-export const evalFormGroupValid = <T extends AbstractControls>({
+export const evalFormGroupValid = <T extends AbstractGroupControls>({
   controls,
   validators
 }: ControlsProps<T>): ValidatorError[] => {
@@ -47,8 +49,8 @@ export const evalFormGroupValid = <T extends AbstractControls>({
   }, [] as ValidatorError[]);
 };
 
-export const controlsToValid = <T extends AbstractControls>(
-  controls: T
+export const controlsToValid = <T extends AbstractControl>(
+  controls: AbstractControls<T>
 ): boolean => {
   return Object.values(controls).reduce(
     (validState, { valid }) => validState && valid,
@@ -56,7 +58,16 @@ export const controlsToValid = <T extends AbstractControls>(
   );
 };
 
-export const controlsToJson = <T extends AbstractControls>(
+export const controlsToDirty = <T extends AbstractControl>(
+  controls: AbstractControls<T>
+): boolean => {
+  return Object.values(controls).reduce(
+    (dirtyState, { dirty }) => dirtyState && dirty,
+    true
+  );
+};
+
+export const controlsToJson = <T extends AbstractGroupControls>(
   controls: T
 ): JsonControls<T> => {
   return Object.entries(controls).reduce((json, [key, { state }]) => {

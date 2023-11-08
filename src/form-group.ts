@@ -1,15 +1,18 @@
-import { controlsToJson, controlsToValid, evalFormGroupValid } from './helpers';
+import {
+  controlsToDirty,
+  controlsToJson,
+  controlsToValid,
+  evalFormGroupValid
+} from './helpers';
 import {
   FormGroupProps,
   JsonControls,
   ValidatorError,
   ValidatorGroupFn
 } from './types';
-import { RolsterControls, RolsterFormGroup } from './types.rolster';
+import { RolsterControls, RolsterGroup } from './types.rolster';
 
-export class FormGroup<T extends RolsterControls>
-  implements RolsterFormGroup<T>
-{
+export class FormGroup<T extends RolsterControls> implements RolsterGroup<T> {
   private controlsValue: T;
 
   private errorValue?: ValidatorError;
@@ -32,6 +35,10 @@ export class FormGroup<T extends RolsterControls>
 
   public get controls(): T {
     return this.controlsValue;
+  }
+
+  public get dirty(): boolean {
+    return controlsToDirty(this.controlsValue);
   }
 
   public get valid(): boolean {

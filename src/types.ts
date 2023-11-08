@@ -24,6 +24,11 @@ export interface AbstractControl<T = any> {
   state?: FormState<T>;
 }
 
+export type AbstractControls<T extends AbstractControl = any> = Record<
+  string,
+  T
+>;
+
 export interface AbstractGroupControl<T = any> extends AbstractControl<T> {
   reset: () => void;
 }
@@ -42,28 +47,27 @@ export interface AbstractFormControl<T = any> extends AbstractBaseControl<T> {
   subscribe: (subscriber: SubscriberControl<T>) => Subscription;
 }
 
-export type AbstractControls<T extends AbstractGroupControl = any> = Record<
-  string,
-  T
->;
+export type AbstractGroupControls<T extends AbstractGroupControl = any> =
+  Record<string, T>;
 
-export interface AbstractGroup<T extends AbstractControls> {
+export interface AbstractGroup<T extends AbstractGroupControls> {
   controls: T;
+  dirty: boolean;
   errors: ValidatorError[];
   invalid: boolean;
   valid: boolean;
   error?: ValidatorError;
 }
 
-export type JsonControls<T extends AbstractControls> = {
+export type JsonControls<T extends AbstractGroupControls> = {
   [K in keyof T]: T[K]['state'];
 };
 
-export type ValidatorGroupFn<T extends AbstractControls, V = any> = (
+export type ValidatorGroupFn<T extends AbstractGroupControls, V = any> = (
   controls: T
 ) => ValidatorResult<V>;
 
-export interface AbstractFormGroup<T extends AbstractControls>
+export interface AbstractFormGroup<T extends AbstractGroupControls>
   extends AbstractGroup<T> {
   json: () => JsonControls<T>;
   reset: () => void;
@@ -75,7 +79,8 @@ export interface AbstractArrayControl<T = any> extends AbstractBaseControl<T> {
   uuid: string;
 }
 
-export type AbstractArrayControls = Record<string, AbstractArrayControl>;
+export type AbstractArrayControls<T extends AbstractArrayControl = any> =
+  Record<string, T>;
 
 export interface AbstractArrayGroup<T extends AbstractArrayControls>
   extends AbstractGroup<T> {
@@ -104,7 +109,35 @@ export interface FormControlProps<T = any> {
   validators?: ValidatorFn<T>[];
 }
 
-export interface FormGroupProps<T extends AbstractControls> {
+export interface FormGroupProps<T extends AbstractGroupControls> {
   controls: T;
+  validators?: ValidatorGroupFn<T>[];
+}
+
+export interface FormArrayControlProps<T = any> {
+  dirty: boolean;
+  uuid: string;
+  state?: FormState<T>;
+  validators?: ValidatorFn<T>[];
+}
+
+export interface FormArrayGroupProps<T extends AbstractArrayControls> {
+  controls: T;
+  uuid: string;
+  validators?: ValidatorGroupFn<T>[];
+}
+
+type FormArrayBuilderControl<T = any> = Record<
+  string,
+  Omit<FormArrayControlProps<T>, 'uuid' | 'dirty'>
+>;
+
+type FormArrayBuilderState<T extends AbstractArrayControls> = (
+  state: Partial<ArrayState<T>>
+) => FormArrayBuilderControl;
+
+export interface FormArrayProps<T extends AbstractArrayControls> {
+  builder: FormArrayBuilderState<T>;
+  state?: ArrayState<T>[];
   validators?: ValidatorGroupFn<T>[];
 }

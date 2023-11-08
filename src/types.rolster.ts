@@ -1,18 +1,17 @@
-import {
-  AbstractControls,
-  AbstractFormControl,
-  AbstractFormGroup
-} from './types';
+import { AbstractBaseControl, AbstractGroup } from './types';
 
-export interface RolsterFormControl<T = any, C extends AbstractControls = any>
-  extends AbstractFormControl<T> {
-  setFormGroup: (formGroup: RolsterFormGroup<C>) => void;
+export type RolsterControls<T extends AbstractBaseControl = any> = Record<
+  string,
+  T
+>;
+
+export interface RolsterControl<T = any, C extends RolsterControls = any>
+  extends AbstractBaseControl<T> {
+  setFormGroup: (formGroup: RolsterGroup<C>) => void;
   updateValueAndValidity: () => void;
 }
 
-export type RolsterControls = AbstractControls<RolsterFormControl>;
-
-export interface RolsterFormGroup<T extends RolsterControls>
-  extends AbstractFormGroup<T> {
+export interface RolsterGroup<T extends RolsterControls>
+  extends AbstractGroup<T> {
   updateValueAndValidity: (controls?: boolean) => void;
 }
