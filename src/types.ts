@@ -24,10 +24,8 @@ export interface AbstractControl<T = any> {
   state?: FormState<T>;
 }
 
-export type AbstractControls<T extends AbstractControl = any> = Record<
-  string,
-  T
->;
+export type AbstractControls<T extends AbstractControl = AbstractControl> =
+  Record<string, T>;
 
 export interface AbstractGroupControl<T = any> extends AbstractControl<T> {
   reset: () => void;
@@ -47,10 +45,13 @@ export interface AbstractFormControl<T = any> extends AbstractBaseControl<T> {
   subscribe: (subscriber: SubscriberControl<T>) => Subscription;
 }
 
-export type AbstractGroupControls<T extends AbstractGroupControl = any> =
-  Record<string, T>;
+export type AbstractGroupControls<
+  T extends AbstractGroupControl = AbstractGroupControl
+> = Record<string, T>;
 
-export interface AbstractGroup<T extends AbstractGroupControls> {
+export interface AbstractGroup<
+  T extends AbstractGroupControls = AbstractGroupControls
+> {
   controls: T;
   dirty: boolean;
   errors: ValidatorError[];
@@ -59,20 +60,26 @@ export interface AbstractGroup<T extends AbstractGroupControls> {
   error?: ValidatorError;
 }
 
-export type JsonControls<T extends AbstractGroupControls> = {
+export type StateControls<T extends AbstractGroupControls> = {
   [K in keyof T]: T[K]['state'];
 };
 
-export type ValidatorGroupFn<T extends AbstractGroupControls, V = any> = (
-  controls: T
-) => ValidatorResult<V>;
+export type ValueControls<T extends AbstractGroupControls> = {
+  [K in keyof T]: T[K]['value'];
+};
 
-export interface AbstractFormGroup<T extends AbstractGroupControls>
-  extends AbstractGroup<T> {
-  json: () => JsonControls<T>;
+export type ValidatorGroupFn<
+  T extends AbstractGroupControls = AbstractGroupControls,
+  V = any
+> = (controls: T) => ValidatorResult<V>;
+
+export interface AbstractFormGroup<
+  T extends AbstractGroupControls = AbstractGroupControls
+> extends AbstractGroup<T> {
   reset: () => void;
   setValidators: (validators: ValidatorGroupFn<T>[]) => void;
-  updateValueAndValidity: () => void;
+  states: () => StateControls<T>;
+  values: () => ValueControls<T>;
 }
 
 export interface AbstractArrayControl<T = any> extends AbstractBaseControl<T> {
@@ -97,9 +104,9 @@ export type AbstractArrayValue<T extends AbstractArrayControls> = {
 
 export interface AbstractArray<T extends AbstractArrayControls>
   extends AbstractGroupControl<AbstractArrayState<T>[]> {
+  controls: T[];
   groups: AbstractArrayGroup<T>[];
   push: (state: Partial<AbstractArrayState<T>>) => void;
-  refresh: (control: AbstractArrayControl) => void;
   remove: (group: AbstractArrayGroup<T>) => void;
   value: AbstractArrayValue<T>[];
 }

@@ -98,7 +98,7 @@ export class FormArray<T extends Controls> implements RolsterFormArray<T> {
     this.builder = builder;
     this.validators = validators;
 
-    this.render(state);
+    this.update(state);
   }
 
   public get groups(): AbstractArrayGroup<T>[] {
@@ -138,7 +138,7 @@ export class FormArray<T extends Controls> implements RolsterFormArray<T> {
   }
 
   public reset(): void {
-    this.render(this.initialState);
+    this.update(this.initialState);
   }
 
   public push(state: Partial<AbstractArrayState<T>>): void {
@@ -151,8 +151,6 @@ export class FormArray<T extends Controls> implements RolsterFormArray<T> {
       new FormGroup({ uuid: uuid(), controls, validators })
     );
   }
-
-  public refresh(_: AbstractArrayControl<any>): void {}
 
   public remove({ uuid }: AbstractArrayGroup<T>): void {
     this.currentGroups = this.currentGroups.filter(
@@ -179,7 +177,7 @@ export class FormArray<T extends Controls> implements RolsterFormArray<T> {
     }
   }
 
-  private render(state?: AbstractArrayState<T>[]): void {
+  private update(state?: AbstractArrayState<T>[]): void {
     if (!state) {
       this.currentControls = [];
       this.currentGroups = [];

@@ -1,8 +1,9 @@
 import { BehaviorSubject, Subscription } from 'rxjs';
 import {
   controlsToDirty,
-  controlsToJson,
+  controlsToState,
   controlsToValid,
+  controlsToValue,
   evalFormControlValid,
   evalFormGroupValid
 } from './helpers';
@@ -10,11 +11,12 @@ import {
   FormControlProps,
   FormGroupProps,
   FormState,
-  JsonControls,
+  StateControls,
   SubscriberControl,
   ValidatorError,
   ValidatorFn,
-  ValidatorGroupFn
+  ValidatorGroupFn,
+  ValueControls
 } from './types';
 import { RolsterControl, RolsterControls, RolsterGroup } from './types.rolster';
 
@@ -191,8 +193,12 @@ export class BaseFormGroup<T extends RolsterControls>
     return this.currentErrors;
   }
 
-  public json(): JsonControls<T> {
-    return controlsToJson(this.currentControls);
+  public states(): StateControls<T> {
+    return controlsToState(this.currentControls);
+  }
+
+  public values(): ValueControls<T> {
+    return controlsToValue(this.currentControls);
   }
 
   public reset(): void {

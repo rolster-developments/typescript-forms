@@ -3,10 +3,11 @@ import {
   AbstractControls,
   AbstractGroupControls,
   FormState,
-  JsonControls,
+  StateControls,
   ValidatorError,
   ValidatorFn,
-  ValidatorGroupFn
+  ValidatorGroupFn,
+  ValueControls
 } from './types';
 
 interface StateProps<T> {
@@ -67,14 +68,24 @@ export const controlsToDirty = <T extends AbstractControl>(
   );
 };
 
-export const controlsToJson = <T extends AbstractGroupControls>(
+export const controlsToState = <T extends AbstractGroupControls>(
   controls: T
-): JsonControls<T> => {
+): StateControls<T> => {
   return Object.entries(controls).reduce((json, [key, { state }]) => {
     json[key as keyof T] = state;
 
     return json;
-  }, {} as JsonControls<T>);
+  }, {} as StateControls<T>);
+};
+
+export const controlsToValue = <T extends AbstractGroupControls>(
+  controls: T
+): ValueControls<T> => {
+  return Object.entries(controls).reduce((json, [key, { value }]) => {
+    json[key as keyof T] = value;
+
+    return json;
+  }, {} as ValueControls<T>);
 };
 
 type ObjectJSON = Record<string, any>;
