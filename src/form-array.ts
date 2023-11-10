@@ -32,18 +32,21 @@ class FormControl<T = any>
   }
 }
 
-class FormGroup<T extends Controls>
+class FormGroup<T extends Controls, E = any>
   extends BaseFormGroup<T>
   implements RolsterFormArrayGroup<T>, AbstractArrayGroup<T>
 {
   public readonly uuid: string;
 
+  public readonly entity?: E;
+
   private arrayValue?: RolsterFormArray<T>;
 
-  constructor({ uuid, controls, validators }: FormArrayGroupProps<T>) {
+  constructor({ controls, uuid, entity, validators }: FormArrayGroupProps<T>) {
     super({ controls, validators });
 
     this.uuid = uuid;
+    this.entity = entity;
   }
 
   public setFormArray(formArray: RolsterFormArray<T>): void {
@@ -71,8 +74,10 @@ function createControlsFromState<T extends Controls>(
   );
 }
 
-export class FormArray<T extends Controls> implements RolsterFormArray<T> {
-  private currentGroups: AbstractArrayGroup<T>[] = [];
+export class FormArray<T extends Controls, E = any>
+  implements RolsterFormArray<T>
+{
+  private currentGroups: AbstractArrayGroup<T, E>[] = [];
 
   private currentControls: T[] = [];
 
@@ -101,7 +106,7 @@ export class FormArray<T extends Controls> implements RolsterFormArray<T> {
     this.update(state);
   }
 
-  public get groups(): AbstractArrayGroup<T>[] {
+  public get groups(): AbstractArrayGroup<T, E>[] {
     return this.currentGroups;
   }
 
@@ -141,18 +146,18 @@ export class FormArray<T extends Controls> implements RolsterFormArray<T> {
     this.update(this.initialState);
   }
 
-  public push(state: Partial<AbstractArrayState<T>>): void {
+  public push(state: Partial<AbstractArrayState<T>>, entity?: E): void {
     const { builder, validators } = this;
 
     const controls = createControlsFromState(state, builder);
 
     this.currentControls.push(controls);
     this.currentGroups.push(
-      new FormGroup({ uuid: uuid(), controls, validators })
+      new FormGroup({ controls, uuid: uuid(), entity, validators })
     );
   }
 
-  public remove({ uuid }: AbstractArrayGroup<T>): void {
+  public remove({ uuid }: AbstractArrayGroup<T, E>): void {
     this.currentGroups = this.currentGroups.filter(
       (group) => group.uuid !== uuid
     );

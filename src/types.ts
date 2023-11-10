@@ -89,9 +89,10 @@ export interface AbstractArrayControl<T = any> extends AbstractBaseControl<T> {
 export type AbstractArrayControls<T extends AbstractArrayControl = any> =
   Record<string, T>;
 
-export interface AbstractArrayGroup<T extends AbstractArrayControls>
+export interface AbstractArrayGroup<T extends AbstractArrayControls, E = any>
   extends AbstractGroup<T> {
   uuid: string;
+  entity?: E;
 }
 
 export type AbstractArrayState<T extends AbstractArrayControls> = {
@@ -102,12 +103,12 @@ export type AbstractArrayValue<T extends AbstractArrayControls> = {
   [K in keyof T]: T[K]['value'];
 };
 
-export interface AbstractArray<T extends AbstractArrayControls>
+export interface AbstractArray<T extends AbstractArrayControls, E = any>
   extends AbstractGroupControl<AbstractArrayState<T>[]> {
   controls: T[];
-  groups: AbstractArrayGroup<T>[];
-  push: (state: Partial<AbstractArrayState<T>>) => void;
-  remove: (group: AbstractArrayGroup<T>) => void;
+  groups: AbstractArrayGroup<T, E>[];
+  push: (state: Partial<AbstractArrayState<T>>, entity?: E) => void;
+  remove: (group: AbstractArrayGroup<T, E>) => void;
   value: AbstractArrayValue<T>[];
 }
 
@@ -127,9 +128,10 @@ export interface FormArrayControlProps<T = any> {
   validators?: ValidatorFn<T>[];
 }
 
-export interface FormArrayGroupProps<T extends AbstractArrayControls> {
+export interface FormArrayGroupProps<T extends AbstractArrayControls, E = any> {
   controls: T;
   uuid: string;
+  entity?: E;
   validators?: ValidatorGroupFn<T>[];
 }
 
