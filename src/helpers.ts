@@ -39,15 +39,21 @@ export const evalFormGroupValid = <T extends AbstractGroupControls>({
   controls,
   validators
 }: ControlsProps<T>): ValidatorError[] => {
-  return validators.reduce((errors, validator) => {
-    const error = validator(controls);
+  return [
+    ...Object.values(controls).reduce(
+      (errors, control) => [...errors, ...control.errors],
+      [] as ValidatorError[]
+    ),
+    ...validators.reduce((errors, validator) => {
+      const error = validator(controls);
 
-    if (error) {
-      errors.push(error);
-    }
+      if (error) {
+        errors.push(error);
+      }
 
-    return errors;
-  }, [] as ValidatorError[]);
+      return errors;
+    }, [] as ValidatorError[])
+  ];
 };
 
 export const controlsToValid = <T extends AbstractControl>(
