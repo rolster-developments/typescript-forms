@@ -1,6 +1,6 @@
 import { BehaviorSubject, Subscription } from 'rxjs';
 import {
-  controlsToDirty,
+  controlsToTouched,
   controlsToState,
   controlsToValid,
   controlsToValue,
@@ -25,7 +25,7 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
 {
   private currentActive = false;
 
-  private currentDirty = false;
+  private currentTouched = false;
 
   private currentDisabled = false;
 
@@ -59,8 +59,8 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
     return this.currentActive;
   }
 
-  public get dirty(): boolean {
-    return this.currentDirty;
+  public get touched(): boolean {
+    return this.currentTouched;
   }
 
   public get disabled(): boolean {
@@ -93,15 +93,15 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
 
   public reset(): void {
     this.setState(this.initialState);
-    this.setDirty(false);
+    this.setTouched(false);
   }
 
   public setActive(active: boolean): void {
     this.currentActive = active;
   }
 
-  public setDirty(dirty: boolean): void {
-    this.currentDirty = dirty;
+  public setTouched(touched: boolean): void {
+    this.currentTouched = touched;
   }
 
   public setDisabled(disabled: boolean): void {
@@ -173,8 +173,8 @@ export class BaseFormGroup<T extends RolsterControls>
     return this.currentControls;
   }
 
-  public get dirty(): boolean {
-    return controlsToDirty(this.currentControls);
+  public get touched(): boolean {
+    return controlsToTouched(this.currentControls);
   }
 
   public get valid(): boolean {

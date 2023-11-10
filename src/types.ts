@@ -2,10 +2,16 @@ import { Subscription } from 'rxjs';
 
 export type FormState<T = any> = T | undefined | null;
 
+export type ValidationFormType = 'control' | 'group' | 'array';
+
 export interface ValidatorError<T = any> {
   id: string;
   message: string;
   data?: T;
+}
+
+export interface ValidationFormError<T = any> extends ValidatorError<T> {
+  type: ValidationFormType;
 }
 
 export type ValidatorResult<T = any> = ValidatorError<T> | undefined;
@@ -15,9 +21,9 @@ export type ValidatorFn<T> = (state?: FormState<T>) => ValidatorResult;
 export type SubscriberControl<T> = (state?: FormState<T>) => void;
 
 export interface AbstractControl<T = any> {
-  dirty: boolean;
   errors: ValidatorError[];
   invalid: boolean;
+  touched: boolean;
   valid: boolean;
   value: T;
   error?: ValidatorError;
@@ -35,7 +41,7 @@ export interface AbstractBaseControl<T = any> extends AbstractGroupControl<T> {
   active: boolean;
   disabled: boolean;
   setActive: (active: boolean) => void;
-  setDirty: (dirty: boolean) => void;
+  setTouched: (touched: boolean) => void;
   setDisabled: (disabled: boolean) => void;
   setState: (state?: FormState<T>) => void;
 }
@@ -53,9 +59,9 @@ export interface AbstractGroup<
   T extends AbstractGroupControls = AbstractGroupControls
 > {
   controls: T;
-  dirty: boolean;
   errors: ValidatorError[];
   invalid: boolean;
+  touched: boolean;
   valid: boolean;
   error?: ValidatorError;
 }

@@ -84,7 +84,7 @@ export class FormArray<T extends Controls, E = any>
 
   private builder: FormArrayBuilderState<T>;
 
-  private currentDirty = false;
+  private currentTouched = false;
 
   private currentValid = true;
 
@@ -115,8 +115,8 @@ export class FormArray<T extends Controls, E = any>
     return this.currentControls;
   }
 
-  public get dirty(): boolean {
-    return this.currentDirty;
+  public get touched(): boolean {
+    return this.currentTouched;
   }
 
   public get invalid(): boolean {

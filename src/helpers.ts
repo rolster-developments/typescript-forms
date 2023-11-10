@@ -65,11 +65,11 @@ export const controlsToValid = <T extends AbstractControl>(
   );
 };
 
-export const controlsToDirty = <T extends AbstractControl>(
+export const controlsToTouched = <T extends AbstractControl>(
   controls: AbstractControls<T>
 ): boolean => {
   return Object.values(controls).reduce(
-    (dirtyState, { dirty }) => dirtyState && dirty,
+    (currentTouched, { touched }) => currentTouched && touched,
     true
   );
 };
