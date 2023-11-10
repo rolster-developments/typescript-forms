@@ -15,8 +15,8 @@ import {
   SetArrayProps
 } from './types';
 import {
-  RolsterFormArrayControls as Controls,
   RolsterFormArray,
+  RolsterFormArrayControls as Controls,
   RolsterFormArrayGroup
 } from './types.rolster';
 
@@ -33,7 +33,7 @@ class FormControl<T = any>
   }
 }
 
-class FormGroup<T extends Controls, E = any>
+class FormGroup<T extends Controls = Controls, E = any>
   extends BaseFormGroup<T>
   implements RolsterFormArrayGroup<T>, AbstractArrayGroup<T>
 {
@@ -41,7 +41,7 @@ class FormGroup<T extends Controls, E = any>
 
   public readonly entity?: E;
 
-  private arrayValue?: RolsterFormArray<T>;
+  private currentParent?: RolsterFormArray<T>;
 
   constructor({ controls, uuid, entity, validators }: FormArrayGroupProps<T>) {
     super({ controls, validators });
@@ -50,18 +50,18 @@ class FormGroup<T extends Controls, E = any>
     this.entity = entity;
   }
 
-  public setFormArray(formArray: RolsterFormArray<T>): void {
-    this.arrayValue = formArray;
+  public setParent(parent: RolsterFormArray<T>): void {
+    this.currentParent = parent;
   }
 
   public updateValueAndValidity(controls?: boolean): void {
     super.updateValueAndValidity(controls);
 
-    this.arrayValue?.updateValueAndValidity();
+    this.currentParent?.updateValueAndValidity();
   }
 }
 
-function createControlsFromState<T extends Controls>(
+function createControls<T extends Controls = Controls>(
   state: Partial<AbstractArrayState<T>>,
   builder: FormArrayBuilderState<T>
 ): T {
@@ -75,7 +75,27 @@ function createControlsFromState<T extends Controls>(
   );
 }
 
-export class FormArray<T extends Controls, E = any>
+function boolSomeGroupValid<T extends Controls = Controls, E = any>(
+  groups: AbstractArrayGroup<T, E>[],
+  key: keyof AbstractArrayGroup<T, E>
+): boolean {
+  return groups.reduce(
+    (currentState, group) => currentState || (group[key] as boolean),
+    false
+  );
+}
+
+function boolAllGroupValid<T extends Controls = Controls, E = any>(
+  groups: AbstractArrayGroup<T, E>[],
+  key: keyof AbstractArrayGroup<T, E>
+): boolean {
+  return groups.reduce(
+    (currentState, group) => currentState && (group[key] as boolean),
+    true
+  );
+}
+
+export class FormArray<T extends Controls = Controls, E = any>
   implements RolsterFormArray<T>
 {
   private currentGroups: AbstractArrayGroup<T, E>[] = [];
@@ -84,13 +104,11 @@ export class FormArray<T extends Controls, E = any>
 
   private builder: FormArrayBuilderState<T>;
 
-  private currentTouched = false;
-
-  private currentValid = true;
-
   private initialState?: AbstractArrayState<T>[];
 
   private currentState?: AbstractArrayState<T>[];
+
+  private currentValid = true;
 
   private currentError?: ValidatorError;
 
@@ -116,7 +134,19 @@ export class FormArray<T extends Controls, E = any>
   }
 
   public get touched(): boolean {
-    return this.currentTouched;
+    return boolSomeGroupValid(this.currentGroups, 'touched');
+  }
+
+  public get touchedAll(): boolean {
+    return boolAllGroupValid(this.currentGroups, 'touchedAll');
+  }
+
+  public get dirty(): boolean {
+    return boolSomeGroupValid(this.currentGroups, 'dirty');
+  }
+
+  public get dirtyAll(): boolean {
+    return boolAllGroupValid(this.currentGroups, 'dirtyAll');
   }
 
   public get invalid(): boolean {
@@ -150,7 +180,7 @@ export class FormArray<T extends Controls, E = any>
   public push(state: Partial<AbstractArrayState<T>>, entity?: E): void {
     const { builder, validators } = this;
 
-    const controls = createControlsFromState(state, builder);
+    const controls = createControls(state, builder);
 
     this.currentControls.push(controls);
     this.currentGroups.push(
@@ -202,13 +232,13 @@ export class FormArray<T extends Controls, E = any>
       const { builder, validators } = this;
 
       this.currentControls = state.map((state) =>
-        createControlsFromState(state, builder)
+        createControls(state, builder)
       );
 
       this.currentGroups = this.currentControls.map((controls) => {
         const formGroup = new FormGroup({ uuid: uuid(), controls, validators });
 
-        formGroup.setFormArray(this);
+        formGroup.setParent(this);
 
         return formGroup;
       });

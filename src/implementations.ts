@@ -1,8 +1,8 @@
 import { BehaviorSubject, Subscription } from 'rxjs';
 import {
-  controlsToTouched,
+  boolAllControlsValid,
+  boolSomeControlsValid,
   controlsToState,
-  controlsToValid,
   controlsToValue,
   evalFormControlValid,
   evalFormGroupValid
@@ -20,12 +20,16 @@ import {
 } from './types';
 import { RolsterControl, RolsterControls, RolsterGroup } from './types.rolster';
 
-export class BaseFormControl<T = any, C extends RolsterControls = any>
-  implements RolsterControl<T, C>
+export class BaseFormControl<
+  T = any,
+  C extends RolsterControls = RolsterControls
+> implements RolsterControl<T, C>
 {
   private currentActive = false;
 
   private currentTouched = false;
+
+  private currentDirty = false;
 
   private currentDisabled = false;
 
@@ -43,7 +47,7 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
 
   private subscribers: BehaviorSubject<FormState<T>>;
 
-  private currentGroup?: RolsterGroup<C>;
+  private currentParent?: RolsterGroup<C>;
 
   constructor({ state, validators }: FormControlProps<T>) {
     this.subscribers = new BehaviorSubject(state);
@@ -61,6 +65,10 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
 
   public get touched(): boolean {
     return this.currentTouched;
+  }
+
+  public get dirty(): boolean {
+    return this.currentDirty;
   }
 
   public get disabled(): boolean {
@@ -94,6 +102,7 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
   public reset(): void {
     this.setState(this.initialState);
     this.setTouched(false);
+    this.currentDirty = false;
   }
 
   public setActive(active: boolean): void {
@@ -112,9 +121,10 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
     this.subscribers.next(state);
 
     this.currentState = state;
+    this.currentDirty = true;
 
     this.updateValueAndValidity();
-    this.currentGroup?.updateValueAndValidity(false);
+    this.currentParent?.updateValueAndValidity(false);
   }
 
   public setValidators(validators: ValidatorFn<T>[] = []): void {
@@ -122,8 +132,8 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
     this.updateValueAndValidity();
   }
 
-  public setFormGroup(formGroup: RolsterGroup<C>): void {
-    this.currentGroup = formGroup;
+  public setParent(parent: RolsterGroup<C>): void {
+    this.currentParent = parent;
   }
 
   public subscribe(subscriber: SubscriberControl<T>): Subscription {
@@ -131,9 +141,7 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
   }
 
   public updateValueAndValidity(): void {
-    if (!this.validators) {
-      this.currentValid = true;
-    } else {
+    if (this.validators) {
       const { currentState: state, validators } = this;
 
       const errors = evalFormControlValid({ state, validators });
@@ -142,12 +150,15 @@ export class BaseFormControl<T = any, C extends RolsterControls = any>
       this.currentErrors = errors;
 
       this.currentValid = errors.length === 0;
+    } else {
+      this.currentValid = true;
     }
   }
 }
 
-export class BaseFormGroup<T extends RolsterControls>
-  implements RolsterGroup<T>
+export class BaseFormGroup<
+  T extends RolsterControls<RolsterControl> = RolsterControls<RolsterControl>
+> implements RolsterGroup<T>
 {
   private currentControls: T;
 
@@ -163,10 +174,12 @@ export class BaseFormGroup<T extends RolsterControls>
     this.currentControls = controls;
 
     Object.values(this.currentControls).forEach((control) => {
-      control.setFormGroup(this);
+      control.setParent(this);
     });
 
     this.validators = validators;
+
+    this.updateValueAndValidity(false);
   }
 
   public get controls(): T {
@@ -174,11 +187,23 @@ export class BaseFormGroup<T extends RolsterControls>
   }
 
   public get touched(): boolean {
-    return controlsToTouched(this.currentControls);
+    return boolSomeControlsValid(this.currentControls, 'touched');
+  }
+
+  public get touchedAll(): boolean {
+    return boolAllControlsValid(this.currentControls, 'touched');
+  }
+
+  public get dirty(): boolean {
+    return boolSomeControlsValid(this.currentControls, 'dirty');
+  }
+
+  public get dirtyAll(): boolean {
+    return boolAllControlsValid(this.currentControls, 'dirty');
   }
 
   public get valid(): boolean {
-    return this.currentValid && controlsToValid(this.currentControls);
+    return this.currentValid && boolAllControlsValid(this.currentControls, 'valid');
   }
 
   public get invalid(): boolean {
@@ -217,9 +242,7 @@ export class BaseFormGroup<T extends RolsterControls>
       });
     }
 
-    if (!this.validators) {
-      this.currentValid = true;
-    } else {
+    if (this.validators) {
       const { controls, validators } = this;
 
       const errors = evalFormGroupValid({ controls, validators });
@@ -228,6 +251,10 @@ export class BaseFormGroup<T extends RolsterControls>
       this.currentError = errors[0];
 
       this.currentValid = errors.length === 0;
+    } else {
+      this.currentErrors = [];
+      this.currentError = undefined;
+      this.currentValid = true;
     }
   }
 }

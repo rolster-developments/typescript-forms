@@ -39,38 +39,34 @@ export const evalFormGroupValid = <T extends AbstractGroupControls>({
   controls,
   validators
 }: ControlsProps<T>): ValidatorError[] => {
-  return [
-    ...Object.values(controls).reduce(
-      (errors, control) => [...errors, ...control.errors],
-      [] as ValidatorError[]
-    ),
-    ...validators.reduce((errors, validator) => {
-      const error = validator(controls);
+  return validators.reduce((errors, validator) => {
+    const error = validator(controls);
 
-      if (error) {
-        errors.push(error);
-      }
+    if (error) {
+      errors.push(error);
+    }
 
-      return errors;
-    }, [] as ValidatorError[])
-  ];
+    return errors;
+  }, [] as ValidatorError[]);
 };
 
-export const controlsToValid = <T extends AbstractControl>(
-  controls: AbstractControls<T>
+export const boolAllControlsValid = <T extends AbstractControl>(
+  controls: AbstractControls<T>,
+  props: keyof T
 ): boolean => {
   return Object.values(controls).reduce(
-    (validState, { valid }) => validState && valid,
+    (currentValid, control) => currentValid && !!control[props],
     true
   );
 };
 
-export const controlsToTouched = <T extends AbstractControl>(
-  controls: AbstractControls<T>
+export const boolSomeControlsValid = <T extends AbstractControl>(
+  controls: AbstractControls<T>,
+  props: keyof T
 ): boolean => {
   return Object.values(controls).reduce(
-    (currentTouched, { touched }) => currentTouched && touched,
-    true
+    (currentValid, control) => currentValid || !!control[props],
+    false
   );
 };
 
