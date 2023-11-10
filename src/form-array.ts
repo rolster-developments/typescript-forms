@@ -11,7 +11,8 @@ import {
   ValidatorGroupFn,
   FormArrayBuilderState,
   FormArrayControlProps,
-  FormArrayGroupProps
+  FormArrayGroupProps,
+  SetArrayProps
 } from './types';
 import {
   RolsterFormArrayControls as Controls,
@@ -155,6 +156,10 @@ export class FormArray<T extends Controls, E = any>
     this.currentGroups.push(
       new FormGroup({ controls, uuid: uuid(), entity, validators })
     );
+  }
+
+  public set(collection: SetArrayProps<T, E>[]): void {
+    collection.forEach(({ state, entity }) => this.push(state, entity));
   }
 
   public remove({ uuid }: AbstractArrayGroup<T, E>): void {

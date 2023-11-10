@@ -103,12 +103,18 @@ export type AbstractArrayValue<T extends AbstractArrayControls> = {
   [K in keyof T]: T[K]['value'];
 };
 
+export interface SetArrayProps<T extends AbstractArrayControls, E = any> {
+  state: Partial<AbstractArrayState<T>>;
+  entity?: E;
+}
+
 export interface AbstractArray<T extends AbstractArrayControls, E = any>
   extends AbstractGroupControl<AbstractArrayState<T>[]> {
   controls: T[];
   groups: AbstractArrayGroup<T, E>[];
   push: (state: Partial<AbstractArrayState<T>>, entity?: E) => void;
   remove: (group: AbstractArrayGroup<T, E>) => void;
+  set: (collection: SetArrayProps<T, E>[]) => void;
   value: AbstractArrayValue<T>[];
 }
 
