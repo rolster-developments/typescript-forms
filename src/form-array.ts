@@ -158,7 +158,14 @@ export class FormArray<T extends Controls, E = any>
     );
   }
 
+  public merge(collection: SetArrayProps<T, E>[]): void {
+    collection.forEach(({ state, entity }) => this.push(state, entity));
+  }
+
   public set(collection: SetArrayProps<T, E>[]): void {
+    this.currentControls = [];
+    this.currentGroups = [];
+
     collection.forEach(({ state, entity }) => this.push(state, entity));
   }
 

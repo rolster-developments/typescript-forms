@@ -112,6 +112,7 @@ export interface AbstractArray<T extends AbstractArrayControls, E = any>
   extends AbstractGroupControl<AbstractArrayState<T>[]> {
   controls: T[];
   groups: AbstractArrayGroup<T, E>[];
+  merge: (collection: SetArrayProps<T, E>[]) => void;
   push: (state: Partial<AbstractArrayState<T>>, entity?: E) => void;
   remove: (group: AbstractArrayGroup<T, E>) => void;
   set: (collection: SetArrayProps<T, E>[]) => void;
