@@ -109,7 +109,7 @@ export interface AbstractArrayControl<T = any> extends AbstractBaseControl<T> {
 
 export type AbstractArrayControls<
   T extends AbstractArrayControl = AbstractArrayControl
-> = Record<string, T>;
+> = AbstractControls<T>;
 
 export interface AbstractArrayGroup<T extends AbstractArrayControls, R = any>
   extends AbstractGroup<T> {
@@ -125,26 +125,27 @@ export type AbstractArrayValue<T extends AbstractArrayControls> = {
   [K in keyof T]: T[K]['value'];
 };
 
-export interface CollectionStateArray<
-  T extends AbstractArrayControls,
-  E = any
-> {
-  state: Partial<AbstractArrayState<T>>;
-  resource?: E;
-}
+export type ValidatorArrayFn<
+  T extends AbstractArrayControls = AbstractArrayControls,
+  R = any,
+  G extends AbstractArrayGroup<T, R> = AbstractArrayGroup<T, R>,
+  V = any
+> = (groups: G[]) => ValidatorResult<V>;
 
 export interface AbstractArray<
   T extends AbstractArrayControls = AbstractArrayControls,
-  E = any
+  R = any,
+  G extends AbstractArrayGroup<T, R> = AbstractArrayGroup<T, R>
 > extends AbstractGroupControl<AbstractArrayState<T>[]> {
   controls: T[];
   dirties: boolean;
-  groups: AbstractArrayGroup<T, E>[];
-  merge: (collection: CollectionStateArray<T, E>[]) => void;
+  groups: G[];
+  merge: (groups: G[]) => void;
   pristines: boolean;
-  push: (state: Partial<AbstractArrayState<T>>, entity?: E) => void;
-  remove: (group: AbstractArrayGroup<T, E>) => void;
-  set: (collection: CollectionStateArray<T, E>[]) => void;
+  push: (group: G) => void;
+  remove: (group: G) => void;
+  set: (groups: G[]) => void;
+  setValidators: (validators: ValidatorArrayFn<T, R>[]) => void;
   toucheds: boolean;
   untoucheds: boolean;
   value: AbstractArrayValue<T>[];
@@ -178,19 +179,11 @@ export interface FormArrayGroupProps<
   validators?: ValidatorGroupFn<T>[];
 }
 
-export type FormArrayBuilderControl<T = any> = Record<
-  string,
-  Omit<FormArrayControlProps<T>, 'uuid'>
->;
-
-export type FormArrayBuilderState<
-  T extends AbstractArrayControls = AbstractArrayControls
-> = (state: Partial<AbstractArrayState<T>>) => FormArrayBuilderControl;
-
 export interface FormArrayProps<
-  T extends AbstractArrayControls = AbstractArrayControls
+  T extends AbstractArrayControls = AbstractArrayControls,
+  R = any,
+  G extends AbstractArrayGroup<T, R> = AbstractArrayGroup<T, R>
 > {
-  builder: FormArrayBuilderState<T>;
-  state?: AbstractArrayState<T>[];
-  validators?: ValidatorGroupFn<T>[];
+  groups?: G[];
+  validators?: ValidatorArrayFn<T, R>[];
 }

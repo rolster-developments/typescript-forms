@@ -81,7 +81,7 @@ export const password: ValidatorFn<any> = (value) => {
     : undefined;
 };
 
-export const reqlength = (length: number): ValidatorFn<string> => {
+export const strReqlength = (length: number): ValidatorFn<string> => {
   return (value) => {
     return !!value && value.length !== length
       ? {
@@ -92,7 +92,7 @@ export const reqlength = (length: number): ValidatorFn<string> => {
   };
 };
 
-export const minlength = (length: number): ValidatorFn<string> => {
+export const strMinlength = (length: number): ValidatorFn<string> => {
   return (value) => {
     return !!value && value.length < length
       ? {
@@ -103,7 +103,7 @@ export const minlength = (length: number): ValidatorFn<string> => {
   };
 };
 
-export const maxlength = (length: number): ValidatorFn<string> => {
+export const strMaxlength = (length: number): ValidatorFn<string> => {
   return (value) => {
     return !!value && value.length < length
       ? {

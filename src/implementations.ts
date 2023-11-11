@@ -164,6 +164,8 @@ export class BaseFormControl<
       this.currentValid = errors.length === 0;
     } else {
       this.currentValid = true;
+      this.currentError = undefined;
+      this.currentErrors = [];
     }
   }
 }

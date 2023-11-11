@@ -1,10 +1,13 @@
 import {
+  AbstractArrayControls,
+  AbstractArrayGroup,
   AbstractControl,
   AbstractControls,
   AbstractGroup,
   AbstractGroupControls,
   FormState,
   StateControls,
+  ValidatorArrayFn,
   ValidatorError,
   ValidatorFn,
   ValidatorGroupFn,
@@ -21,17 +24,28 @@ const toBoolean = (value: any): boolean => {
   );
 };
 
-interface StateProps<T> {
+interface ControlValidProps<T> {
   state: FormState<T>;
   validators: ValidatorFn<T>[];
 }
 
-interface ControlsProps<T extends AbstractGroupControls> {
+interface GroupValidProps<T extends AbstractGroupControls> {
   controls: T;
   validators: ValidatorGroupFn<T>[];
 }
 
-export const controlIsValid = <T>(props: StateProps<T>): ValidatorError[] => {
+interface ArrayValidProps<
+  T extends AbstractArrayControls = AbstractArrayControls,
+  R = any,
+  G extends AbstractArrayGroup<T, R> = AbstractArrayGroup<T, R>
+> {
+  groups: G[];
+  validators: ValidatorArrayFn<T, R>[];
+}
+
+export const controlIsValid = <T>(
+  props: ControlValidProps<T>
+): ValidatorError[] => {
   const { state, validators } = props;
 
   return validators.reduce((errors, validator) => {
@@ -88,7 +102,7 @@ export const controlsToValue = <T extends AbstractGroupControls>(
 export const groupIsValid = <T extends AbstractGroupControls>({
   controls,
   validators
-}: ControlsProps<T>): ValidatorError[] => {
+}: GroupValidProps<T>): ValidatorError[] => {
   return validators.reduce((errors, validator) => {
     const error = validator(controls);
 
@@ -113,6 +127,24 @@ export function groupSomeChecked<T extends AbstractGroupControls>(
 ): boolean {
   return groups.reduce((value, group) => value || toBoolean(group[key]), false);
 }
+
+export const arrayIsValid = <
+  T extends AbstractArrayControls = AbstractArrayControls,
+  R = any
+>({
+  groups,
+  validators
+}: ArrayValidProps<T, R>): ValidatorError[] => {
+  return validators.reduce((errors, validator) => {
+    const error = validator(groups);
+
+    if (error) {
+      errors.push(error);
+    }
+
+    return errors;
+  }, [] as ValidatorError[]);
+};
 
 type ObjectJSON = Record<string, any>;
 

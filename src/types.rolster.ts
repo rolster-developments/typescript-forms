@@ -1,9 +1,10 @@
 import {
   AbstractArray,
   AbstractArrayControl,
+  AbstractArrayGroup,
   AbstractBaseControl,
   AbstractControls,
-  AbstractFormGroup
+  AbstractGroup
 } from './types';
 
 export type RolsterControls<
@@ -19,7 +20,7 @@ export interface RolsterControl<
 }
 
 export interface RolsterGroup<T extends RolsterControls = RolsterControls>
-  extends AbstractFormGroup<T> {
+  extends AbstractGroup<T> {
   updateValueAndValidity: (controls?: boolean) => void;
 }
 
@@ -41,13 +42,16 @@ export interface RolsterArrayControl<
 export type RolsterFormArrayControls = RolsterControls<RolsterArrayControl>;
 
 export interface RolsterFormArrayGroup<
-  T extends RolsterFormArrayControls = RolsterFormArrayControls
-> extends RolsterGroup<T> {
+  T extends RolsterFormArrayControls = RolsterFormArrayControls,
+  R = any
+> extends AbstractArrayGroup<T, R> {
   setParent: (parent: RolsterFormArray<T>) => void;
+  updateValueAndValidity: (controls?: boolean) => void;
 }
 
 export interface RolsterFormArray<
-  T extends RolsterFormArrayControls = RolsterFormArrayControls
-> extends AbstractArray<T> {
-  updateValueAndValidity: () => void;
+  T extends RolsterFormArrayControls = RolsterFormArrayControls,
+  R = any
+> extends AbstractArray<T, R, RolsterFormArrayGroup<T, R>> {
+  updateValueAndValidity: (groups?: boolean) => void;
 }
