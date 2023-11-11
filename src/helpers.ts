@@ -1,6 +1,7 @@
 import {
   AbstractControl,
   AbstractControls,
+  AbstractGroup,
   AbstractGroupControls,
   FormState,
   StateControls,
@@ -9,6 +10,16 @@ import {
   ValidatorGroupFn,
   ValueControls
 } from './types';
+
+const FALSY_VALUE = ['false', 'undefined', '0', 0];
+
+const toBoolean = (value: any): boolean => {
+  return !(
+    !(typeof value !== 'undefined' && value !== null) ||
+    value === false ||
+    FALSY_VALUE.includes(value)
+  );
+};
 
 interface StateProps<T> {
   state: FormState<T>;
@@ -20,10 +31,9 @@ interface ControlsProps<T extends AbstractGroupControls> {
   validators: ValidatorGroupFn<T>[];
 }
 
-export const evalFormControlValid = <T>({
-  state,
-  validators
-}: StateProps<T>): ValidatorError[] => {
+export const controlIsValid = <T>(props: StateProps<T>): ValidatorError[] => {
+  const { state, validators } = props;
+
   return validators.reduce((errors, validator) => {
     const error = validator(state);
 
@@ -35,37 +45,22 @@ export const evalFormControlValid = <T>({
   }, [] as ValidatorError[]);
 };
 
-export const evalFormGroupValid = <T extends AbstractGroupControls>({
-  controls,
-  validators
-}: ControlsProps<T>): ValidatorError[] => {
-  return validators.reduce((errors, validator) => {
-    const error = validator(controls);
-
-    if (error) {
-      errors.push(error);
-    }
-
-    return errors;
-  }, [] as ValidatorError[]);
-};
-
-export const boolAllControlsValid = <T extends AbstractControl>(
+export const controlsAllChecked = <T extends AbstractControl>(
   controls: AbstractControls<T>,
   props: keyof T
 ): boolean => {
   return Object.values(controls).reduce(
-    (currentValid, control) => currentValid && !!control[props],
+    (value, control) => value && toBoolean(control[props]),
     true
   );
 };
 
-export const boolSomeControlsValid = <T extends AbstractControl>(
+export const controlsSomeChecked = <T extends AbstractControl>(
   controls: AbstractControls<T>,
   props: keyof T
 ): boolean => {
   return Object.values(controls).reduce(
-    (currentValid, control) => currentValid || !!control[props],
+    (value, control) => value || toBoolean(control[props]),
     false
   );
 };
@@ -89,6 +84,35 @@ export const controlsToValue = <T extends AbstractGroupControls>(
     return json;
   }, {} as ValueControls<T>);
 };
+
+export const groupIsValid = <T extends AbstractGroupControls>({
+  controls,
+  validators
+}: ControlsProps<T>): ValidatorError[] => {
+  return validators.reduce((errors, validator) => {
+    const error = validator(controls);
+
+    if (error) {
+      errors.push(error);
+    }
+
+    return errors;
+  }, [] as ValidatorError[]);
+};
+
+export function groupAllChecked<T extends AbstractGroupControls>(
+  groups: AbstractGroup<T>[],
+  key: keyof AbstractGroup<T>
+): boolean {
+  return groups.reduce((value, group) => value && toBoolean(group[key]), true);
+}
+
+export function groupSomeChecked<T extends AbstractGroupControls>(
+  groups: AbstractGroup<T>[],
+  key: keyof AbstractGroup<T>
+): boolean {
+  return groups.reduce((value, group) => value || toBoolean(group[key]), false);
+}
 
 type ObjectJSON = Record<string, any>;
 

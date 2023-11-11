@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { evalFormGroupValid } from './helpers';
+import { groupAllChecked, groupIsValid, groupSomeChecked } from './helpers';
 import { BaseFormControl, BaseFormGroup } from './implementations';
 import {
   AbstractArrayGroup,
@@ -12,7 +12,7 @@ import {
   FormArrayBuilderState,
   FormArrayControlProps,
   FormArrayGroupProps,
-  SetArrayProps
+  CollectionStateArray
 } from './types';
 import {
   RolsterFormArray,
@@ -39,15 +39,20 @@ class FormGroup<T extends Controls = Controls, E = any>
 {
   public readonly uuid: string;
 
-  public readonly entity?: E;
+  public readonly resource?: E;
 
   private currentParent?: RolsterFormArray<T>;
 
-  constructor({ controls, uuid, entity, validators }: FormArrayGroupProps<T>) {
+  constructor({
+    controls,
+    uuid,
+    resource: entity,
+    validators
+  }: FormArrayGroupProps<T>) {
     super({ controls, validators });
 
     this.uuid = uuid;
-    this.entity = entity;
+    this.resource = entity;
   }
 
   public setParent(parent: RolsterFormArray<T>): void {
@@ -75,32 +80,10 @@ function createControls<T extends Controls = Controls>(
   );
 }
 
-function boolSomeGroupValid<T extends Controls = Controls, E = any>(
-  groups: AbstractArrayGroup<T, E>[],
-  key: keyof AbstractArrayGroup<T, E>
-): boolean {
-  return groups.reduce(
-    (currentState, group) => currentState || (group[key] as boolean),
-    false
-  );
-}
-
-function boolAllGroupValid<T extends Controls = Controls, E = any>(
-  groups: AbstractArrayGroup<T, E>[],
-  key: keyof AbstractArrayGroup<T, E>
-): boolean {
-  return groups.reduce(
-    (currentState, group) => currentState && (group[key] as boolean),
-    true
-  );
-}
-
 export class FormArray<T extends Controls = Controls, E = any>
   implements RolsterFormArray<T>
 {
   private currentGroups: AbstractArrayGroup<T, E>[] = [];
-
-  private currentControls: T[] = [];
 
   private builder: FormArrayBuilderState<T>;
 
@@ -122,7 +105,7 @@ export class FormArray<T extends Controls = Controls, E = any>
     this.builder = builder;
     this.validators = validators;
 
-    this.update(state);
+    this.initGroups(state);
   }
 
   public get groups(): AbstractArrayGroup<T, E>[] {
@@ -130,23 +113,39 @@ export class FormArray<T extends Controls = Controls, E = any>
   }
 
   public get controls(): T[] {
-    return this.currentControls;
+    return this.groups.map(({ controls }) => controls);
   }
 
   public get touched(): boolean {
-    return boolSomeGroupValid(this.currentGroups, 'touched');
+    return groupSomeChecked(this.currentGroups, 'touched');
   }
 
-  public get touchedAll(): boolean {
-    return boolAllGroupValid(this.currentGroups, 'touchedAll');
+  public get toucheds(): boolean {
+    return groupAllChecked(this.currentGroups, 'toucheds');
+  }
+
+  public get untouched(): boolean {
+    return !this.touched;
+  }
+
+  public get untoucheds(): boolean {
+    return !this.toucheds;
   }
 
   public get dirty(): boolean {
-    return boolSomeGroupValid(this.currentGroups, 'dirty');
+    return groupSomeChecked(this.currentGroups, 'dirty');
   }
 
-  public get dirtyAll(): boolean {
-    return boolAllGroupValid(this.currentGroups, 'dirtyAll');
+  public get dirties(): boolean {
+    return groupAllChecked(this.currentGroups, 'dirties');
+  }
+
+  public get pristine(): boolean {
+    return !this.dirty;
+  }
+
+  public get pristines(): boolean {
+    return !this.dirties;
   }
 
   public get invalid(): boolean {
@@ -174,74 +173,94 @@ export class FormArray<T extends Controls = Controls, E = any>
   }
 
   public reset(): void {
-    this.update(this.initialState);
+    this.initGroups(this.initialState);
   }
 
-  public push(state: Partial<AbstractArrayState<T>>, entity?: E): void {
-    const { builder, validators } = this;
+  public push(state: Partial<AbstractArrayState<T>>, resource?: E): void {
+    this.setGroups([...this.currentGroups, this.createGroup(state, resource)]);
+  }
 
-    const controls = createControls(state, builder);
+  public merge(collection: CollectionStateArray<T, E>[]): void {
+    this.setGroups([
+      ...this.currentGroups,
+      ...collection.map(({ state, resource }) =>
+        this.createGroup(state, resource)
+      )
+    ]);
+  }
 
-    this.currentControls.push(controls);
-    this.currentGroups.push(
-      new FormGroup({ controls, uuid: uuid(), entity, validators })
+  public set(collection: CollectionStateArray<T, E>[]): void {
+    this.setGroups(
+      collection.map(({ state, resource }) => this.createGroup(state, resource))
     );
-  }
-
-  public merge(collection: SetArrayProps<T, E>[]): void {
-    collection.forEach(({ state, entity }) => this.push(state, entity));
-  }
-
-  public set(collection: SetArrayProps<T, E>[]): void {
-    this.currentControls = [];
-    this.currentGroups = [];
-
-    collection.forEach(({ state, entity }) => this.push(state, entity));
   }
 
   public remove({ uuid }: AbstractArrayGroup<T, E>): void {
-    this.currentGroups = this.currentGroups.filter(
-      (group) => group.uuid !== uuid
-    );
-
-    this.currentControls = this.currentGroups.map(({ controls }) => controls);
+    this.setGroups(this.currentGroups.filter((group) => group.uuid !== uuid));
   }
 
   public updateValueAndValidity(): void {
-    if (!this.validators) {
-      this.currentValid = true;
-    } else {
-      const { controls, validators } = this;
+    if (this.validators) {
+      const { groups, validators } = this;
 
-      const errors = controls.reduce((errors, controls) => {
-        return [...errors, ...evalFormGroupValid({ controls, validators })];
-      }, [] as ValidatorError[]);
+      const errors = groups.reduce(
+        (errors, { controls }) => [
+          ...errors,
+          ...groupIsValid({ controls, validators })
+        ],
+        [] as ValidatorError[]
+      );
 
       this.currentErrors = errors;
       this.currentError = errors[0];
 
       this.currentValid = errors.length === 0;
+    } else {
+      this.currentValid = true;
+      this.currentErrors = [];
+      this.currentError = undefined;
     }
   }
 
-  private update(state?: AbstractArrayState<T>[]): void {
-    if (!state) {
-      this.currentControls = [];
-      this.currentGroups = [];
-    } else {
+  private createGroup(
+    state: Partial<AbstractArrayState<T>>,
+    resource?: E
+  ): FormGroup<T> {
+    const { builder, validators } = this;
+
+    return new FormGroup({
+      controls: createControls(state, builder),
+      uuid: uuid(),
+      resource,
+      validators
+    });
+  }
+
+  private setGroups(groups: AbstractArrayGroup<T, E>[]): void {
+    this.currentGroups = groups;
+
+    this.updateValueAndValidity();
+  }
+
+  private initGroups(state?: AbstractArrayState<T>[]): void {
+    if (state) {
       const { builder, validators } = this;
 
-      this.currentControls = state.map((state) =>
-        createControls(state, builder)
+      this.setGroups(
+        state.map((state) => {
+          const formGroup = new FormGroup({
+            uuid: uuid(),
+            controls: createControls(state, builder),
+            validators
+          });
+
+          formGroup.setParent(this);
+
+          return formGroup;
+        })
       );
-
-      this.currentGroups = this.currentControls.map((controls) => {
-        const formGroup = new FormGroup({ uuid: uuid(), controls, validators });
-
-        formGroup.setParent(this);
-
-        return formGroup;
-      });
+    } else {
+      this.setGroups([]);
     }
   }
 }

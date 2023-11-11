@@ -24,7 +24,9 @@ export interface AbstractControl<T = any> {
   dirty: boolean;
   errors: ValidatorError[];
   invalid: boolean;
+  pristine: boolean;
   touched: boolean;
+  untouched: boolean;
   valid: boolean;
   value: T;
   error?: ValidatorError;
@@ -41,6 +43,7 @@ export interface AbstractGroupControl<T = any> extends AbstractControl<T> {
 export interface AbstractBaseControl<T = any> extends AbstractGroupControl<T> {
   active: boolean;
   disabled: boolean;
+  enabled: boolean;
   setActive: (active: boolean) => void;
   setTouched: (touched: boolean) => void;
   setDisabled: (disabled: boolean) => void;
@@ -61,11 +64,15 @@ export interface AbstractGroup<
 > {
   controls: T;
   dirty: boolean;
-  dirtyAll: boolean;
+  dirties: boolean;
   errors: ValidatorError[];
   invalid: boolean;
+  pristine: boolean;
+  pristines: boolean;
   touched: boolean;
-  touchedAll: boolean;
+  toucheds: boolean;
+  untouched: boolean;
+  untoucheds: boolean;
   valid: boolean;
   error?: ValidatorError;
 }
@@ -100,13 +107,14 @@ export interface AbstractArrayControl<T = any> extends AbstractBaseControl<T> {
   uuid: string;
 }
 
-export type AbstractArrayControls<T extends AbstractArrayControl = any> =
-  Record<string, T>;
+export type AbstractArrayControls<
+  T extends AbstractArrayControl = AbstractArrayControl
+> = Record<string, T>;
 
-export interface AbstractArrayGroup<T extends AbstractArrayControls, E = any>
+export interface AbstractArrayGroup<T extends AbstractArrayControls, R = any>
   extends AbstractGroup<T> {
   uuid: string;
-  entity?: E;
+  resource?: R;
 }
 
 export type AbstractArrayState<T extends AbstractArrayControls> = {
@@ -117,9 +125,12 @@ export type AbstractArrayValue<T extends AbstractArrayControls> = {
   [K in keyof T]: T[K]['value'];
 };
 
-export interface SetArrayProps<T extends AbstractArrayControls, E = any> {
+export interface CollectionStateArray<
+  T extends AbstractArrayControls,
+  E = any
+> {
   state: Partial<AbstractArrayState<T>>;
-  entity?: E;
+  resource?: E;
 }
 
 export interface AbstractArray<
@@ -127,13 +138,15 @@ export interface AbstractArray<
   E = any
 > extends AbstractGroupControl<AbstractArrayState<T>[]> {
   controls: T[];
-  dirtyAll: boolean;
+  dirties: boolean;
   groups: AbstractArrayGroup<T, E>[];
-  merge: (collection: SetArrayProps<T, E>[]) => void;
+  merge: (collection: CollectionStateArray<T, E>[]) => void;
+  pristines: boolean;
   push: (state: Partial<AbstractArrayState<T>>, entity?: E) => void;
   remove: (group: AbstractArrayGroup<T, E>) => void;
-  set: (collection: SetArrayProps<T, E>[]) => void;
-  touchedAll: boolean;
+  set: (collection: CollectionStateArray<T, E>[]) => void;
+  toucheds: boolean;
+  untoucheds: boolean;
   value: AbstractArrayValue<T>[];
 }
 
@@ -157,11 +170,11 @@ export interface FormArrayControlProps<T = any> {
 
 export interface FormArrayGroupProps<
   T extends AbstractArrayControls = AbstractArrayControls,
-  E = any
+  R = any
 > {
   controls: T;
   uuid: string;
-  entity?: E;
+  resource?: R;
   validators?: ValidatorGroupFn<T>[];
 }
 

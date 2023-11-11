@@ -1,11 +1,11 @@
 import { BehaviorSubject, Subscription } from 'rxjs';
 import {
-  boolAllControlsValid,
-  boolSomeControlsValid,
+  controlsAllChecked,
+  controlsSomeChecked,
   controlsToState,
   controlsToValue,
-  evalFormControlValid,
-  evalFormGroupValid
+  controlIsValid,
+  groupIsValid
 } from './helpers';
 import {
   FormControlProps,
@@ -67,12 +67,24 @@ export class BaseFormControl<
     return this.currentTouched;
   }
 
+  public get untouched(): boolean {
+    return !this.currentTouched;
+  }
+
   public get dirty(): boolean {
     return this.currentDirty;
   }
 
+  public get pristine(): boolean {
+    return !this.currentDirty;
+  }
+
   public get disabled(): boolean {
     return this.currentDisabled;
+  }
+
+  public get enabled(): boolean {
+    return !this.currentDisabled;
   }
 
   public get invalid(): boolean {
@@ -144,7 +156,7 @@ export class BaseFormControl<
     if (this.validators) {
       const { currentState: state, validators } = this;
 
-      const errors = evalFormControlValid({ state, validators });
+      const errors = controlIsValid({ state, validators });
 
       this.currentError = errors[0];
       this.currentErrors = errors;
@@ -187,23 +199,41 @@ export class BaseFormGroup<
   }
 
   public get touched(): boolean {
-    return boolSomeControlsValid(this.currentControls, 'touched');
+    return controlsSomeChecked(this.currentControls, 'touched');
   }
 
-  public get touchedAll(): boolean {
-    return boolAllControlsValid(this.currentControls, 'touched');
+  public get toucheds(): boolean {
+    return controlsAllChecked(this.currentControls, 'touched');
+  }
+
+  public get untouched(): boolean {
+    return !this.touched;
+  }
+
+  public get untoucheds(): boolean {
+    return !this.toucheds;
   }
 
   public get dirty(): boolean {
-    return boolSomeControlsValid(this.currentControls, 'dirty');
+    return controlsSomeChecked(this.currentControls, 'dirty');
   }
 
-  public get dirtyAll(): boolean {
-    return boolAllControlsValid(this.currentControls, 'dirty');
+  public get dirties(): boolean {
+    return controlsAllChecked(this.currentControls, 'dirty');
+  }
+
+  public get pristine(): boolean {
+    return !this.dirty;
+  }
+
+  public get pristines(): boolean {
+    return this.dirties;
   }
 
   public get valid(): boolean {
-    return this.currentValid && boolAllControlsValid(this.currentControls, 'valid');
+    return (
+      this.currentValid && controlsAllChecked(this.currentControls, 'valid')
+    );
   }
 
   public get invalid(): boolean {
@@ -245,7 +275,7 @@ export class BaseFormGroup<
     if (this.validators) {
       const { controls, validators } = this;
 
-      const errors = evalFormGroupValid({ controls, validators });
+      const errors = groupIsValid({ controls, validators });
 
       this.currentErrors = errors;
       this.currentError = errors[0];

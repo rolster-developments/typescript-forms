@@ -2,12 +2,13 @@ import {
   AbstractArray,
   AbstractArrayControl,
   AbstractBaseControl,
+  AbstractControls,
   AbstractFormGroup
 } from './types';
 
 export type RolsterControls<
   T extends AbstractBaseControl = AbstractBaseControl
-> = Record<string, T>;
+> = AbstractControls<T>;
 
 export interface RolsterControl<
   T = any,
