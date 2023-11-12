@@ -6,12 +6,12 @@ import {
   AbstractGroup,
   AbstractGroupControls,
   FormState,
-  StateControls,
+  StateGroup,
   ValidatorArrayFn,
   ValidatorError,
   ValidatorFn,
   ValidatorGroupFn,
-  ValueControls
+  ValueGroup
 } from './types';
 
 const FALSY_VALUE = ['false', 'undefined', '0', 0];
@@ -81,22 +81,22 @@ export const controlsSomeChecked = <T extends AbstractControl>(
 
 export const controlsToState = <T extends AbstractGroupControls>(
   controls: T
-): StateControls<T> => {
+): StateGroup<T> => {
   return Object.entries(controls).reduce((json, [key, { state }]) => {
     json[key as keyof T] = state;
 
     return json;
-  }, {} as StateControls<T>);
+  }, {} as StateGroup<T>);
 };
 
 export const controlsToValue = <T extends AbstractGroupControls>(
   controls: T
-): ValueControls<T> => {
+): ValueGroup<T> => {
   return Object.entries(controls).reduce((json, [key, { value }]) => {
     json[key as keyof T] = value;
 
     return json;
-  }, {} as ValueControls<T>);
+  }, {} as ValueGroup<T>);
 };
 
 export const groupIsValid = <T extends AbstractGroupControls>({

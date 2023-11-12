@@ -77,13 +77,13 @@ export interface AbstractGroup<
   error?: ValidatorError;
 }
 
-export type StateControls<
+export type StateGroup<
   T extends AbstractGroupControls = AbstractGroupControls
 > = {
   [K in keyof T]: T[K]['state'];
 };
 
-export type ValueControls<
+export type ValueGroup<
   T extends AbstractGroupControls = AbstractGroupControls
 > = {
   [K in keyof T]: T[K]['value'];
@@ -99,8 +99,8 @@ export interface AbstractFormGroup<
 > extends AbstractGroup<T> {
   reset: () => void;
   setValidators: (validators: ValidatorGroupFn<T>[]) => void;
-  states: () => StateControls<T>;
-  values: () => ValueControls<T>;
+  state: StateGroup<T>;
+  value: ValueGroup<T>;
 }
 
 export interface AbstractArrayControl<T = any> extends AbstractBaseControl<T> {
@@ -113,15 +113,17 @@ export type AbstractArrayControls<
 
 export interface AbstractArrayGroup<T extends AbstractArrayControls, R = any>
   extends AbstractGroup<T> {
+  state: ArrayStateGroup<T>;
   uuid: string;
+  value: ArrayValueGroup<T>;
   resource?: R;
 }
 
-export type AbstractArrayState<T extends AbstractArrayControls> = {
+export type ArrayStateGroup<T extends AbstractArrayControls> = {
   [K in keyof T]: T[K]['state'];
 };
 
-export type AbstractArrayValue<T extends AbstractArrayControls> = {
+export type ArrayValueGroup<T extends AbstractArrayControls> = {
   [K in keyof T]: T[K]['value'];
 };
 
@@ -136,7 +138,7 @@ export interface AbstractArray<
   T extends AbstractArrayControls = AbstractArrayControls,
   R = any,
   G extends AbstractArrayGroup<T, R> = AbstractArrayGroup<T, R>
-> extends AbstractGroupControl<AbstractArrayState<T>[]> {
+> extends AbstractGroupControl<ArrayStateGroup<T>[]> {
   controls: T[];
   dirties: boolean;
   groups: G[];
@@ -146,9 +148,10 @@ export interface AbstractArray<
   remove: (group: G) => void;
   set: (groups: G[]) => void;
   setValidators: (validators: ValidatorArrayFn<T, R>[]) => void;
+  state: ArrayStateGroup<T>[];
   toucheds: boolean;
   untoucheds: boolean;
-  value: AbstractArrayValue<T>[];
+  value: ArrayValueGroup<T>[];
 }
 
 export interface FormControlProps<T = any> {

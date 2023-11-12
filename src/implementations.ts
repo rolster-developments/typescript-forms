@@ -2,8 +2,6 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import {
   controlsAllChecked,
   controlsSomeChecked,
-  controlsToState,
-  controlsToValue,
   controlIsValid,
   groupIsValid
 } from './helpers';
@@ -11,12 +9,10 @@ import {
   FormControlProps,
   FormGroupProps,
   FormState,
-  StateControls,
   SubscriberControl,
   ValidatorError,
   ValidatorFn,
-  ValidatorGroupFn,
-  ValueControls
+  ValidatorGroupFn
 } from './types';
 import { RolsterControl, RolsterControls, RolsterGroup } from './types.rolster';
 
@@ -174,7 +170,7 @@ export class BaseFormGroup<
   T extends RolsterControls<RolsterControl> = RolsterControls<RolsterControl>
 > implements RolsterGroup<T>
 {
-  private currentControls: T;
+  protected currentControls: T;
 
   private currentError?: ValidatorError;
 
@@ -248,14 +244,6 @@ export class BaseFormGroup<
 
   public get errors(): ValidatorError[] {
     return this.currentErrors;
-  }
-
-  public states(): StateControls<T> {
-    return controlsToState(this.currentControls);
-  }
-
-  public values(): ValueControls<T> {
-    return controlsToValue(this.currentControls);
   }
 
   public reset(): void {

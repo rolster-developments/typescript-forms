@@ -9,9 +9,9 @@ import {
 import { BaseFormControl, BaseFormGroup } from './implementations';
 import {
   AbstractArrayGroup,
-  AbstractArrayState,
+  ArrayStateGroup,
   AbstractArrayControl,
-  AbstractArrayValue,
+  ArrayValueGroup,
   FormArrayProps,
   FormArrayControlProps,
   FormArrayGroupProps,
@@ -73,6 +73,14 @@ export class FormArrayGroup<T extends Controls = Controls, R = any>
     super.updateValueAndValidity(controls);
 
     this.currentParent?.updateValueAndValidity(false);
+  }
+
+  public get state(): ArrayStateGroup<T> {
+    return controlsToState(this.currentControls);
+  }
+
+  public get value(): ArrayValueGroup<T> {
+    return controlsToValue(this.currentControls);
   }
 }
 
@@ -149,12 +157,12 @@ export class FormArray<T extends Controls = Controls, R = any>
     return !this.currentValid;
   }
 
-  public get state(): AbstractArrayState<T>[] | undefined {
-    return this.currentGroups.map(({ controls }) => controlsToState(controls));
+  public get state(): ArrayStateGroup<T>[] {
+    return this.currentGroups.map((group) => group.state);
   }
 
-  public get value(): AbstractArrayValue<T>[] {
-    return this.currentGroups.map(({ controls }) => controlsToValue(controls));
+  public get value(): ArrayValueGroup<T>[] {
+    return this.currentGroups.map((group) => group.value);
   }
 
   public get error(): ValidatorError | undefined {
