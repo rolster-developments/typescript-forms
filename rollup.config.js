@@ -12,7 +12,7 @@ const plugins = [
   })
 ];
 
-const createConfiguration = (file) => {
+const rollupTs = (file) => {
   return {
     input: [`dist/esm/${file}.js`],
     output: [
@@ -36,4 +36,4 @@ const createConfiguration = (file) => {
 
 const exports = ['index', 'helpers'];
 
-export default [...exports.map((file) => createConfiguration(file))];
+export default [...exports.map((file) => rollupTs(file))];
