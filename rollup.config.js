@@ -1,12 +1,12 @@
+import typescript from '@rollup/plugin-typescript';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
-import typescript from '@rollup/plugin-typescript';
 
 const plugins = [
   commonjs(),
   resolve(),
   typescript({
-    tsconfig: './tsconfig.json',
+    tsconfig: './tsconfig.app.json',
     declaration: true,
     declarationDir: 'dist'
   })
@@ -29,14 +29,11 @@ const createConfiguration = (file) => {
         inlineDynamicImports: true
       }
     ],
-    external: ['rxjs', 'uuid'],
+    external: ['@rolster/validators', 'rxjs', 'uuid'],
     plugins
   };
 };
 
-export default [
-  createConfiguration('index'),
-  createConfiguration('expressions'),
-  createConfiguration('helpers'),
-  createConfiguration('validators')
-];
+const exports = ['index', 'helpers'];
+
+export default [...exports.map((file) => createConfiguration(file))];

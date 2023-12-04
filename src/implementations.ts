@@ -1,7 +1,8 @@
+import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import {
   controlsAllChecked,
-  controlsSomeChecked,
+  controlsPartialChecked,
   controlIsValid,
   groupIsValid
 } from './helpers';
@@ -10,8 +11,6 @@ import {
   FormGroupProps,
   FormState,
   SubscriberControl,
-  ValidatorError,
-  ValidatorFn,
   ValidatorGroupFn
 } from './types';
 import { RolsterControl, RolsterControls, RolsterGroup } from './types.rolster';
@@ -21,7 +20,7 @@ export class BaseFormControl<
   C extends RolsterControls = RolsterControls
 > implements RolsterControl<T, C>
 {
-  private currentActive = false;
+  private currentFocused = false;
 
   private currentTouched = false;
 
@@ -55,8 +54,12 @@ export class BaseFormControl<
     this.updateValueAndValidity();
   }
 
-  public get active(): boolean {
-    return this.currentActive;
+  public get focused(): boolean {
+    return this.currentFocused;
+  }
+
+  public get unfocused(): boolean {
+    return !this.currentFocused;
   }
 
   public get touched(): boolean {
@@ -83,12 +86,12 @@ export class BaseFormControl<
     return !this.currentDisabled;
   }
 
-  public get invalid(): boolean {
-    return !this.currentValid;
-  }
-
   public get valid(): boolean {
     return this.currentValid;
+  }
+
+  public get invalid(): boolean {
+    return !this.currentValid;
   }
 
   public get state(): FormState<T> {
@@ -99,30 +102,42 @@ export class BaseFormControl<
     return this.currentState as T;
   }
 
-  public get error(): ValidatorError | undefined {
-    return this.currentError;
-  }
-
   public get errors(): ValidatorError[] {
     return this.currentErrors;
   }
 
+  public get error(): ValidatorError | undefined {
+    return this.currentError;
+  }
+
   public reset(): void {
     this.setState(this.initialState);
-    this.setTouched(false);
+    this.untouch();
     this.currentDirty = false;
   }
 
-  public setActive(active: boolean): void {
-    this.currentActive = active;
+  public focus(): void {
+    this.currentFocused = true;
   }
 
-  public setTouched(touched: boolean): void {
-    this.currentTouched = touched;
+  public blur(): void {
+    this.currentFocused = false;
   }
 
-  public setDisabled(disabled: boolean): void {
-    this.currentDisabled = disabled;
+  public touch(): void {
+    this.currentTouched = true;
+  }
+
+  public untouch(): void {
+    this.currentTouched = false;
+  }
+
+  public disable(): void {
+    this.currentDisabled = true;
+  }
+
+  public enable(): void {
+    this.currentDisabled = false;
   }
 
   public setState(state?: FormState<T>): void {
@@ -197,7 +212,7 @@ export class BaseFormGroup<
   }
 
   public get touched(): boolean {
-    return controlsSomeChecked(this.currentControls, 'touched');
+    return controlsPartialChecked(this.currentControls, 'touched');
   }
 
   public get toucheds(): boolean {
@@ -213,7 +228,7 @@ export class BaseFormGroup<
   }
 
   public get dirty(): boolean {
-    return controlsSomeChecked(this.currentControls, 'dirty');
+    return controlsPartialChecked(this.currentControls, 'dirty');
   }
 
   public get dirties(): boolean {
@@ -238,12 +253,12 @@ export class BaseFormGroup<
     return !this.valid;
   }
 
-  public get error(): ValidatorError | undefined {
-    return this.currentError;
-  }
-
   public get errors(): ValidatorError[] {
     return this.currentErrors;
+  }
+
+  public get error(): ValidatorError | undefined {
+    return this.currentError;
   }
 
   public reset(): void {

@@ -1,8 +1,0 @@
-{
-  "name": "@rolster/forms/expressions",
-  "types": "../dist/esm/expressions.d.ts",
-  "main": "../dist/cjs/expressions.js",
-  "module": "../dist/esm/expressions.js",
-  "unpkg": "../dist/es/expressions.js",
-  "sideEffects": false
-}

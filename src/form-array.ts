@@ -1,10 +1,11 @@
+import { ValidatorError } from '@rolster/validators';
 import { v4 as uuid } from 'uuid';
 import {
   arrayIsValid,
   controlsToState,
   controlsToValue,
   groupAllChecked,
-  groupSomeChecked
+  groupPartialChecked
 } from './helpers';
 import { BaseFormControl, BaseFormGroup } from './implementations';
 import {
@@ -15,8 +16,7 @@ import {
   FormArrayProps,
   FormArrayControlProps,
   FormArrayGroupProps,
-  ValidatorArrayFn,
-  ValidatorError
+  ValidatorArrayFn
 } from './types';
 import {
   RolsterFormArray,
@@ -118,7 +118,7 @@ export class FormArray<T extends Controls = Controls, R = any>
   }
 
   public get touched(): boolean {
-    return groupSomeChecked(this.currentGroups, 'touched');
+    return groupPartialChecked(this.currentGroups, 'touched');
   }
 
   public get toucheds(): boolean {
@@ -134,7 +134,7 @@ export class FormArray<T extends Controls = Controls, R = any>
   }
 
   public get dirty(): boolean {
-    return groupSomeChecked(this.currentGroups, 'dirty');
+    return groupPartialChecked(this.currentGroups, 'dirty');
   }
 
   public get dirties(): boolean {

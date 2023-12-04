@@ -1,3 +1,4 @@
+import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import {
   AbstractArrayControls,
   AbstractArrayGroup,
@@ -8,8 +9,6 @@ import {
   FormState,
   StateGroup,
   ValidatorArrayFn,
-  ValidatorError,
-  ValidatorFn,
   ValidatorGroupFn,
   ValueGroup
 } from './types';
@@ -69,7 +68,7 @@ export const controlsAllChecked = <T extends AbstractControl>(
   );
 };
 
-export const controlsSomeChecked = <T extends AbstractControl>(
+export const controlsPartialChecked = <T extends AbstractControl>(
   controls: AbstractControls<T>,
   props: keyof T
 ): boolean => {
@@ -121,7 +120,7 @@ export function groupAllChecked<T extends AbstractGroupControls>(
   return groups.reduce((value, group) => value && toBoolean(group[key]), true);
 }
 
-export function groupSomeChecked<T extends AbstractGroupControls>(
+export function groupPartialChecked<T extends AbstractGroupControls>(
   groups: AbstractGroup<T>[],
   key: keyof AbstractGroup<T>
 ): boolean {
@@ -144,53 +143,4 @@ export const arrayIsValid = <
 
     return errors;
   }, [] as ValidatorError[]);
-};
-
-type ObjectJSON = Record<string, any>;
-
-type Validators<T extends ObjectJSON> = Partial<
-  Record<keyof T, ValidatorFn<T>[]>
->;
-
-type ErrorsJSON = Record<string, ValidatorError[]>;
-
-interface ValidatorsResult {
-  errors: ErrorsJSON;
-  valid: boolean;
-}
-
-export const validateJSON = <T extends ObjectJSON>(
-  object: T,
-  validators: Validators<T>
-): ValidatorsResult => {
-  return Object.keys(validators).reduce(
-    (result, key) => {
-      const validatorsFn = validators[key];
-
-      const errorsObject =
-        validatorsFn?.reduce((errors, validator) => {
-          const error = validator(object[key]);
-
-          if (error) {
-            errors.push(error);
-          }
-
-          return errors;
-        }, [] as ValidatorError[]) || [];
-
-      if (errorsObject.length) {
-        const errors: ErrorsJSON = { ...result.errors };
-        errors[key] = errorsObject;
-
-        return {
-          ...result,
-          errors,
-          valid: result.valid && false
-        };
-      }
-
-      return result;
-    },
-    { valid: true, errors: {} } as ValidatorsResult
-  );
 };
