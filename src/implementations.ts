@@ -141,13 +141,13 @@ export class BaseFormControl<
   }
 
   public setState(state?: FormState<T>): void {
-    this.subscribers.next(state);
-
     this.currentState = state;
     this.currentDirty = true;
 
     this.updateValueAndValidity();
     this.currentParent?.updateValueAndValidity(false);
+
+    this.subscribers.next(state);
   }
 
   public setValidators(validators: ValidatorFn<T>[] = []): void {

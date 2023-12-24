@@ -3,7 +3,9 @@ import { BaseFormGroup } from './implementations';
 import { AbstractFormGroup, StateGroup, ValueGroup } from './types';
 import { RolsterFormControls } from './types.rolster';
 
-export class FormGroup<T extends RolsterFormControls = RolsterFormControls>
+export type FormControls = RolsterFormControls;
+
+export class FormGroup<T extends FormControls = FormControls>
   extends BaseFormGroup<T>
   implements AbstractFormGroup<T>
 {
