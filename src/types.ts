@@ -16,16 +16,17 @@ export interface ValidationFormError<T = any> extends ValidatorError<T> {
 export type SubscriberControl<T> = (state?: FormState<T>) => void;
 
 export interface AbstractControl<T = any> {
-  errors: ValidatorError[];
-  value: T;
-  error?: ValidatorError;
-  state?: FormState<T>;
   dirty: boolean;
+  errors: ValidatorError[];
+  invalid: boolean;
   pristine: boolean;
   touched: boolean;
   untouched: boolean;
   valid: boolean;
-  invalid: boolean;
+  value: T;
+  wrong: boolean;
+  error?: ValidatorError;
+  state?: FormState<T>;
 }
 
 export type AbstractControls<T extends AbstractControl = AbstractControl> =
@@ -36,17 +37,17 @@ export interface AbstractGroupControl<T = any> extends AbstractControl<T> {
 }
 
 export interface AbstractBaseControl<T = any> extends AbstractGroupControl<T> {
-  focused: boolean;
-  unfocused: boolean;
+  blur: () => void;
+  disable: () => void;
   disabled: boolean;
+  enable: () => void;
   enabled: boolean;
   focus: () => void;
-  blur: () => void;
-  enable: () => void;
-  disable: () => void;
-  touch: () => void;
-  untouch: () => void;
+  focused: boolean;
   setState: (state?: FormState<T>) => void;
+  touch: () => void;
+  unfocused: boolean;
+  untouch: () => void;
 }
 
 export interface AbstractFormControl<T = any> extends AbstractBaseControl<T> {
@@ -62,10 +63,10 @@ export interface AbstractGroup<
   T extends AbstractGroupControls = AbstractGroupControls
 > {
   controls: T;
-  errors: ValidatorError[];
-  error?: ValidatorError;
   dirty: boolean;
   dirties: boolean;
+  errors: ValidatorError[];
+  invalid: boolean;
   pristine: boolean;
   pristines: boolean;
   touched: boolean;
@@ -73,7 +74,8 @@ export interface AbstractGroup<
   untouched: boolean;
   untoucheds: boolean;
   valid: boolean;
-  invalid: boolean;
+  wrong: boolean;
+  error?: ValidatorError;
 }
 
 export type StateGroup<
@@ -151,6 +153,7 @@ export interface AbstractArray<
   toucheds: boolean;
   untoucheds: boolean;
   value: ArrayValueGroup<T>[];
+  wrong: boolean;
 }
 
 export interface FormControlProps<T = any> {

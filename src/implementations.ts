@@ -110,6 +110,10 @@ export class BaseFormControl<
     return this.currentError;
   }
 
+  public get wrong(): boolean {
+    return this.touched && this.invalid;
+  }
+
   public reset(): void {
     this.setState(this.initialState);
     this.untouch();
@@ -259,6 +263,10 @@ export class BaseFormGroup<
 
   public get error(): ValidatorError | undefined {
     return this.currentError;
+  }
+
+  public get wrong(): boolean {
+    return this.touched && this.invalid;
   }
 
   public reset(): void {

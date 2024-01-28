@@ -173,6 +173,10 @@ export class FormArray<T extends Controls = Controls, R = any>
     return this.currentErrors;
   }
 
+  public get wrong(): boolean {
+    return this.touched && this.invalid;
+  }
+
   public reset(): void {
     this.refresh(this.initialState);
   }
