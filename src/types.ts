@@ -115,6 +115,7 @@ export type AbstractArrayControls<
 
 export interface AbstractArrayGroup<T extends AbstractArrayControls, R = any>
   extends AbstractGroup<T> {
+  setValidators: (validators: ValidatorGroupFn<T>[]) => void;
   state: ArrayStateGroup<T>;
   uuid: string;
   value: ArrayValueGroup<T>;
