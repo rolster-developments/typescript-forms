@@ -1,7 +1,7 @@
 import { controlsToState, controlsToValue } from './helpers';
 import { BaseFormGroup } from './implementations';
 import { AbstractFormGroup, StateGroup, ValueGroup } from './types';
-import { RolsterFormControls } from './types.rolster';
+import { RolsterFormControls } from './types-rolster';
 
 export type FormControls = RolsterFormControls;
 

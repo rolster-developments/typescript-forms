@@ -1,11 +1,12 @@
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import {
   controlsAllChecked,
   controlsPartialChecked,
   controlIsValid,
   groupIsValid
 } from './helpers';
+import { RolsterControl, RolsterControls, RolsterGroup } from './types-rolster';
 import {
   FormControlProps,
   FormGroupProps,
@@ -13,7 +14,6 @@ import {
   SubscriberControl,
   ValidatorGroupFn
 } from './types';
-import { RolsterControl, RolsterControls, RolsterGroup } from './types.rolster';
 
 export class BaseFormControl<
   T = any,
@@ -163,8 +163,10 @@ export class BaseFormControl<
     this.currentParent = parent;
   }
 
-  public subscribe(subscriber: SubscriberControl<T>): Subscription {
-    return this.subscribers.subscribe(subscriber);
+  public subscribe(subscriber: SubscriberControl<T>): Unsubscription {
+    const subscription = this.subscribers.subscribe(subscriber);
+
+    return () => subscription.unsubscribe();
   }
 
   public updateValueAndValidity(): void {

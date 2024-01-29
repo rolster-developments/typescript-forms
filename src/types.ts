@@ -3,7 +3,6 @@ import {
   ValidatorFn,
   ValidatorResult
 } from '@rolster/validators';
-import { Subscription } from 'rxjs';
 
 export type FormState<T = any> = T | undefined | null;
 
@@ -52,7 +51,7 @@ export interface AbstractBaseControl<T = any> extends AbstractGroupControl<T> {
 
 export interface AbstractFormControl<T = any> extends AbstractBaseControl<T> {
   setValidators: (validators?: ValidatorFn<T>[]) => void;
-  subscribe: (subscriber: SubscriberControl<T>) => Subscription;
+  subscribe: (subscriber: SubscriberControl<T>) => Unsubscription;
 }
 
 export type AbstractGroupControls<

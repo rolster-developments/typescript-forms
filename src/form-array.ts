@@ -9,6 +9,11 @@ import {
 } from './helpers';
 import { BaseFormControl, BaseFormGroup } from './implementations';
 import {
+  RolsterFormArray,
+  RolsterFormArrayControls as Controls,
+  RolsterFormArrayGroup
+} from './types-rolster';
+import {
   AbstractArrayGroup,
   ArrayStateGroup,
   AbstractArrayControl,
@@ -18,11 +23,6 @@ import {
   FormArrayGroupProps,
   ValidatorArrayFn
 } from './types';
-import {
-  RolsterFormArray,
-  RolsterFormArrayControls as Controls,
-  RolsterFormArrayGroup
-} from './types.rolster';
 
 type RolsterArrayControlProps<T = any> = Omit<FormArrayControlProps<T>, 'uuid'>;
 type RolsterArrayGroupProps<T extends Controls = Controls> = Omit<
@@ -41,8 +41,8 @@ export class FormArrayControl<T = any>
 {
   public readonly uuid: string;
 
-  constructor({ state, validators }: RolsterArrayControlProps<T>) {
-    super({ state, validators });
+  constructor(props: RolsterArrayControlProps<T>) {
+    super(props);
 
     this.uuid = uuid();
   }
