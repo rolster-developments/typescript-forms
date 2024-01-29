@@ -105,6 +105,7 @@ export interface AbstractFormGroup<
 }
 
 export interface AbstractArrayControl<T = any> extends AbstractBaseControl<T> {
+  setValidators: (validators?: ValidatorFn<T>[]) => void;
   uuid: string;
 }
 
