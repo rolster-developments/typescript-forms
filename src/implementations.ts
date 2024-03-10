@@ -44,7 +44,10 @@ export class BaseFormControl<
 
   private currentParent?: RolsterGroup<C>;
 
-  constructor({ state, validators }: FormControlProps<T>) {
+  constructor(props?: FormControlProps<T>) {
+    const state = props?.state;
+    const validators = props?.validators;
+
     this.subscribers = new BehaviorSubject(state);
 
     this.initialState = state;
