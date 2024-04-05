@@ -40,13 +40,13 @@ function getFormControlProps<T = any>(
   return { state, validators };
 }
 
-export function instanceOfFormGroupProps<T extends Controls = Controls>(
+export function instanceOfFormGroupProps<T extends Controls>(
   props: any
 ): props is FormGroupProps<T> {
   return 'controls' in props || 'validators' in props;
 }
 
-function getFormGroupProps<T extends Controls = Controls>(
+function getFormGroupProps<T extends Controls>(
   props: FormGroupProps<T> | T,
   validators?: ValidatorGroupFn<T>[]
 ): FormGroupProps<T> {
@@ -239,10 +239,10 @@ export class BaseFormControl<
   }
 }
 
-export class BaseFormGroup<T extends Controls = Controls>
-  implements RolsterGroup<T>
+export class BaseFormGroup<C extends Controls = Controls>
+  implements RolsterGroup<C>
 {
-  protected currentControls: T;
+  protected currentControls: C;
 
   private currentError?: ValidatorError;
 
@@ -250,13 +250,13 @@ export class BaseFormGroup<T extends Controls = Controls>
 
   private currentValid = true;
 
-  private validators?: ValidatorGroupFn<T>[];
+  private validators?: ValidatorGroupFn<C>[];
 
-  constructor(controls: T, validators?: ValidatorGroupFn<T>[]);
-  constructor(props: FormGroupProps<T>);
+  constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
+  constructor(props: FormGroupProps<C>);
   constructor(
-    props: FormGroupProps<T> | T,
-    validatorsFn?: ValidatorGroupFn<T>[]
+    props: FormGroupProps<C> | C,
+    validatorsFn?: ValidatorGroupFn<C>[]
   ) {
     const { controls, validators } = getFormGroupProps(props, validatorsFn);
 
@@ -271,7 +271,7 @@ export class BaseFormGroup<T extends Controls = Controls>
     this.updateValueAndValidity(false);
   }
 
-  public get controls(): T {
+  public get controls(): C {
     return this.currentControls;
   }
 
@@ -333,7 +333,7 @@ export class BaseFormGroup<T extends Controls = Controls>
     Object.values(this.currentControls).forEach((control) => control.reset());
   }
 
-  public setValidators(validators: ValidatorGroupFn<T>[]): void {
+  public setValidators(validators: ValidatorGroupFn<C>[]): void {
     this.validators = validators;
     this.updateValueAndValidity();
   }
@@ -352,7 +352,6 @@ export class BaseFormGroup<T extends Controls = Controls>
 
       this.currentErrors = errors;
       this.currentError = errors[0];
-
       this.currentValid = errors.length === 0;
     } else {
       this.currentErrors = [];

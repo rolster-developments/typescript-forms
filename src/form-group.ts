@@ -5,15 +5,15 @@ import { RolsterFormControls } from './types-rolster';
 
 export type FormControls = RolsterFormControls;
 
-export class FormGroup<T extends FormControls = FormControls>
-  extends BaseFormGroup<T>
-  implements AbstractFormGroup<T>
+export class FormGroup<C extends FormControls = FormControls>
+  extends BaseFormGroup<C>
+  implements AbstractFormGroup<C>
 {
-  public get state(): StateGroup<T> {
+  public get state(): StateGroup<C> {
     return controlsToState(this.currentControls);
   }
 
-  public get value(): ValueGroup<T> {
+  public get value(): ValueGroup<C> {
     return controlsToValue(this.currentControls);
   }
 }

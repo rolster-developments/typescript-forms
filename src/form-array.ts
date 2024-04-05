@@ -86,23 +86,23 @@ export class FormArrayControl<T = any>
   }
 }
 
-export class FormArrayGroup<T extends Controls = Controls, R = any>
-  extends BaseFormGroup<T>
-  implements RolsterFormArrayGroup<T>
+export class FormArrayGroup<C extends Controls = Controls, R = any>
+  extends BaseFormGroup<C>
+  implements RolsterFormArrayGroup<C>
 {
   public readonly uuid: string;
 
   public readonly resource?: R;
 
-  private currentParent?: RolsterFormArray<T>;
+  private currentParent?: RolsterFormArray<C>;
 
-  constructor(controls: T, validators?: ValidatorGroupFn<T>[]);
-  constructor(props: RolsterArrayGroupProps<T>);
+  constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
+  constructor(props: RolsterArrayGroupProps<C>);
   constructor(
-    props: RolsterArrayGroupProps<T> | T,
-    validatorsFn?: ValidatorGroupFn<T>[]
+    props: RolsterArrayGroupProps<C> | C,
+    validatorsFn?: ValidatorGroupFn<C>[]
   ) {
-    if (instanceOfFormGroupProps<T>(props)) {
+    if (instanceOfFormGroupProps<C>(props)) {
       super(props);
       this.resource = props.resource;
     } else {
@@ -112,7 +112,7 @@ export class FormArrayGroup<T extends Controls = Controls, R = any>
     this.uuid = uuid();
   }
 
-  public setParent(parent: RolsterFormArray<T>): void {
+  public setParent(parent: RolsterFormArray<C>): void {
     this.currentParent = parent;
   }
 
@@ -122,21 +122,21 @@ export class FormArrayGroup<T extends Controls = Controls, R = any>
     this.currentParent?.updateValueAndValidity(false);
   }
 
-  public get state(): ArrayStateGroup<T> {
+  public get state(): ArrayStateGroup<C> {
     return controlsToState(this.currentControls);
   }
 
-  public get value(): ArrayValueGroup<T> {
+  public get value(): ArrayValueGroup<C> {
     return controlsToValue(this.currentControls);
   }
 }
 
-export class FormArray<T extends Controls = Controls, R = any>
-  implements RolsterFormArray<T>
+export class FormArray<C extends Controls = Controls, R = any>
+  implements RolsterFormArray<C>
 {
-  private currentGroups: RolsterFormArrayGroup<T, R>[] = [];
+  private currentGroups: RolsterFormArrayGroup<C, R>[] = [];
 
-  private initialState?: RolsterFormArrayGroup<T, R>[];
+  private initialState?: RolsterFormArrayGroup<C, R>[];
 
   private currentValid = true;
 
@@ -144,17 +144,17 @@ export class FormArray<T extends Controls = Controls, R = any>
 
   private currentErrors: ValidatorError[] = [];
 
-  private validators?: ValidatorArrayFn<T, R>[];
+  private validators?: ValidatorArrayFn<C, R>[];
 
   constructor();
   constructor(
-    props: RolsterFormArrayGroup<T, R>[],
-    validatorsFn?: ValidatorArrayFn<T, R>[]
+    props: RolsterFormArrayGroup<C, R>[],
+    validatorsFn?: ValidatorArrayFn<C, R>[]
   );
-  constructor(props: RolsterArrayProps<T>);
+  constructor(props: RolsterArrayProps<C>);
   constructor(
-    props?: RolsterArrayProps<T> | RolsterFormArrayGroup<T, R>[],
-    validatorsFn?: ValidatorArrayFn<T, R>[]
+    props?: RolsterArrayProps<C> | RolsterFormArrayGroup<C, R>[],
+    validatorsFn?: ValidatorArrayFn<C, R>[]
   ) {
     const { groups, validators } = getFormArrayProps(props, validatorsFn);
 
@@ -167,11 +167,11 @@ export class FormArray<T extends Controls = Controls, R = any>
     this.refresh(this.initialState);
   }
 
-  public get groups(): RolsterFormArrayGroup<T, R>[] {
+  public get groups(): RolsterFormArrayGroup<C, R>[] {
     return this.currentGroups;
   }
 
-  public get controls(): T[] {
+  public get controls(): C[] {
     return this.groups.map(({ controls }) => controls);
   }
 
@@ -215,11 +215,11 @@ export class FormArray<T extends Controls = Controls, R = any>
     return !this.currentValid;
   }
 
-  public get state(): ArrayStateGroup<T>[] {
+  public get state(): ArrayStateGroup<C>[] {
     return this.currentGroups.map((group) => group.state);
   }
 
-  public get value(): ArrayValueGroup<T>[] {
+  public get value(): ArrayValueGroup<C>[] {
     return this.currentGroups.map((group) => group.value);
   }
 
@@ -239,29 +239,29 @@ export class FormArray<T extends Controls = Controls, R = any>
     this.refresh(this.initialState);
   }
 
-  public push(group: RolsterFormArrayGroup<T, R>): void {
+  public push(group: RolsterFormArrayGroup<C, R>): void {
     group.setParent(this);
 
     this.refresh([...this.currentGroups, group]);
   }
 
-  public merge(groups: RolsterFormArrayGroup<T, R>[]): void {
+  public merge(groups: RolsterFormArrayGroup<C, R>[]): void {
     groups.forEach((group) => group.setParent(this));
 
     this.refresh([...this.currentGroups, ...groups]);
   }
 
-  public set(groups: RolsterFormArrayGroup<T, R>[]): void {
+  public set(groups: RolsterFormArrayGroup<C, R>[]): void {
     groups.forEach((group) => group.setParent(this));
 
     this.refresh(groups);
   }
 
-  public remove({ uuid }: AbstractArrayGroup<T, R>): void {
+  public remove({ uuid }: AbstractArrayGroup<C, R>): void {
     this.refresh(this.currentGroups.filter((group) => group.uuid !== uuid));
   }
 
-  public setValidators(validators: ValidatorArrayFn<T, R>[]): void {
+  public setValidators(validators: ValidatorArrayFn<C, R>[]): void {
     this.validators = validators;
   }
 
@@ -286,7 +286,7 @@ export class FormArray<T extends Controls = Controls, R = any>
     }
   }
 
-  private refresh(groups?: RolsterFormArrayGroup<T, R>[]): void {
+  private refresh(groups?: RolsterFormArrayGroup<C, R>[]): void {
     this.currentGroups = groups || [];
 
     this.updateValueAndValidity();
