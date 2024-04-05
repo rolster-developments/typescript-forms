@@ -20,7 +20,9 @@ type Controls = RolsterControls<RolsterControl>;
 export function instanceOfFormControlProps<T = any>(
   props: any
 ): props is FormControlProps<T> {
-  return 'state' in props || 'validators' in props;
+  return (
+    (typeof props === 'object' && 'state' in props) || 'validators' in props
+  );
 }
 
 function getFormControlProps<T = any>(
@@ -43,7 +45,9 @@ function getFormControlProps<T = any>(
 export function instanceOfFormGroupProps<T extends Controls>(
   props: any
 ): props is FormGroupProps<T> {
-  return 'controls' in props || 'validators' in props;
+  return (
+    (typeof props === 'object' && 'controls' in props) || 'validators' in props
+  );
 }
 
 function getFormGroupProps<T extends Controls>(

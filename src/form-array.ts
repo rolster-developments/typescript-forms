@@ -45,7 +45,9 @@ type RolsterArrayProps<T extends Controls = Controls, R = any> = FormArrayProps<
 function instanceOfFormArrayProps<T extends Controls = Controls, R = any>(
   props: any
 ): props is RolsterArrayProps<T, R> {
-  return 'groups' in props || 'validators' in props;
+  return (
+    (typeof props === 'object' && 'groups' in props) || 'validators' in props
+  );
 }
 
 function getFormArrayProps<T extends Controls = Controls, R = any>(
