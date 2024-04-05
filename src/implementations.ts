@@ -93,8 +93,8 @@ export class BaseFormControl<
   private currentParent?: RolsterGroup<C>;
 
   constructor();
-  constructor(state: FormState<T>, validators?: ValidatorFn<T>[]);
   constructor(props: FormControlProps<T>);
+  constructor(state: FormState<T>, validators?: ValidatorFn<T>[]);
   constructor(
     props?: FormControlProps<T> | FormState<T>,
     validatorsFn?: ValidatorFn<T>[]
@@ -256,8 +256,8 @@ export class BaseFormGroup<C extends Controls = Controls>
 
   private validators?: ValidatorGroupFn<C>[];
 
-  constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
   constructor(props: FormGroupProps<C>);
+  constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
   constructor(
     props: FormGroupProps<C> | C,
     validatorsFn?: ValidatorGroupFn<C>[]

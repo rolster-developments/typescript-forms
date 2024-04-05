@@ -149,11 +149,11 @@ export class FormArray<C extends Controls = Controls, R = any>
   private validators?: ValidatorArrayFn<C, R>[];
 
   constructor();
+  constructor(props: RolsterArrayProps<C>);
   constructor(
-    props: RolsterFormArrayGroup<C, R>[],
+    groups: RolsterFormArrayGroup<C, R>[],
     validatorsFn?: ValidatorArrayFn<C, R>[]
   );
-  constructor(props: RolsterArrayProps<C>);
   constructor(
     props?: RolsterArrayProps<C> | RolsterFormArrayGroup<C, R>[],
     validatorsFn?: ValidatorArrayFn<C, R>[]
