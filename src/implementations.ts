@@ -21,7 +21,7 @@ export function instanceOfFormControlProps<T = any>(
   props: any
 ): props is FormControlProps<T> {
   return (
-    (typeof props === 'object' && 'state' in props) || 'validators' in props
+    typeof props === 'object' && ('state' in props || 'validators' in props)
   );
 }
 
@@ -46,7 +46,7 @@ export function instanceOfFormGroupProps<T extends Controls>(
   props: any
 ): props is FormGroupProps<T> {
   return (
-    (typeof props === 'object' && 'controls' in props) || 'validators' in props
+    typeof props === 'object' && ('controls' in props || 'validators' in props)
   );
 }
 
