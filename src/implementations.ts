@@ -15,6 +15,50 @@ import {
   ValidatorGroupFn
 } from './types';
 
+type Controls = RolsterControls<RolsterControl>;
+
+export function instanceOfFormControlProps<T = any>(
+  props: any
+): props is FormControlProps<T> {
+  return 'state' in props || 'validators' in props;
+}
+
+function getFormControlProps<T = any>(
+  props?: FormControlProps<T> | FormState<T>,
+  validators?: ValidatorFn<T>[]
+): FormControlProps<T> {
+  if (props === undefined || props === null) {
+    return { state: undefined, validators: undefined };
+  }
+
+  if (instanceOfFormControlProps<T>(props)) {
+    return props;
+  }
+
+  const state = props as FormState<T>;
+
+  return { state, validators };
+}
+
+export function instanceOfFormGroupProps<T extends Controls = Controls>(
+  props: any
+): props is FormGroupProps<T> {
+  return 'controls' in props || 'validators' in props;
+}
+
+function getFormGroupProps<T extends Controls = Controls>(
+  props: FormGroupProps<T> | T,
+  validators?: ValidatorGroupFn<T>[]
+): FormGroupProps<T> {
+  if (instanceOfFormGroupProps<T>(props)) {
+    return props;
+  }
+
+  const controls = props as T;
+
+  return { controls, validators };
+}
+
 export class BaseFormControl<
   T = any,
   C extends RolsterControls = RolsterControls
@@ -44,9 +88,14 @@ export class BaseFormControl<
 
   private currentParent?: RolsterGroup<C>;
 
-  constructor(props?: FormControlProps<T>) {
-    const state = props?.state;
-    const validators = props?.validators;
+  constructor();
+  constructor(state: FormState<T>, validators?: ValidatorFn<T>[]);
+  constructor(props: FormControlProps<T>);
+  constructor(
+    props?: FormControlProps<T> | FormState<T>,
+    validatorsFn?: ValidatorFn<T>[]
+  ) {
+    const { state, validators } = getFormControlProps(props, validatorsFn);
 
     this.subscribers = new BehaviorSubject(state);
 
@@ -190,9 +239,8 @@ export class BaseFormControl<
   }
 }
 
-export class BaseFormGroup<
-  T extends RolsterControls<RolsterControl> = RolsterControls<RolsterControl>
-> implements RolsterGroup<T>
+export class BaseFormGroup<T extends Controls = Controls>
+  implements RolsterGroup<T>
 {
   protected currentControls: T;
 
@@ -204,7 +252,14 @@ export class BaseFormGroup<
 
   private validators?: ValidatorGroupFn<T>[];
 
-  constructor({ controls, validators }: FormGroupProps<T>) {
+  constructor(controls: T, validators?: ValidatorGroupFn<T>[]);
+  constructor(props: FormGroupProps<T>);
+  constructor(
+    props: FormGroupProps<T> | T,
+    validatorsFn?: ValidatorGroupFn<T>[]
+  ) {
+    const { controls, validators } = getFormGroupProps(props, validatorsFn);
+
     this.currentControls = controls;
 
     Object.values(this.currentControls).forEach((control) => {
