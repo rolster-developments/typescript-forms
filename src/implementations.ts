@@ -1,10 +1,12 @@
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import { BehaviorSubject } from 'rxjs';
 import {
+  controlIsValid,
   controlsAllChecked,
   controlsPartialChecked,
-  controlIsValid,
-  groupIsValid
+  groupIsValid,
+  instanceOfFormControlProps,
+  instanceOfFormGroupProps
 } from './helpers';
 import { RolsterControl, RolsterControls, RolsterGroup } from './types-rolster';
 import {
@@ -17,50 +19,48 @@ import {
 
 type Controls = RolsterControls<RolsterControl>;
 
-export function instanceOfFormControlProps<T = any>(
-  props: any
-): props is FormControlProps<T> {
-  return (
-    typeof props === 'object' && ('state' in props || 'validators' in props)
-  );
-}
+type ArgsControlProps<T = any> = [
+  FormControlProps<T> | FormState<T>,
+  Undefined<ValidatorFn<T>[]>
+];
 
-function getFormControlProps<T = any>(
-  props?: FormControlProps<T> | FormState<T>,
-  validators?: ValidatorFn<T>[]
+type ArgsGroupProps<T extends Controls> = [
+  FormGroupProps<T> | T,
+  Undefined<ValidatorGroupFn<T>[]>
+];
+
+function createFormControlProps<T = any>(
+  ...argsProps: ArgsControlProps<T>
 ): FormControlProps<T> {
-  if (props === undefined || props === null) {
+  if (argsProps.length < 1) {
     return { state: undefined, validators: undefined };
   }
 
-  if (instanceOfFormControlProps<T>(props)) {
-    return props;
+  const [state, validators] = argsProps;
+
+  if (
+    argsProps.length < 2 &&
+    instanceOfFormControlProps<T, FormControlProps<T>>(state)
+  ) {
+    return state;
   }
 
-  const state = props as FormState<T>;
-
-  return { state, validators };
+  return { state: state as FormState<T>, validators };
 }
 
-export function instanceOfFormGroupProps<T extends Controls>(
-  props: any
-): props is FormGroupProps<T> {
-  return (
-    typeof props === 'object' && ('controls' in props || 'validators' in props)
-  );
-}
-
-function getFormGroupProps<T extends Controls>(
-  props: FormGroupProps<T> | T,
-  validators?: ValidatorGroupFn<T>[]
+function createFormGroupProps<T extends Controls>(
+  ...argsProps: ArgsGroupProps<T>
 ): FormGroupProps<T> {
-  if (instanceOfFormGroupProps<T>(props)) {
-    return props;
+  const [controls, validators] = argsProps;
+
+  if (
+    argsProps.length < 2 &&
+    instanceOfFormGroupProps<T, FormGroupProps<T>>(argsProps)
+  ) {
+    return argsProps;
   }
 
-  const controls = props as T;
-
-  return { controls, validators };
+  return { controls: controls as T, validators };
 }
 
 export class BaseFormControl<
@@ -96,10 +96,13 @@ export class BaseFormControl<
   constructor(props: FormControlProps<T>);
   constructor(state: FormState<T>, validators?: ValidatorFn<T>[]);
   constructor(
-    props?: FormControlProps<T> | FormState<T>,
-    validatorsFn?: ValidatorFn<T>[]
+    controlProps?: FormControlProps<T> | FormState<T>,
+    controlValidators?: ValidatorFn<T>[]
   ) {
-    const { state, validators } = getFormControlProps(props, validatorsFn);
+    const { state, validators } = createFormControlProps(
+      controlProps,
+      controlValidators
+    );
 
     this.subscribers = new BehaviorSubject(state);
 
@@ -259,10 +262,13 @@ export class BaseFormGroup<C extends Controls = Controls>
   constructor(props: FormGroupProps<C>);
   constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
   constructor(
-    props: FormGroupProps<C> | C,
-    validatorsFn?: ValidatorGroupFn<C>[]
+    argsProps: FormGroupProps<C> | C,
+    argsValidators?: ValidatorGroupFn<C>[]
   ) {
-    const { controls, validators } = getFormGroupProps(props, validatorsFn);
+    const { controls, validators } = createFormGroupProps(
+      argsProps,
+      argsValidators
+    );
 
     this.currentControls = controls;
 

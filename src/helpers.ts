@@ -6,12 +6,21 @@ import {
   AbstractControls,
   AbstractGroup,
   AbstractGroupControls,
+  FormArrayProps,
+  FormControlProps,
+  FormGroupProps,
   FormState,
   StateGroup,
   ValidatorArrayFn,
   ValidatorGroupFn,
   ValueGroup
 } from './types';
+import {
+  RolsterControl,
+  RolsterControls,
+  RolsterFormArrayControls,
+  RolsterFormArrayGroup
+} from './types-rolster';
 
 const FALSY_VALUE = ['false', 'undefined', '0', 0];
 
@@ -144,3 +153,36 @@ export const arrayIsValid = <
     return errors;
   }, [] as ValidatorError[]);
 };
+
+type Controls = RolsterControls<RolsterControl>;
+
+export function instanceOfFormControlProps<T, C extends FormControlProps<T>>(
+  props: any
+): props is C {
+  return (
+    typeof props === 'object' && ('state' in props || 'validators' in props)
+  );
+}
+
+export function instanceOfFormGroupProps<
+  C extends Controls,
+  G extends FormGroupProps<C>
+>(props: any): props is G {
+  return (
+    typeof props === 'object' && ('controls' in props || 'validators' in props)
+  );
+}
+type RolsterArrayProps<
+  T extends RolsterFormArrayControls = RolsterFormArrayControls,
+  R = any
+> = FormArrayProps<T, R, RolsterFormArrayGroup<T, R>>;
+
+export function instanceOfFormArrayProps<
+  T extends RolsterFormArrayControls,
+  R,
+  A extends RolsterArrayProps<T, R>
+>(props: any): props is A {
+  return (
+    typeof props === 'object' && ('groups' in props || 'validators' in props)
+  );
+}
