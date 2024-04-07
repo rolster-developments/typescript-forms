@@ -168,9 +168,7 @@ export function instanceOfFormGroupProps<
   C extends Controls,
   G extends FormGroupProps<C>
 >(props: any): props is G {
-  return (
-    typeof props === 'object' && ('controls' in props || 'validators' in props)
-  );
+  return typeof props === 'object' && 'controls' in props;
 }
 type RolsterArrayProps<
   T extends RolsterFormArrayControls = RolsterFormArrayControls,

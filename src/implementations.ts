@@ -24,43 +24,40 @@ type ArgsControlProps<T = any> = [
   Undefined<ValidatorFn<T>[]>
 ];
 
-type ArgsGroupProps<T extends Controls> = [
-  FormGroupProps<T> | T,
-  Undefined<ValidatorGroupFn<T>[]>
+type ArgsGroupProps<C extends Controls> = [
+  FormGroupProps<C> | C,
+  Undefined<ValidatorGroupFn<C>[]>
 ];
 
-function createFormControlProps<T = any>(
+function createFormControlProps<T>(
   ...argsProps: ArgsControlProps<T>
 ): FormControlProps<T> {
-  if (argsProps.length < 1) {
+  const [props, validators] = argsProps;
+
+  if (!props) {
     return { state: undefined, validators: undefined };
   }
 
-  const [state, validators] = argsProps;
-
   if (
-    argsProps.length < 2 &&
-    instanceOfFormControlProps<T, FormControlProps<T>>(state)
+    !validators &&
+    instanceOfFormControlProps<T, FormControlProps<T>>(props)
   ) {
-    return state;
+    return props;
   }
 
-  return { state: state as FormState<T>, validators };
+  return { state: props as FormState<T>, validators };
 }
 
-function createFormGroupProps<T extends Controls>(
-  ...argsProps: ArgsGroupProps<T>
-): FormGroupProps<T> {
-  const [controls, validators] = argsProps;
+function createFormGroupProps<C extends Controls>(
+  ...argsProps: ArgsGroupProps<C>
+): FormGroupProps<C> {
+  const [props, validators] = argsProps;
 
-  if (
-    argsProps.length < 2 &&
-    instanceOfFormGroupProps<T, FormGroupProps<T>>(argsProps)
-  ) {
-    return argsProps;
+  if (!validators && instanceOfFormGroupProps<C, FormGroupProps<C>>(props)) {
+    return props;
   }
 
-  return { controls: controls as T, validators };
+  return { controls: props as C, validators };
 }
 
 export class BaseFormControl<
@@ -262,12 +259,12 @@ export class BaseFormGroup<C extends Controls = Controls>
   constructor(props: FormGroupProps<C>);
   constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
   constructor(
-    argsProps: FormGroupProps<C> | C,
-    argsValidators?: ValidatorGroupFn<C>[]
+    groupProps: FormGroupProps<C> | C,
+    groupValidators?: ValidatorGroupFn<C>[]
   ) {
     const { controls, validators } = createFormGroupProps(
-      argsProps,
-      argsValidators
+      groupProps,
+      groupValidators
     );
 
     this.currentControls = controls;

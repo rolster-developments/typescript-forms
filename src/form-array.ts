@@ -13,61 +13,61 @@ import {
 import { BaseFormControl, BaseFormGroup } from './implementations';
 import {
   RolsterFormArray,
-  RolsterFormArrayControls as Controls,
+  RolsterFormArrayControls as Groups,
   RolsterFormArrayGroup
 } from './types-rolster';
 import {
+  AbstractArrayControl,
   AbstractArrayGroup,
   ArrayStateGroup,
-  AbstractArrayControl,
   ArrayValueGroup,
-  FormArrayProps,
   FormArrayControlProps,
   FormArrayGroupProps,
-  ValidatorArrayFn,
-  FormState,
-  ValidatorGroupFn,
+  FormArrayProps,
   FormControlProps,
-  FormGroupProps
+  FormGroupProps,
+  FormState,
+  ValidatorArrayFn,
+  ValidatorGroupFn
 } from './types';
 
-type RolsterArrayControlProps<T = any> = Omit<FormArrayControlProps<T>, 'uuid'>;
-type RolsterArrayGroupProps<T extends Controls = Controls> = Omit<
+type RolsterArrayControlProps<T> = Omit<FormArrayControlProps<T>, 'uuid'>;
+type RolsterArrayGroupProps<T extends Groups> = Omit<
   FormArrayGroupProps<T>,
   'uuid'
 >;
-type RolsterArrayProps<T extends Controls = Controls, R = any> = FormArrayProps<
-  T,
+type RolsterArrayProps<G extends Groups, R> = FormArrayProps<
+  G,
   R,
-  RolsterFormArrayGroup<T, R>
+  RolsterFormArrayGroup<G, R>
 >;
 
-type ArgsArrayProps<T extends Controls, R> = [
-  Undefined<RolsterArrayProps<T> | RolsterFormArrayGroup<T, R>[]>,
-  Undefined<ValidatorArrayFn<T, R>[]>
+type ArgsArrayProps<G extends Groups, R> = [
+  Undefined<RolsterArrayProps<G, R> | RolsterFormArrayGroup<G, R>[]>,
+  Undefined<ValidatorArrayFn<G, R>[]>
 ];
 
-function createFormArrayProps<T extends Controls, R>(
-  ...argsProps: ArgsArrayProps<T, R>
-): RolsterArrayProps<T, R> {
-  if (argsProps.length < 1) {
+function createFormArrayProps<G extends Groups, R>(
+  ...argsProps: ArgsArrayProps<G, R>
+): RolsterArrayProps<G, R> {
+  const [groups, validators] = argsProps;
+
+  if (!groups) {
     return { groups: undefined, validators: undefined };
   }
 
-  const [groups, validators] = argsProps;
-
   if (
-    argsProps.length < 2 &&
-    instanceOfFormArrayProps<T, R, RolsterArrayProps<T, R>>(groups)
+    !validators &&
+    instanceOfFormArrayProps<G, R, RolsterArrayProps<G, R>>(groups)
   ) {
     return groups;
   }
 
-  return { groups: groups as RolsterFormArrayGroup<T, R>[], validators };
+  return { groups: groups as RolsterFormArrayGroup<G, R>[], validators };
 }
 
 export class FormArrayControl<T = any>
-  extends BaseFormControl<T, Controls>
+  extends BaseFormControl<T, Groups>
   implements AbstractArrayControl<T>
 {
   public readonly uuid: string;
@@ -87,7 +87,7 @@ export class FormArrayControl<T = any>
   }
 }
 
-export class FormArrayGroup<C extends Controls = Controls, R = any>
+export class FormArrayGroup<C extends Groups = Groups, R = any>
   extends BaseFormGroup<C>
   implements RolsterFormArrayGroup<C>
 {
@@ -132,12 +132,12 @@ export class FormArrayGroup<C extends Controls = Controls, R = any>
   }
 }
 
-export class FormArray<C extends Controls = Controls, R = any>
-  implements RolsterFormArray<C>
+export class FormArray<G extends Groups = Groups, R = any>
+  implements RolsterFormArray<G>
 {
-  private currentGroups: RolsterFormArrayGroup<C, R>[] = [];
+  private currentGroups: RolsterFormArrayGroup<G, R>[] = [];
 
-  private initialState?: RolsterFormArrayGroup<C, R>[];
+  private initialState?: RolsterFormArrayGroup<G, R>[];
 
   private currentValid = true;
 
@@ -145,17 +145,17 @@ export class FormArray<C extends Controls = Controls, R = any>
 
   private currentErrors: ValidatorError[] = [];
 
-  private validators?: ValidatorArrayFn<C, R>[];
+  private validators?: ValidatorArrayFn<G, R>[];
 
   constructor();
-  constructor(props: RolsterArrayProps<C>);
+  constructor(props: RolsterArrayProps<G, R>);
   constructor(
-    groups: RolsterFormArrayGroup<C, R>[],
-    validators?: ValidatorArrayFn<C, R>[]
+    groups: RolsterFormArrayGroup<G, R>[],
+    validators?: ValidatorArrayFn<G, R>[]
   );
   constructor(
-    arrayProps?: RolsterArrayProps<C> | RolsterFormArrayGroup<C, R>[],
-    arrayValidators?: ValidatorArrayFn<C, R>[]
+    arrayProps?: RolsterArrayProps<G, R> | RolsterFormArrayGroup<G, R>[],
+    arrayValidators?: ValidatorArrayFn<G, R>[]
   ) {
     const { groups, validators } = createFormArrayProps(
       arrayProps,
@@ -171,11 +171,11 @@ export class FormArray<C extends Controls = Controls, R = any>
     this.refresh(this.initialState);
   }
 
-  public get groups(): RolsterFormArrayGroup<C, R>[] {
+  public get groups(): RolsterFormArrayGroup<G, R>[] {
     return this.currentGroups;
   }
 
-  public get controls(): C[] {
+  public get controls(): G[] {
     return this.groups.map(({ controls }) => controls);
   }
 
@@ -219,11 +219,11 @@ export class FormArray<C extends Controls = Controls, R = any>
     return !this.currentValid;
   }
 
-  public get state(): ArrayStateGroup<C>[] {
+  public get state(): ArrayStateGroup<G>[] {
     return this.currentGroups.map((group) => group.state);
   }
 
-  public get value(): ArrayValueGroup<C>[] {
+  public get value(): ArrayValueGroup<G>[] {
     return this.currentGroups.map((group) => group.value);
   }
 
@@ -243,29 +243,29 @@ export class FormArray<C extends Controls = Controls, R = any>
     this.refresh(this.initialState);
   }
 
-  public push(group: RolsterFormArrayGroup<C, R>): void {
+  public push(group: RolsterFormArrayGroup<G, R>): void {
     group.setParent(this);
 
     this.refresh([...this.currentGroups, group]);
   }
 
-  public merge(groups: RolsterFormArrayGroup<C, R>[]): void {
+  public merge(groups: RolsterFormArrayGroup<G, R>[]): void {
     groups.forEach((group) => group.setParent(this));
 
     this.refresh([...this.currentGroups, ...groups]);
   }
 
-  public set(groups: RolsterFormArrayGroup<C, R>[]): void {
+  public set(groups: RolsterFormArrayGroup<G, R>[]): void {
     groups.forEach((group) => group.setParent(this));
 
     this.refresh(groups);
   }
 
-  public remove({ uuid }: AbstractArrayGroup<C, R>): void {
+  public remove({ uuid }: AbstractArrayGroup<G, R>): void {
     this.refresh(this.currentGroups.filter((group) => group.uuid !== uuid));
   }
 
-  public setValidators(validators: ValidatorArrayFn<C, R>[]): void {
+  public setValidators(validators: ValidatorArrayFn<G, R>[]): void {
     this.validators = validators;
   }
 
@@ -290,7 +290,7 @@ export class FormArray<C extends Controls = Controls, R = any>
     }
   }
 
-  private refresh(groups?: RolsterFormArrayGroup<C, R>[]): void {
+  private refresh(groups?: RolsterFormArrayGroup<G, R>[]): void {
     this.currentGroups = groups || [];
 
     this.updateValueAndValidity();
