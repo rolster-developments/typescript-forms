@@ -62,7 +62,7 @@ export function createFormControlProps<T, C extends FormControlProps<T>>(
   const [props, validators] = argsProps;
 
   if (!props) {
-    return { state: undefined, validators: undefined } as C;
+    return { state: undefined, validators } as C;
   }
 
   if (!validators && instanceOfFormControlProps<T, C>(props)) {
@@ -94,7 +94,7 @@ export function createFormArrayProps<
   const [props, validators] = argsProps;
 
   if (!props) {
-    return { groups: undefined, validators: undefined } as A;
+    return { groups: undefined, validators } as A;
   }
 
   if (!validators && instanceOfFormArrayProps<C, R, G, A>(props)) {
