@@ -1,12 +1,11 @@
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import { BehaviorSubject } from 'rxjs';
+import { createFormControlProps, createFormGroupProps } from './arguments';
 import {
   controlIsValid,
   controlsAllChecked,
   controlsPartialChecked,
-  groupIsValid,
-  instanceOfFormControlProps,
-  instanceOfFormGroupProps
+  groupIsValid
 } from './helpers';
 import { RolsterControl, RolsterControls, RolsterGroup } from './types-rolster';
 import {
@@ -16,49 +15,6 @@ import {
   SubscriberControl,
   ValidatorGroupFn
 } from './types';
-
-type Controls = RolsterControls<RolsterControl>;
-
-type ArgsControlProps<T = any> = [
-  FormControlProps<T> | FormState<T>,
-  Undefined<ValidatorFn<T>[]>
-];
-
-type ArgsGroupProps<C extends Controls> = [
-  FormGroupProps<C> | C,
-  Undefined<ValidatorGroupFn<C>[]>
-];
-
-function createFormControlProps<T>(
-  ...argsProps: ArgsControlProps<T>
-): FormControlProps<T> {
-  const [props, validators] = argsProps;
-
-  if (!props) {
-    return { state: undefined, validators: undefined };
-  }
-
-  if (
-    !validators &&
-    instanceOfFormControlProps<T, FormControlProps<T>>(props)
-  ) {
-    return props;
-  }
-
-  return { state: props as FormState<T>, validators };
-}
-
-function createFormGroupProps<C extends Controls>(
-  ...argsProps: ArgsGroupProps<C>
-): FormGroupProps<C> {
-  const [props, validators] = argsProps;
-
-  if (!validators && instanceOfFormGroupProps<C, FormGroupProps<C>>(props)) {
-    return props;
-  }
-
-  return { controls: props as C, validators };
-}
 
 export class BaseFormControl<
   T = any,
@@ -243,8 +199,9 @@ export class BaseFormControl<
   }
 }
 
-export class BaseFormGroup<C extends Controls = Controls>
-  implements RolsterGroup<C>
+export class BaseFormGroup<
+  C extends RolsterControls<RolsterControl> = RolsterControls<RolsterControl>
+> implements RolsterGroup<C>
 {
   protected currentControls: C;
 

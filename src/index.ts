@@ -1,4 +1,9 @@
-export * from './form-array';
-export * from './form-control';
-export * from './form-group';
+export {
+  createFormArrayProps,
+  createFormControlProps,
+  createFormGroupProps
+} from './arguments';
+export { FormArray, FormArrayControl, FormArrayGroup } from './form-array';
+export { FormControl } from './form-control';
+export { FormControls, FormGroup } from './form-group';
 export * from './types';

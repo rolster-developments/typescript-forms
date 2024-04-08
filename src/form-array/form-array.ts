@@ -1,139 +1,29 @@
-import { ValidatorError, ValidatorFn } from '@rolster/validators';
-import { v4 as uuid } from 'uuid';
-import {
-  arrayIsValid,
-  controlsToState,
-  controlsToValue,
-  groupAllChecked,
-  groupPartialChecked,
-  instanceOfFormArrayProps,
-  instanceOfFormControlProps,
-  instanceOfFormGroupProps
-} from './helpers';
-import { BaseFormControl, BaseFormGroup } from './implementations';
+import { ValidatorError } from '@rolster/validators';
+import { createFormArrayProps } from '../arguments';
+import { arrayIsValid, groupAllChecked, groupPartialChecked } from '../helpers';
 import {
   RolsterFormArray,
-  RolsterFormArrayControls as Groups,
+  RolsterFormArrayControls,
   RolsterFormArrayGroup
-} from './types-rolster';
+} from '../types-rolster';
 import {
-  AbstractArrayControl,
   AbstractArrayGroup,
   ArrayStateGroup,
   ArrayValueGroup,
-  FormArrayControlProps,
-  FormArrayGroupProps,
   FormArrayProps,
-  FormControlProps,
-  FormGroupProps,
-  FormState,
-  ValidatorArrayFn,
-  ValidatorGroupFn
-} from './types';
+  ValidatorArrayFn
+} from '../types';
 
-type RolsterArrayControlProps<T> = Omit<FormArrayControlProps<T>, 'uuid'>;
-type RolsterArrayGroupProps<T extends Groups> = Omit<
-  FormArrayGroupProps<T>,
-  'uuid'
->;
-type RolsterArrayProps<G extends Groups, R> = FormArrayProps<
+type RolsterArrayProps<G extends RolsterFormArrayControls, R> = FormArrayProps<
   G,
   R,
   RolsterFormArrayGroup<G, R>
 >;
 
-type ArgsArrayProps<G extends Groups, R> = [
-  Undefined<RolsterArrayProps<G, R> | RolsterFormArrayGroup<G, R>[]>,
-  Undefined<ValidatorArrayFn<G, R>[]>
-];
-
-function createFormArrayProps<G extends Groups, R>(
-  ...argsProps: ArgsArrayProps<G, R>
-): RolsterArrayProps<G, R> {
-  const [groups, validators] = argsProps;
-
-  if (!groups) {
-    return { groups: undefined, validators: undefined };
-  }
-
-  if (
-    !validators &&
-    instanceOfFormArrayProps<G, R, RolsterArrayProps<G, R>>(groups)
-  ) {
-    return groups;
-  }
-
-  return { groups: groups as RolsterFormArrayGroup<G, R>[], validators };
-}
-
-export class FormArrayControl<T = any>
-  extends BaseFormControl<T, Groups>
-  implements AbstractArrayControl<T>
-{
-  public readonly uuid: string;
-
-  constructor();
-  constructor(props: RolsterArrayControlProps<T>);
-  constructor(state: FormState<T>, validators?: ValidatorFn<T>[]);
-  constructor(
-    controlProps?: RolsterArrayControlProps<T> | FormState<T>,
-    controlValidators?: ValidatorFn<T>[]
-  ) {
-    instanceOfFormControlProps<T, FormControlProps<T>>(controlProps)
-      ? super(controlProps)
-      : super(controlProps, controlValidators);
-
-    this.uuid = uuid();
-  }
-}
-
-export class FormArrayGroup<C extends Groups = Groups, R = any>
-  extends BaseFormGroup<C>
-  implements RolsterFormArrayGroup<C>
-{
-  public readonly uuid: string;
-
-  public readonly resource?: R;
-
-  private currentParent?: RolsterFormArray<C>;
-
-  constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
-  constructor(props: RolsterArrayGroupProps<C>);
-  constructor(
-    groupProps: RolsterArrayGroupProps<C> | C,
-    groupValidators?: ValidatorGroupFn<C>[]
-  ) {
-    if (instanceOfFormGroupProps<C, FormGroupProps<C>>(groupProps)) {
-      super(groupProps);
-      this.resource = groupProps.resource;
-    } else {
-      super(groupProps, groupValidators);
-    }
-
-    this.uuid = uuid();
-  }
-
-  public setParent(parent: RolsterFormArray<C>): void {
-    this.currentParent = parent;
-  }
-
-  public updateValueAndValidity(controls?: boolean): void {
-    super.updateValueAndValidity(controls);
-
-    this.currentParent?.updateValueAndValidity(false);
-  }
-
-  public get state(): ArrayStateGroup<C> {
-    return controlsToState(this.currentControls);
-  }
-
-  public get value(): ArrayValueGroup<C> {
-    return controlsToValue(this.currentControls);
-  }
-}
-
-export class FormArray<G extends Groups = Groups, R = any>
-  implements RolsterFormArray<G>
+export class FormArray<
+  G extends RolsterFormArrayControls = RolsterFormArrayControls,
+  R = any
+> implements RolsterFormArray<G>
 {
   private currentGroups: RolsterFormArrayGroup<G, R>[] = [];
 
