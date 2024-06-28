@@ -19,6 +19,8 @@ type RolsterArrayGroupProps<T extends RolsterFormArrayControls> = Omit<
   'uuid'
 >;
 
+export type FormArrayControls = RolsterFormArrayControls;
+
 export class FormArrayGroup<
     C extends RolsterFormArrayControls = RolsterFormArrayControls,
     R = any
