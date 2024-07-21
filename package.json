@@ -69,5 +69,8 @@
     "rolster",
     "typescript",
     "forms"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }
