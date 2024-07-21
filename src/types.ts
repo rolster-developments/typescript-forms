@@ -14,7 +14,7 @@ export interface ValidationFormError<T = any> extends ValidatorError<T> {
 
 export type SubscriberControl<T> = (state?: FormState<T>) => void;
 
-export interface AbstractControl<T = any> {
+export interface AbstractBaseControl<T = any> {
   dirty: boolean;
   errors: ValidatorError[];
   invalid: boolean;
@@ -28,15 +28,16 @@ export interface AbstractControl<T = any> {
   state?: FormState<T>;
 }
 
-export type AbstractControls<T extends AbstractControl = AbstractControl> =
-  Record<string, T>;
+export type AbstractControls<
+  T extends AbstractBaseControl = AbstractBaseControl
+> = Record<string, T>;
 
-export interface AbstractGroupControl<T = any> extends AbstractControl<T> {
+export interface AbstractControl<T = any> extends AbstractBaseControl<T> {
   reset: () => void;
   subscribe: (subscriber: SubscriberControl<T>) => Unsubscription;
 }
 
-export interface AbstractBaseControl<T = any> extends AbstractGroupControl<T> {
+export interface AbstractFunctionalControl<T = any> extends AbstractControl<T> {
   blur: () => void;
   disable: () => void;
   disabled: boolean;
@@ -50,13 +51,13 @@ export interface AbstractBaseControl<T = any> extends AbstractGroupControl<T> {
   untouch: () => void;
 }
 
-export interface AbstractFormControl<T = any> extends AbstractBaseControl<T> {
+export interface AbstractFormControl<T = any>
+  extends AbstractFunctionalControl<T> {
   setValidators: (validators?: ValidatorFn<T>[]) => void;
 }
 
-export type AbstractGroupControls<
-  T extends AbstractGroupControl = AbstractGroupControl
-> = Record<string, T>;
+export type AbstractGroupControls<T extends AbstractControl = AbstractControl> =
+  Record<string, T>;
 
 export interface AbstractGroup<
   T extends AbstractGroupControls = AbstractGroupControls
@@ -147,7 +148,7 @@ export interface AbstractArray<
   T extends AbstractArrayGroupControls = AbstractArrayGroupControls,
   R = any,
   G extends AbstractArrayGroup<T, R> = AbstractArrayGroup<T, R>
-> extends AbstractGroupControl<ArrayStateGroup<T>[]> {
+> extends AbstractControl<ArrayStateGroup<T>[]> {
   controls: T[];
   dirties: boolean;
   groups: G[];

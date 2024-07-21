@@ -2,7 +2,7 @@ import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import {
   AbstractArrayGroupControls,
   AbstractArrayGroup,
-  AbstractControl,
+  AbstractBaseControl,
   AbstractControls,
   AbstractGroup,
   AbstractGroupControls,
@@ -58,7 +58,7 @@ export const controlIsValid = <T>(
   }, [] as ValidatorError[]);
 };
 
-export const controlsAllChecked = <T extends AbstractControl>(
+export const controlsAllChecked = <T extends AbstractBaseControl>(
   controls: AbstractControls<T>,
   props: keyof T
 ): boolean => {
@@ -68,7 +68,7 @@ export const controlsAllChecked = <T extends AbstractControl>(
   );
 };
 
-export const controlsPartialChecked = <T extends AbstractControl>(
+export const controlsPartialChecked = <T extends AbstractBaseControl>(
   controls: AbstractControls<T>,
   props: keyof T
 ): boolean => {

@@ -9,9 +9,9 @@ import {
   groupIsValid
 } from './helpers';
 import {
+  AbstractControl,
   AbstractControls,
   AbstractFormGroup,
-  AbstractGroupControl,
   FormGroupProps,
   StateGroup,
   SubscriberGroup,
@@ -19,9 +19,8 @@ import {
   ValueGroup
 } from './types';
 
-export type FormControls<
-  T extends AbstractGroupControl = AbstractGroupControl
-> = AbstractControls<T>;
+export type FormControls<T extends AbstractControl = AbstractControl> =
+  AbstractControls<T>;
 
 export class FormGroup<C extends FormControls = FormControls>
   implements AbstractFormGroup<C>
