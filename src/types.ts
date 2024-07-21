@@ -33,6 +33,7 @@ export type AbstractControls<T extends AbstractControl = AbstractControl> =
 
 export interface AbstractGroupControl<T = any> extends AbstractControl<T> {
   reset: () => void;
+  subscribe: (subscriber: SubscriberControl<T>) => Unsubscription;
 }
 
 export interface AbstractBaseControl<T = any> extends AbstractGroupControl<T> {
@@ -51,7 +52,6 @@ export interface AbstractBaseControl<T = any> extends AbstractGroupControl<T> {
 
 export interface AbstractFormControl<T = any> extends AbstractBaseControl<T> {
   setValidators: (validators?: ValidatorFn<T>[]) => void;
-  subscribe: (subscriber: SubscriberControl<T>) => Unsubscription;
 }
 
 export type AbstractGroupControls<
@@ -78,33 +78,37 @@ export interface AbstractGroup<
 }
 
 export type StateGroup<
-  T extends AbstractGroupControls = AbstractGroupControls
+  C extends AbstractGroupControls = AbstractGroupControls
 > = {
-  [K in keyof T]: T[K]['state'];
+  [K in keyof C]: C[K]['state'];
 };
 
 export type ValueGroup<
-  T extends AbstractGroupControls = AbstractGroupControls
+  C extends AbstractGroupControls = AbstractGroupControls
 > = {
-  [K in keyof T]: T[K]['value'];
+  [K in keyof C]: C[K]['value'];
 };
 
 export type ValidatorGroupFn<
-  T extends AbstractGroupControls = AbstractGroupControls,
+  C extends AbstractGroupControls = AbstractGroupControls,
   V = any
-> = (controls: T) => ValidatorResult<V>;
+> = (controls: C) => ValidatorResult<V>;
+
+export type SubscriberGroup<
+  C extends AbstractGroupControls = AbstractGroupControls
+> = (state: StateGroup<C>) => void;
 
 export interface AbstractFormGroup<
-  T extends AbstractGroupControls = AbstractGroupControls
-> extends AbstractGroup<T> {
+  C extends AbstractGroupControls = AbstractGroupControls
+> extends AbstractGroup<C> {
   reset: () => void;
-  setValidators: (validators: ValidatorGroupFn<T>[]) => void;
-  state: StateGroup<T>;
-  value: ValueGroup<T>;
+  setValidators: (validators: ValidatorGroupFn<C>[]) => void;
+  state: StateGroup<C>;
+  subscribe: (subscriber: SubscriberGroup<C>) => Unsubscription;
+  value: ValueGroup<C>;
 }
 
-export interface AbstractArrayControl<T = any> extends AbstractBaseControl<T> {
-  setValidators: (validators?: ValidatorFn<T>[]) => void;
+export interface AbstractArrayControl<T = any> extends AbstractFormControl<T> {
   uuid: string;
 }
 
@@ -118,17 +122,18 @@ export interface AbstractArrayGroup<
 > extends AbstractGroup<C> {
   setValidators: (validators: ValidatorGroupFn<C>[]) => void;
   state: ArrayStateGroup<C>;
+  subscribe: (subscriber: SubscriberGroup<C>) => Unsubscription;
   uuid: string;
   value: ArrayValueGroup<C>;
   resource?: R;
 }
 
-export type ArrayStateGroup<T extends AbstractArrayGroupControls> = {
-  [K in keyof T]: T[K]['state'];
+export type ArrayStateGroup<C extends AbstractArrayGroupControls> = {
+  [K in keyof C]: C[K]['state'];
 };
 
-export type ArrayValueGroup<T extends AbstractArrayGroupControls> = {
-  [K in keyof T]: T[K]['value'];
+export type ArrayValueGroup<C extends AbstractArrayGroupControls> = {
+  [K in keyof C]: C[K]['value'];
 };
 
 export type ValidatorArrayFn<

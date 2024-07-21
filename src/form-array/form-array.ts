@@ -1,33 +1,38 @@
+import { Observable, observable } from '@rolster/commons';
 import { ValidatorError } from '@rolster/validators';
 import { createFormArrayProps } from '../arguments';
 import { arrayIsValid, groupAllChecked, groupPartialChecked } from '../helpers';
 import {
-  RolsterFormArray,
-  RolsterFormArrayControls,
-  RolsterFormArrayGroup
-} from '../types-rolster';
-import {
+  AbstractArray,
+  AbstractArrayControl,
   AbstractArrayGroup,
+  AbstractControls,
   ArrayStateGroup,
   ArrayValueGroup,
   FormArrayProps,
+  SubscriberControl,
   ValidatorArrayFn
 } from '../types';
 
-type RolsterArrayProps<G extends RolsterFormArrayControls, R> = FormArrayProps<
+type FormControls<T extends AbstractArrayControl = AbstractArrayControl> =
+  AbstractControls<T>;
+
+type ArrayProps<G extends FormControls, R> = FormArrayProps<
   G,
   R,
-  RolsterFormArrayGroup<G, R>
+  AbstractArrayGroup<G, R>
 >;
 
-export class FormArray<
-  G extends RolsterFormArrayControls = RolsterFormArrayControls,
-  R = any
-> implements RolsterFormArray<G>
-{
-  private currentGroups: RolsterFormArrayGroup<G, R>[] = [];
+type SubscriberArray<G extends FormControls> = SubscriberControl<
+  ArrayStateGroup<G>[]
+>;
 
-  private initialState?: RolsterFormArrayGroup<G, R>[];
+export class FormArray<G extends FormControls = FormControls, R = any>
+  implements AbstractArray<G, R>
+{
+  private currentGroups: AbstractArrayGroup<G, R>[] = [];
+
+  private initialState?: AbstractArrayGroup<G, R>[];
 
   private currentValid = true;
 
@@ -37,14 +42,18 @@ export class FormArray<
 
   private validators?: ValidatorArrayFn<G, R>[];
 
+  private observable: Observable<ArrayStateGroup<G>[]>;
+
+  private unsusbcriptions: Map<string, Unsubscription>;
+
   constructor();
-  constructor(props: RolsterArrayProps<G, R>);
+  constructor(props: ArrayProps<G, R>);
   constructor(
-    groups: RolsterFormArrayGroup<G, R>[],
+    groups: AbstractArrayGroup<G, R>[],
     validators?: ValidatorArrayFn<G, R>[]
   );
   constructor(
-    arrayProps?: RolsterArrayProps<G, R> | RolsterFormArrayGroup<G, R>[],
+    arrayProps?: ArrayProps<G, R> | AbstractArrayGroup<G, R>[],
     arrayValidators?: ValidatorArrayFn<G, R>[]
   ) {
     const { groups, validators } = createFormArrayProps(
@@ -52,16 +61,22 @@ export class FormArray<
       arrayValidators
     );
 
-    this.initialState = groups;
+    this.unsusbcriptions = new Map();
 
-    this.initialState?.forEach((group) => group.setParent(this));
+    this.initialState = groups;
 
     this.validators = validators;
 
     this.refresh(this.initialState);
+
+    this.observable = observable(this.state);
+
+    groups?.forEach((group) => {
+      this.subscription(group);
+    });
   }
 
-  public get groups(): RolsterFormArrayGroup<G, R>[] {
+  public get groups(): AbstractArrayGroup<G, R>[] {
     return this.currentGroups;
   }
 
@@ -70,11 +85,11 @@ export class FormArray<
   }
 
   public get touched(): boolean {
-    return groupPartialChecked(this.currentGroups, 'touched');
+    return groupPartialChecked(this.groups, 'touched');
   }
 
   public get toucheds(): boolean {
-    return groupAllChecked(this.currentGroups, 'toucheds');
+    return groupAllChecked(this.groups, 'toucheds');
   }
 
   public get untouched(): boolean {
@@ -86,11 +101,11 @@ export class FormArray<
   }
 
   public get dirty(): boolean {
-    return groupPartialChecked(this.currentGroups, 'dirty');
+    return groupPartialChecked(this.groups, 'dirty');
   }
 
   public get dirties(): boolean {
-    return groupAllChecked(this.currentGroups, 'dirties');
+    return groupAllChecked(this.groups, 'dirties');
   }
 
   public get pristine(): boolean {
@@ -102,7 +117,7 @@ export class FormArray<
   }
 
   public get valid(): boolean {
-    return this.currentValid && groupAllChecked(this.currentGroups, 'valid');
+    return this.currentValid && groupAllChecked(this.groups, 'valid');
   }
 
   public get invalid(): boolean {
@@ -110,11 +125,11 @@ export class FormArray<
   }
 
   public get state(): ArrayStateGroup<G>[] {
-    return this.currentGroups.map((group) => group.state);
+    return this.groups.map(({ state }) => state);
   }
 
   public get value(): ArrayValueGroup<G>[] {
-    return this.currentGroups.map((group) => group.value);
+    return this.groups.map(({ value }) => value);
   }
 
   public get error(): ValidatorError | undefined {
@@ -133,45 +148,63 @@ export class FormArray<
     this.refresh(this.initialState);
   }
 
-  public push(group: RolsterFormArrayGroup<G, R>): void {
-    group.setParent(this);
+  public push(group: AbstractArrayGroup<G, R>): void {
+    this.subscription(group);
 
-    this.refresh([...this.currentGroups, group]);
+    this.refresh([...this.groups, group]);
   }
 
-  public merge(groups: RolsterFormArrayGroup<G, R>[]): void {
-    groups.forEach((group) => group.setParent(this));
+  public merge(groups: AbstractArrayGroup<G, R>[]): void {
+    groups.forEach((group) => {
+      this.subscription(group);
+    });
 
-    this.refresh([...this.currentGroups, ...groups]);
+    this.refresh([...this.groups, ...groups]);
   }
 
-  public set(groups: RolsterFormArrayGroup<G, R>[]): void {
-    groups.forEach((group) => group.setParent(this));
+  public set(groups: AbstractArrayGroup<G, R>[]): void {
+    this.currentGroups.forEach(({ uuid }) => {
+      this.unsusbcriptions.delete(uuid);
+    });
 
-    this.refresh(groups);
+    groups.forEach((group) => {
+      this.subscription(group);
+    });
+
+    this.refresh(groups); // Update groups
   }
 
   public remove({ uuid }: AbstractArrayGroup<G, R>): void {
-    this.refresh(this.currentGroups.filter((group) => group.uuid !== uuid));
+    this.refresh(this.groups.filter((group) => group.uuid !== uuid));
   }
 
   public setValidators(validators: ValidatorArrayFn<G, R>[]): void {
     this.validators = validators;
+
+    this.updateValidityStatus(this.groups, validators);
   }
 
-  public updateValueAndValidity(groups = true): void {
-    if (groups) {
-      this.currentGroups.forEach((group) => group.updateValueAndValidity(true));
-    }
+  public subscribe(subscriber: SubscriberArray<G>): Unsubscription {
+    return this.observable.subscribe(subscriber);
+  }
 
-    if (this.validators) {
-      const { groups, validators } = this;
+  private subscription(group: AbstractArrayGroup<G, R>): void {
+    const unsusbcription = group.subscribe(() => {
+      this.updateValidityStatus(this.groups, this.validators);
+    });
 
+    this.unsusbcriptions.set(group.uuid, unsusbcription);
+  }
+
+  private updateValidityStatus(
+    groups: AbstractArrayGroup<G, R>[],
+    validators?: ValidatorArrayFn<G, R>[]
+  ): void {
+    if (validators) {
       const errors = arrayIsValid({ groups, validators });
 
       this.currentErrors = errors;
       this.currentError = errors[0];
-
       this.currentValid = errors.length === 0;
     } else {
       this.currentValid = true;
@@ -180,9 +213,11 @@ export class FormArray<
     }
   }
 
-  private refresh(groups?: RolsterFormArrayGroup<G, R>[]): void {
-    this.currentGroups = groups || [];
+  private refresh(newGroups?: AbstractArrayGroup<G, R>[]): void {
+    const groups = newGroups || [];
 
-    this.updateValueAndValidity();
+    this.currentGroups = groups;
+
+    this.updateValidityStatus(groups, this.validators);
   }
 }

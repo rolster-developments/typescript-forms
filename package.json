@@ -1,6 +1,6 @@
 {
-  "name": "@rolster/helpers-forms",
-  "version": "1.10.10",
+  "name": "@rolster/forms",
+  "version": "2.0.0",
   "description": "It implements a set of classes that allow managing the control of states of the input components of the UI.",
   "module": "dist/esm/index.js",
   "main": "dist/cjs/index.js",
@@ -41,7 +41,8 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@rolster/validators": "^1.0.5",
+    "@rolster/commons": "^2.0.2",
+    "@rolster/validators": "^2.0.0",
     "rxjs": "^7.8.1",
     "uuid": "^9.0.1"
   },
