@@ -88,9 +88,13 @@ export interface AbstractFormGroup<
   subscribe: (subscriber: SubscriberGroup<C>) => Unsubscription;
 }
 
-export interface AbstractArrayControl<T = any>
-  extends AbstractReactiveControl<T> {
+export interface AbstractArrayControl<T = any> extends AbstractFormControl<T> {
   uuid: string;
+}
+
+export interface AbstractReactiveArrayControl<T = any>
+  extends AbstractArrayControl<T> {
+  subscribe: (subscriber: SubscriberControl<T>) => Unsubscription;
 }
 
 export type AbstractArrayControls<
