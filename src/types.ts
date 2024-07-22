@@ -12,22 +12,18 @@ export interface ValidationFormError<T = any> extends ValidatorError<T> {
 
 export type SubscriberControl<T> = (state: T) => void;
 
-export interface AbstractBaseControl<T = any> {
+export interface AbstractControl<T = any> {
   dirty: boolean;
   errors: ValidatorError[];
   invalid: boolean;
   pristine: boolean;
+  reset: () => void;
   touched: boolean;
   untouched: boolean;
   valid: boolean;
   wrong: boolean;
   error?: ValidatorError;
   state?: T;
-}
-
-export interface AbstractControl<T = any> extends AbstractBaseControl<T> {
-  reset: () => void;
-  subscribe: (subscriber: SubscriberControl<T>) => Unsubscription;
 }
 
 export interface AbstractFormControl<T = any> extends AbstractControl<T> {
@@ -43,6 +39,11 @@ export interface AbstractFormControl<T = any> extends AbstractControl<T> {
   unfocused: boolean;
   untouch: () => void;
   setValidators: (validators?: ValidatorFn<T>[]) => void;
+}
+
+export interface AbstractReactiveControl<T = any>
+  extends AbstractFormControl<T> {
+  subscribe: (subscriber: SubscriberControl<T>) => Unsubscription;
 }
 
 export type AbstractControls<T extends AbstractControl = AbstractControl> =
@@ -87,7 +88,8 @@ export interface AbstractFormGroup<
   subscribe: (subscriber: SubscriberGroup<C>) => Unsubscription;
 }
 
-export interface AbstractArrayControl<T = any> extends AbstractFormControl<T> {
+export interface AbstractArrayControl<T = any>
+  extends AbstractReactiveControl<T> {
   uuid: string;
 }
 
@@ -115,12 +117,20 @@ export type ValidatorArrayFn<
   V = any
 > = (groups: G[]) => ValidatorResult<V>;
 
+export type ArrayFormControls<
+  T extends AbstractArrayControl = AbstractArrayControl
+> = AbstractArrayControls<T>;
+
+export type SubscriberArray<C extends ArrayFormControls> = SubscriberControl<
+  ArrayStateGroup<C>[]
+>;
+
 export interface AbstractArray<
-  T extends AbstractArrayControls = AbstractArrayControls,
+  C extends AbstractArrayControls = AbstractArrayControls,
   R = any,
-  G extends AbstractArrayGroup<T, R> = AbstractArrayGroup<T, R>
-> extends AbstractControl<ArrayStateGroup<T>[]> {
-  controls: T[];
+  G extends AbstractArrayGroup<C, R> = AbstractArrayGroup<C, R>
+> extends AbstractControl<ArrayStateGroup<C>[]> {
+  controls: C[];
   dirties: boolean;
   groups: G[];
   merge: (groups: G[]) => void;
@@ -128,7 +138,8 @@ export interface AbstractArray<
   push: (group: G) => void;
   remove: (group: G) => void;
   set: (groups: G[]) => void;
-  setValidators: (validators: ValidatorArrayFn<T, R>[]) => void;
+  setValidators: (validators: ValidatorArrayFn<C, R>[]) => void;
+  subscribe: (subscriber: SubscriberArray<C>) => Unsubscription;
   toucheds: boolean;
   untoucheds: boolean;
   wrong: boolean;

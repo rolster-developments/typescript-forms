@@ -8,16 +8,16 @@ import {
   groupIsValid
 } from './helpers';
 import {
-  AbstractControl,
   AbstractFormGroup,
   AbstractControls,
   FormGroupOptions,
   StateGroup,
   SubscriberGroup,
-  ValidatorGroupFn
+  ValidatorGroupFn,
+  AbstractReactiveControl
 } from './types';
 
-export type FormControls<T extends AbstractControl = AbstractControl> =
+export type FormControls<T extends AbstractReactiveControl = AbstractReactiveControl> =
   AbstractControls<T>;
 
 export class FormGroup<C extends FormControls = FormControls>

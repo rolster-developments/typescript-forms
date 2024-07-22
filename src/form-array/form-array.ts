@@ -4,34 +4,26 @@ import { createFormArrayOptions } from '../arguments';
 import { arrayIsValid, groupAllChecked, groupPartialChecked } from '../helpers';
 import {
   AbstractArray,
-  AbstractArrayControl,
   AbstractArrayGroup,
-  AbstractArrayControls,
+  ArrayFormControls,
   ArrayStateGroup,
   FormArrayOptions,
-  SubscriberControl,
+  SubscriberArray,
   ValidatorArrayFn
 } from '../types';
 
-type FormControls<T extends AbstractArrayControl = AbstractArrayControl> =
-  AbstractArrayControls<T>;
-
-type ArrayOptions<G extends FormControls, R> = FormArrayOptions<
-  G,
+type ArrayOptions<C extends ArrayFormControls, R> = FormArrayOptions<
+  C,
   R,
-  AbstractArrayGroup<G, R>
+  AbstractArrayGroup<C, R>
 >;
 
-type SubscriberArray<G extends FormControls> = SubscriberControl<
-  ArrayStateGroup<G>[]
->;
-
-export class FormArray<G extends FormControls = FormControls, R = any>
-  implements AbstractArray<G, R>
+export class FormArray<C extends ArrayFormControls = ArrayFormControls, R = any>
+  implements AbstractArray<C, R>
 {
-  private currentGroups: AbstractArrayGroup<G, R>[] = [];
+  private currentGroups: AbstractArrayGroup<C, R>[] = [];
 
-  private initialState?: AbstractArrayGroup<G, R>[];
+  private initialState?: AbstractArrayGroup<C, R>[];
 
   private currentValid = true;
 
@@ -39,21 +31,21 @@ export class FormArray<G extends FormControls = FormControls, R = any>
 
   private currentErrors: ValidatorError[] = [];
 
-  private validators?: ValidatorArrayFn<G, R>[];
+  private validators?: ValidatorArrayFn<C, R>[];
 
-  private observable: Observable<ArrayStateGroup<G>[]>;
+  private observable: Observable<ArrayStateGroup<C>[]>;
 
   private unsusbcriptions: Map<string, Unsubscription>;
 
   constructor();
-  constructor(options: ArrayOptions<G, R>);
+  constructor(options: ArrayOptions<C, R>);
   constructor(
-    groups: AbstractArrayGroup<G, R>[],
-    validators?: ValidatorArrayFn<G, R>[]
+    groups: AbstractArrayGroup<C, R>[],
+    validators?: ValidatorArrayFn<C, R>[]
   );
   constructor(
-    arrayOptions?: ArrayOptions<G, R> | AbstractArrayGroup<G, R>[],
-    arrayValidators?: ValidatorArrayFn<G, R>[]
+    arrayOptions?: ArrayOptions<C, R> | AbstractArrayGroup<C, R>[],
+    arrayValidators?: ValidatorArrayFn<C, R>[]
   ) {
     const { groups, validators } = createFormArrayOptions(
       arrayOptions,
@@ -75,11 +67,11 @@ export class FormArray<G extends FormControls = FormControls, R = any>
     });
   }
 
-  public get groups(): AbstractArrayGroup<G, R>[] {
+  public get groups(): AbstractArrayGroup<C, R>[] {
     return this.currentGroups;
   }
 
-  public get controls(): G[] {
+  public get controls(): C[] {
     return this.groups.map(({ controls }) => controls);
   }
 
@@ -123,7 +115,7 @@ export class FormArray<G extends FormControls = FormControls, R = any>
     return !this.currentValid;
   }
 
-  public get state(): ArrayStateGroup<G>[] {
+  public get state(): ArrayStateGroup<C>[] {
     return this.groups.map(({ state }) => state);
   }
 
@@ -143,13 +135,13 @@ export class FormArray<G extends FormControls = FormControls, R = any>
     this.refresh(this.initialState);
   }
 
-  public push(group: AbstractArrayGroup<G, R>): void {
+  public push(group: AbstractArrayGroup<C, R>): void {
     this.subscription(group);
 
     this.refresh([...this.groups, group]);
   }
 
-  public merge(groups: AbstractArrayGroup<G, R>[]): void {
+  public merge(groups: AbstractArrayGroup<C, R>[]): void {
     groups.forEach((group) => {
       this.subscription(group);
     });
@@ -157,7 +149,7 @@ export class FormArray<G extends FormControls = FormControls, R = any>
     this.refresh([...this.groups, ...groups]);
   }
 
-  public set(groups: AbstractArrayGroup<G, R>[]): void {
+  public set(groups: AbstractArrayGroup<C, R>[]): void {
     this.currentGroups.forEach(({ uuid }) => {
       this.unsusbcriptions.delete(uuid);
     });
@@ -169,21 +161,21 @@ export class FormArray<G extends FormControls = FormControls, R = any>
     this.refresh(groups); // Update groups
   }
 
-  public remove({ uuid }: AbstractArrayGroup<G, R>): void {
+  public remove({ uuid }: AbstractArrayGroup<C, R>): void {
     this.refresh(this.groups.filter((group) => group.uuid !== uuid));
   }
 
-  public setValidators(validators: ValidatorArrayFn<G, R>[]): void {
+  public setValidators(validators: ValidatorArrayFn<C, R>[]): void {
     this.validators = validators;
 
     this.updateValidityStatus(this.groups, validators);
   }
 
-  public subscribe(subscriber: SubscriberArray<G>): Unsubscription {
+  public subscribe(subscriber: SubscriberArray<C>): Unsubscription {
     return this.observable.subscribe(subscriber);
   }
 
-  private subscription(group: AbstractArrayGroup<G, R>): void {
+  private subscription(group: AbstractArrayGroup<C, R>): void {
     const unsusbcription = group.subscribe(() => {
       this.updateValidityStatus(this.groups, this.validators);
     });
@@ -192,8 +184,8 @@ export class FormArray<G extends FormControls = FormControls, R = any>
   }
 
   private updateValidityStatus(
-    groups: AbstractArrayGroup<G, R>[],
-    validators?: ValidatorArrayFn<G, R>[]
+    groups: AbstractArrayGroup<C, R>[],
+    validators?: ValidatorArrayFn<C, R>[]
   ): void {
     if (validators) {
       const errors = arrayIsValid({ groups, validators });
@@ -208,7 +200,7 @@ export class FormArray<G extends FormControls = FormControls, R = any>
     }
   }
 
-  private refresh(newGroups?: AbstractArrayGroup<G, R>[]): void {
+  private refresh(newGroups?: AbstractArrayGroup<C, R>[]): void {
     const groups = newGroups || [];
 
     this.currentGroups = groups;
@@ -218,17 +210,24 @@ export class FormArray<G extends FormControls = FormControls, R = any>
 }
 
 export function formArray<
-  G extends FormControls = FormControls,
+  G extends ArrayFormControls = ArrayFormControls,
   R = any
 >(): FormArray<G, R>;
-export function formArray<G extends FormControls = FormControls, R = any>(
-  options: ArrayOptions<G, R>
-): FormArray<G, R>;
-export function formArray<G extends FormControls = FormControls, R = any>(
+export function formArray<
+  G extends ArrayFormControls = ArrayFormControls,
+  R = any
+>(options: ArrayOptions<G, R>): FormArray<G, R>;
+export function formArray<
+  G extends ArrayFormControls = ArrayFormControls,
+  R = any
+>(
   groups: AbstractArrayGroup<G, R>[],
   validators?: ValidatorArrayFn<G, R>[]
 ): FormArray<G, R>;
-export function formArray<G extends FormControls = FormControls, R = any>(
+export function formArray<
+  G extends ArrayFormControls = ArrayFormControls,
+  R = any
+>(
   options?: ArrayOptions<G, R> | AbstractArrayGroup<G, R>[],
   validators?: ValidatorArrayFn<G, R>[]
 ): FormArray<G, R> {
