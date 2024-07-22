@@ -5,7 +5,6 @@ import {
   controlsAllChecked,
   controlsPartialChecked,
   controlsToState,
-  controlsToValue,
   groupIsValid
 } from './helpers';
 import {
@@ -15,8 +14,7 @@ import {
   FormGroupProps,
   StateGroup,
   SubscriberGroup,
-  ValidatorGroupFn,
-  ValueGroup
+  ValidatorGroupFn
 } from './types';
 
 export type FormControls<T extends AbstractControl = AbstractControl> =
@@ -111,10 +109,6 @@ export class FormGroup<C extends FormControls = FormControls>
     return controlsToState(this.controls);
   }
 
-  public get value(): ValueGroup<C> {
-    return controlsToValue(this.controls);
-  }
-
   public get errors(): ValidatorError[] {
     return this.currentErrors;
   }
@@ -158,4 +152,18 @@ export class FormGroup<C extends FormControls = FormControls>
       this.currentValid = true;
     }
   }
+}
+
+export function formGroup<C extends FormControls = FormControls>(
+  props: FormGroupProps<C>
+): FormGroup<C>;
+export function formGroup<C extends FormControls = FormControls>(
+  controls: C,
+  validators?: ValidatorGroupFn<C>[]
+): FormGroup<C>;
+export function formGroup<C extends FormControls = FormControls>(
+  groupProps: FormGroupProps<C> | C,
+  groupValidators?: ValidatorGroupFn<C>[]
+): FormGroup<C> {
+  return new FormGroup(createFormGroupProps(groupProps, groupValidators));
 }

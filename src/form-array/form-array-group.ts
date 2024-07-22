@@ -46,3 +46,17 @@ export class FormArrayGroup<
     this.resource = resource;
   }
 }
+
+export function formArrayGroup<C extends FormArrayControls = FormArrayControls>(
+  props: ArrayGroupProps<C>
+): FormArrayGroup<C>;
+export function formArrayGroup<C extends FormArrayControls = FormArrayControls>(
+  controls: C,
+  validators?: ValidatorGroupFn<C>[]
+): FormArrayGroup<C>;
+export function formArrayGroup<C extends FormArrayControls = FormArrayControls>(
+  groupProps: ArrayGroupProps<C> | C,
+  groupValidators?: ValidatorGroupFn<C>[]
+): FormArrayGroup<C> {
+  return new FormArrayGroup(createFormGroupProps(groupProps, groupValidators));
+}

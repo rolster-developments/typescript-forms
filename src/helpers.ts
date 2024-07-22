@@ -6,11 +6,9 @@ import {
   AbstractControls,
   AbstractGroup,
   AbstractGroupControls,
-  FormState,
   StateGroup,
   ValidatorArrayFn,
-  ValidatorGroupFn,
-  ValueGroup
+  ValidatorGroupFn
 } from './types';
 
 const FALSY_VALUE = ['false', 'undefined', '0', 0];
@@ -24,7 +22,7 @@ function toBoolean(value: any): boolean {
 }
 
 interface ControlValidProps<T> {
-  state: FormState<T>;
+  state: T;
   validators: ValidatorFn<T>[];
 }
 
@@ -81,21 +79,11 @@ export const controlsPartialChecked = <T extends AbstractBaseControl>(
 export const controlsToState = <C extends AbstractGroupControls>(
   controls: C
 ): StateGroup<C> => {
-  return Object.entries(controls).reduce((json, [key, { state }]) => {
-    json[key as keyof C] = state;
+  return Object.entries(controls).reduce((result, [key, { state }]) => {
+    result[key as keyof C] = state;
 
-    return json;
+    return result;
   }, {} as StateGroup<C>);
-};
-
-export const controlsToValue = <C extends AbstractGroupControls>(
-  controls: C
-): ValueGroup<C> => {
-  return Object.entries(controls).reduce((json, [key, { value }]) => {
-    json[key as keyof C] = value;
-
-    return json;
-  }, {} as ValueGroup<C>);
 };
 
 export const groupIsValid = <C extends AbstractGroupControls>({

@@ -8,7 +8,6 @@ import {
   AbstractArrayGroup,
   AbstractControls,
   ArrayStateGroup,
-  ArrayValueGroup,
   FormArrayProps,
   SubscriberControl,
   ValidatorArrayFn
@@ -128,10 +127,6 @@ export class FormArray<G extends FormControls = FormControls, R = any>
     return this.groups.map(({ state }) => state);
   }
 
-  public get value(): ArrayValueGroup<G>[] {
-    return this.groups.map(({ value }) => value);
-  }
-
   public get error(): ValidatorError | undefined {
     return this.currentError;
   }
@@ -220,4 +215,22 @@ export class FormArray<G extends FormControls = FormControls, R = any>
 
     this.updateValidityStatus(groups, this.validators);
   }
+}
+
+export function formArray<
+  G extends FormControls = FormControls,
+  R = any
+>(): FormArray<G, R>;
+export function formArray<G extends FormControls = FormControls, R = any>(
+  props: ArrayProps<G, R>
+): FormArray<G, R>;
+export function formArray<G extends FormControls = FormControls, R = any>(
+  groups: AbstractArrayGroup<G, R>[],
+  validators?: ValidatorArrayFn<G, R>[]
+): FormArray<G, R>;
+export function formArray<G extends FormControls = FormControls, R = any>(
+  arrayProps?: ArrayProps<G, R> | AbstractArrayGroup<G, R>[],
+  arrayValidators?: ValidatorArrayFn<G, R>[]
+): FormArray<G, R> {
+  return new FormArray(createFormArrayProps(arrayProps, arrayValidators));
 }

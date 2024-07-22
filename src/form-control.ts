@@ -5,7 +5,8 @@ import { controlIsValid } from './helpers';
 import {
   AbstractControl,
   FormControlProps,
-  FormState,
+  FormStateProps,
+  FormValidatorsProps,
   SubscriberControl
 } from './types';
 
@@ -20,9 +21,9 @@ export class FormControl<T = any> implements AbstractControl<T> {
 
   private currentValid = true;
 
-  private initialState: FormState<T>;
+  private initialState: T;
 
-  private currentState?: FormState<T>;
+  private currentState: T;
 
   private currentError?: ValidatorError;
 
@@ -30,13 +31,13 @@ export class FormControl<T = any> implements AbstractControl<T> {
 
   private validators?: ValidatorFn<T>[];
 
-  private observable: Observable<FormState<T>>;
+  private observable: Observable<T>;
 
   constructor();
   constructor(props: FormControlProps<T>);
-  constructor(state: FormState<T>, validators?: ValidatorFn<T>[]);
+  constructor(state: T, validators?: ValidatorFn<T>[]);
   constructor(
-    controlProps?: FormControlProps<T> | FormState<T>,
+    controlProps?: FormControlProps<T> | T,
     controlValidators?: ValidatorFn<T>[]
   ) {
     const { state, validators } = createFormControlProps(
@@ -93,12 +94,8 @@ export class FormControl<T = any> implements AbstractControl<T> {
     return !this.currentValid;
   }
 
-  public get state(): FormState<T> {
+  public get state(): T {
     return this.currentState;
-  }
-
-  public get value(): T {
-    return this.currentState as T;
   }
 
   public get errors(): ValidatorError[] {
@@ -143,7 +140,7 @@ export class FormControl<T = any> implements AbstractControl<T> {
     this.currentDisabled = false;
   }
 
-  public setState(state?: FormState<T>): void {
+  public setState(state: T): void {
     this.currentState = state;
     this.currentDirty = true;
 
@@ -162,7 +159,7 @@ export class FormControl<T = any> implements AbstractControl<T> {
   }
 
   private updateValueAndValidity(
-    state: FormState<T>,
+    state: T,
     validators?: ValidatorFn<T>[]
   ): void {
     if (validators) {
@@ -178,4 +175,20 @@ export class FormControl<T = any> implements AbstractControl<T> {
       this.currentErrors = [];
     }
   }
+}
+
+export function formControl<T>(): FormControl<T | undefined>;
+export function formControl<T>(props: FormStateProps<T>): FormControl<T>;
+export function formControl<T>(
+  props: FormValidatorsProps<T>
+): FormControl<T | undefined>;
+export function formControl<T>(
+  state: T,
+  validators?: ValidatorFn<T>[]
+): FormControl<T>;
+export function formControl<T>(
+  props?: FormControlProps<T> | T,
+  validators?: ValidatorFn<T>[]
+): FormControl<T> {
+  return new FormControl(createFormControlProps(props, validators));
 }

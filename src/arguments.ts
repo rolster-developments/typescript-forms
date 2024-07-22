@@ -6,13 +6,12 @@ import {
   FormArrayProps,
   FormControlProps,
   FormGroupProps,
-  FormState,
   ValidatorArrayFn,
   ValidatorGroupFn
 } from './types';
 
 type ArgsControlProps<T = any> = [
-  FormControlProps<T> | FormState<T>,
+  FormControlProps<T> | T | undefined,
   Undefined<ValidatorFn<T>[]>
 ];
 
@@ -69,7 +68,7 @@ export function createFormControlProps<T, C extends FormControlProps<T>>(
     return props;
   }
 
-  return { state: props as FormState<T>, validators } as C;
+  return { state: props as T, validators } as C;
 }
 
 export function createFormGroupProps<
