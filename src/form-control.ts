@@ -1,12 +1,12 @@
 import { Observable, observable } from '@rolster/commons';
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
-import { createFormControlProps } from './arguments';
+import { createFormControlOptions } from './arguments';
 import { controlIsValid } from './helpers';
 import {
   AbstractControl,
-  FormControlProps,
-  FormStateProps,
-  FormValidatorsProps,
+  FormControlOptions,
+  FormStateOptions,
+  FormValidatorsOptions,
   SubscriberControl
 } from './types';
 
@@ -34,13 +34,13 @@ export class FormControl<T = any> implements AbstractControl<T> {
   private observable: Observable<T>;
 
   constructor();
-  constructor(props: FormControlProps<T>);
+  constructor(props: FormControlOptions<T>);
   constructor(state: T, validators?: ValidatorFn<T>[]);
   constructor(
-    controlProps?: FormControlProps<T> | T,
+    controlProps?: FormControlOptions<T> | T,
     controlValidators?: ValidatorFn<T>[]
   ) {
-    const { state, validators } = createFormControlProps(
+    const { state, validators } = createFormControlOptions(
       controlProps,
       controlValidators
     );
@@ -178,17 +178,17 @@ export class FormControl<T = any> implements AbstractControl<T> {
 }
 
 export function formControl<T>(): FormControl<T | undefined>;
-export function formControl<T>(props: FormStateProps<T>): FormControl<T>;
+export function formControl<T>(options: FormStateOptions<T>): FormControl<T>;
 export function formControl<T>(
-  props: FormValidatorsProps<T>
+  options: FormValidatorsOptions<T>
 ): FormControl<T | undefined>;
 export function formControl<T>(
   state: T,
   validators?: ValidatorFn<T>[]
 ): FormControl<T>;
 export function formControl<T>(
-  props?: FormControlProps<T> | T,
+  options?: FormControlOptions<T> | T,
   validators?: ValidatorFn<T>[]
 ): FormControl<T> {
-  return new FormControl(createFormControlProps(props, validators));
+  return new FormControl(createFormControlOptions(options, validators));
 }

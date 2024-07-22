@@ -1,38 +1,28 @@
+import { parseBoolean } from '@rolster/commons';
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import {
-  AbstractArrayGroupControls,
+  AbstractControl,
   AbstractArrayGroup,
-  AbstractBaseControl,
-  AbstractControls,
+  AbstractArrayControls,
   AbstractGroup,
-  AbstractGroupControls,
+  AbstractControls,
   StateGroup,
   ValidatorArrayFn,
   ValidatorGroupFn
 } from './types';
 
-const FALSY_VALUE = ['false', 'undefined', '0', 0];
-
-function toBoolean(value: any): boolean {
-  return !(
-    !(typeof value !== 'undefined' && value !== null) ||
-    value === false ||
-    FALSY_VALUE.includes(value)
-  );
-}
-
-interface ControlValidProps<T> {
+interface ControlValidOptions<T> {
   state: T;
   validators: ValidatorFn<T>[];
 }
 
-interface GroupValidProps<T extends AbstractGroupControls> {
+interface GroupValidOptions<T extends AbstractControls> {
   controls: T;
   validators: ValidatorGroupFn<T>[];
 }
 
-interface ArrayValidProps<
-  T extends AbstractArrayGroupControls = AbstractArrayGroupControls,
+interface ArrayValidOptions<
+  T extends AbstractArrayControls = AbstractArrayControls,
   R = any,
   G extends AbstractArrayGroup<T, R> = AbstractArrayGroup<T, R>
 > {
@@ -40,11 +30,10 @@ interface ArrayValidProps<
   validators: ValidatorArrayFn<T, R>[];
 }
 
-export const controlIsValid = <T>(
-  props: ControlValidProps<T>
-): ValidatorError[] => {
-  const { state, validators } = props;
-
+export const controlIsValid = <T>({
+  state,
+  validators
+}: ControlValidOptions<T>): ValidatorError[] => {
   return validators.reduce((errors, validator) => {
     const error = validator(state);
 
@@ -56,27 +45,27 @@ export const controlIsValid = <T>(
   }, [] as ValidatorError[]);
 };
 
-export const controlsAllChecked = <T extends AbstractBaseControl>(
+export const controlsAllChecked = <T extends AbstractControl>(
   controls: AbstractControls<T>,
-  props: keyof T
+  key: keyof T
 ): boolean => {
   return Object.values(controls).reduce(
-    (value, control) => value && toBoolean(control[props]),
+    (value, control) => value && parseBoolean(control[key]),
     true
   );
 };
 
-export const controlsPartialChecked = <T extends AbstractBaseControl>(
+export const controlsPartialChecked = <T extends AbstractControl>(
   controls: AbstractControls<T>,
-  props: keyof T
+  key: keyof T
 ): boolean => {
   return Object.values(controls).reduce(
-    (value, control) => value || toBoolean(control[props]),
+    (value, control) => value || parseBoolean(control[key]),
     false
   );
 };
 
-export const controlsToState = <C extends AbstractGroupControls>(
+export const controlsToState = <C extends AbstractControls>(
   controls: C
 ): StateGroup<C> => {
   return Object.entries(controls).reduce((result, [key, { state }]) => {
@@ -86,10 +75,10 @@ export const controlsToState = <C extends AbstractGroupControls>(
   }, {} as StateGroup<C>);
 };
 
-export const groupIsValid = <C extends AbstractGroupControls>({
+export const groupIsValid = <C extends AbstractControls>({
   controls,
   validators
-}: GroupValidProps<C>): ValidatorError[] => {
+}: GroupValidOptions<C>): ValidatorError[] => {
   return validators.reduce((errors, validator) => {
     const error = validator(controls);
 
@@ -101,27 +90,33 @@ export const groupIsValid = <C extends AbstractGroupControls>({
   }, [] as ValidatorError[]);
 };
 
-export function groupAllChecked<C extends AbstractGroupControls>(
+export function groupAllChecked<C extends AbstractControls>(
   groups: AbstractGroup<C>[],
   key: keyof AbstractGroup<C>
 ): boolean {
-  return groups.reduce((value, group) => value && toBoolean(group[key]), true);
+  return groups.reduce(
+    (value, group) => value && parseBoolean(group[key]),
+    true
+  );
 }
 
-export function groupPartialChecked<C extends AbstractGroupControls>(
+export function groupPartialChecked<C extends AbstractControls>(
   groups: AbstractGroup<C>[],
   key: keyof AbstractGroup<C>
 ): boolean {
-  return groups.reduce((value, group) => value || toBoolean(group[key]), false);
+  return groups.reduce(
+    (value, group) => value || parseBoolean(group[key]),
+    false
+  );
 }
 
 export const arrayIsValid = <
-  C extends AbstractArrayGroupControls = AbstractArrayGroupControls,
+  C extends AbstractArrayControls = AbstractArrayControls,
   R = any
 >({
   groups,
   validators
-}: ArrayValidProps<C, R>): ValidatorError[] => {
+}: ArrayValidOptions<C, R>): ValidatorError[] => {
   return validators.reduce((errors, validator) => {
     const error = validator(groups);
 

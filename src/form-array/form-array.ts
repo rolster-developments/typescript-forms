@@ -1,22 +1,22 @@
 import { Observable, observable } from '@rolster/commons';
 import { ValidatorError } from '@rolster/validators';
-import { createFormArrayProps } from '../arguments';
+import { createFormArrayOptions } from '../arguments';
 import { arrayIsValid, groupAllChecked, groupPartialChecked } from '../helpers';
 import {
   AbstractArray,
   AbstractArrayControl,
   AbstractArrayGroup,
-  AbstractControls,
+  AbstractArrayControls,
   ArrayStateGroup,
-  FormArrayProps,
+  FormArrayOptions,
   SubscriberControl,
   ValidatorArrayFn
 } from '../types';
 
 type FormControls<T extends AbstractArrayControl = AbstractArrayControl> =
-  AbstractControls<T>;
+  AbstractArrayControls<T>;
 
-type ArrayProps<G extends FormControls, R> = FormArrayProps<
+type ArrayOptions<G extends FormControls, R> = FormArrayOptions<
   G,
   R,
   AbstractArrayGroup<G, R>
@@ -46,17 +46,17 @@ export class FormArray<G extends FormControls = FormControls, R = any>
   private unsusbcriptions: Map<string, Unsubscription>;
 
   constructor();
-  constructor(props: ArrayProps<G, R>);
+  constructor(options: ArrayOptions<G, R>);
   constructor(
     groups: AbstractArrayGroup<G, R>[],
     validators?: ValidatorArrayFn<G, R>[]
   );
   constructor(
-    arrayProps?: ArrayProps<G, R> | AbstractArrayGroup<G, R>[],
+    arrayOptions?: ArrayOptions<G, R> | AbstractArrayGroup<G, R>[],
     arrayValidators?: ValidatorArrayFn<G, R>[]
   ) {
-    const { groups, validators } = createFormArrayProps(
-      arrayProps,
+    const { groups, validators } = createFormArrayOptions(
+      arrayOptions,
       arrayValidators
     );
 
@@ -222,15 +222,15 @@ export function formArray<
   R = any
 >(): FormArray<G, R>;
 export function formArray<G extends FormControls = FormControls, R = any>(
-  props: ArrayProps<G, R>
+  options: ArrayOptions<G, R>
 ): FormArray<G, R>;
 export function formArray<G extends FormControls = FormControls, R = any>(
   groups: AbstractArrayGroup<G, R>[],
   validators?: ValidatorArrayFn<G, R>[]
 ): FormArray<G, R>;
 export function formArray<G extends FormControls = FormControls, R = any>(
-  arrayProps?: ArrayProps<G, R> | AbstractArrayGroup<G, R>[],
-  arrayValidators?: ValidatorArrayFn<G, R>[]
+  options?: ArrayOptions<G, R> | AbstractArrayGroup<G, R>[],
+  validators?: ValidatorArrayFn<G, R>[]
 ): FormArray<G, R> {
-  return new FormArray(createFormArrayProps(arrayProps, arrayValidators));
+  return new FormArray(createFormArrayOptions(options, validators));
 }

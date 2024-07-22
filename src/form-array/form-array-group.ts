@@ -1,20 +1,20 @@
 import { v4 as uuid } from 'uuid';
-import { createFormGroupProps } from '../arguments';
+import { createFormGroupOptions } from '../arguments';
 import { FormGroup } from '../form-group';
 import {
   AbstractArrayControl,
   AbstractArrayGroup,
-  AbstractControls,
-  FormArrayGroupProps,
+  AbstractArrayControls,
+  FormArrayGroupOptions,
   ValidatorGroupFn
 } from '../types';
 
 export type FormArrayControls<
   T extends AbstractArrayControl = AbstractArrayControl
-> = AbstractControls<T>;
+> = AbstractArrayControls<T>;
 
-type ArrayGroupProps<T extends FormArrayControls> = Omit<
-  FormArrayGroupProps<T>,
+type ArrayGroupOptions<T extends FormArrayControls> = Omit<
+  FormArrayGroupOptions<T>,
   'uuid'
 >;
 
@@ -29,16 +29,16 @@ export class FormArrayGroup<
 
   public readonly resource?: R;
 
+  constructor(options: ArrayGroupOptions<C>);
   constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
-  constructor(props: ArrayGroupProps<C>);
   constructor(
-    groupProps: ArrayGroupProps<C> | C,
+    groupOptions: ArrayGroupOptions<C> | C,
     groupValidators?: ValidatorGroupFn<C>[]
   ) {
-    const { controls, resource, validators } = createFormGroupProps<
+    const { controls, resource, validators } = createFormGroupOptions<
       C,
-      ArrayGroupProps<C>
-    >(groupProps, groupValidators);
+      ArrayGroupOptions<C>
+    >(groupOptions, groupValidators);
 
     super(controls, validators);
 
@@ -48,15 +48,15 @@ export class FormArrayGroup<
 }
 
 export function formArrayGroup<C extends FormArrayControls = FormArrayControls>(
-  props: ArrayGroupProps<C>
+  options: ArrayGroupOptions<C>
 ): FormArrayGroup<C>;
 export function formArrayGroup<C extends FormArrayControls = FormArrayControls>(
   controls: C,
   validators?: ValidatorGroupFn<C>[]
 ): FormArrayGroup<C>;
 export function formArrayGroup<C extends FormArrayControls = FormArrayControls>(
-  groupProps: ArrayGroupProps<C> | C,
-  groupValidators?: ValidatorGroupFn<C>[]
+  options: ArrayGroupOptions<C> | C,
+  validators?: ValidatorGroupFn<C>[]
 ): FormArrayGroup<C> {
-  return new FormArrayGroup(createFormGroupProps(groupProps, groupValidators));
+  return new FormArrayGroup(createFormGroupOptions(options, validators));
 }

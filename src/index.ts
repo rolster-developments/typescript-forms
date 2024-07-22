@@ -1,7 +1,7 @@
 export {
-  createFormArrayProps,
-  createFormControlProps,
-  createFormGroupProps
+  createFormArrayOptions,
+  createFormControlOptions,
+  createFormGroupOptions
 } from './arguments';
 export {
   FormArray,

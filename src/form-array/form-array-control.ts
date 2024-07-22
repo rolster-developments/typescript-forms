@@ -1,10 +1,10 @@
 import { ValidatorFn } from '@rolster/validators';
 import { v4 as uuid } from 'uuid';
-import { createFormControlProps } from '../arguments';
+import { createFormControlOptions } from '../arguments';
 import { FormControl } from '../form-control';
-import { AbstractArrayControl, FormArrayControlProps } from '../types';
+import { AbstractArrayControl, FormArrayControlOptions } from '../types';
 
-type ArrayControlProps<T> = Omit<FormArrayControlProps<T>, 'uuid'>;
+type ArrayControlOptions<T> = Omit<FormArrayControlOptions<T>, 'uuid'>;
 
 export class FormArrayControl<T = any>
   extends FormControl<T>
@@ -13,14 +13,14 @@ export class FormArrayControl<T = any>
   public readonly uuid: string;
 
   constructor();
-  constructor(props: ArrayControlProps<T>);
+  constructor(options: ArrayControlOptions<T>);
   constructor(state: T, validators?: ValidatorFn<T>[]);
   constructor(
-    controlProps?: ArrayControlProps<T> | T,
+    controlOptions?: ArrayControlOptions<T> | T,
     controlValidators?: ValidatorFn<T>[]
   ) {
-    const { state, validators } = createFormControlProps(
-      controlProps,
+    const { state, validators } = createFormControlOptions(
+      controlOptions,
       controlValidators
     );
 
@@ -30,23 +30,23 @@ export class FormArrayControl<T = any>
   }
 }
 
-type ArrayStateProps<T> = Omit<ArrayControlProps<T>, 'validators'>;
-type ArrayValidatorsProps<T> = Omit<ArrayControlProps<T>, 'state'>;
+type ArrayStateProps<T> = Omit<ArrayControlOptions<T>, 'validators'>;
+type ArrayValidatorsProps<T> = Omit<ArrayControlOptions<T>, 'state'>;
 
 export function formArrayControl<T>(): FormArrayControl<T | undefined>;
 export function formArrayControl<T>(
-  props: ArrayStateProps<T>
+  options: ArrayStateProps<T>
 ): FormArrayControl<T>;
 export function formArrayControl<T>(
-  props: ArrayValidatorsProps<T>
+  options: ArrayValidatorsProps<T>
 ): FormArrayControl<T | undefined>;
 export function formArrayControl<T>(
   state: T,
   validators?: ValidatorFn<T>[]
 ): FormArrayControl<T>;
 export function formArrayControl<T>(
-  props?: ArrayControlProps<T> | T,
+  options?: ArrayControlOptions<T> | T,
   validators?: ValidatorFn<T>[]
 ): FormArrayControl<T> {
-  return new FormArrayControl(createFormControlProps(props, validators));
+  return new FormArrayControl(createFormControlOptions(options, validators));
 }

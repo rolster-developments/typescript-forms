@@ -1,6 +1,6 @@
 import { Observable, observable } from '@rolster/commons';
 import { ValidatorError } from '@rolster/validators';
-import { createFormGroupProps } from './arguments';
+import { createFormGroupOptions } from './arguments';
 import {
   controlsAllChecked,
   controlsPartialChecked,
@@ -9,9 +9,9 @@ import {
 } from './helpers';
 import {
   AbstractControl,
-  AbstractControls,
   AbstractFormGroup,
-  FormGroupProps,
+  AbstractControls,
+  FormGroupOptions,
   StateGroup,
   SubscriberGroup,
   ValidatorGroupFn
@@ -35,14 +35,14 @@ export class FormGroup<C extends FormControls = FormControls>
 
   private observable: Observable<StateGroup<C>>;
 
-  constructor(props: FormGroupProps<C>);
+  constructor(options: FormGroupOptions<C>);
   constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
   constructor(
-    groupProps: FormGroupProps<C> | C,
+    groupOptions: FormGroupOptions<C> | C,
     groupValidators?: ValidatorGroupFn<C>[]
   ) {
-    const { controls, validators } = createFormGroupProps(
-      groupProps,
+    const { controls, validators } = createFormGroupOptions(
+      groupOptions,
       groupValidators
     );
 
@@ -155,15 +155,15 @@ export class FormGroup<C extends FormControls = FormControls>
 }
 
 export function formGroup<C extends FormControls = FormControls>(
-  props: FormGroupProps<C>
+  options: FormGroupOptions<C>
 ): FormGroup<C>;
 export function formGroup<C extends FormControls = FormControls>(
   controls: C,
   validators?: ValidatorGroupFn<C>[]
 ): FormGroup<C>;
 export function formGroup<C extends FormControls = FormControls>(
-  groupProps: FormGroupProps<C> | C,
-  groupValidators?: ValidatorGroupFn<C>[]
+  options: FormGroupOptions<C> | C,
+  validators?: ValidatorGroupFn<C>[]
 ): FormGroup<C> {
-  return new FormGroup(createFormGroupProps(groupProps, groupValidators));
+  return new FormGroup(createFormGroupOptions(options, validators));
 }
