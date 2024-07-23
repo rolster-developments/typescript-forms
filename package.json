@@ -1,6 +1,6 @@
 {
   "name": "@rolster/forms",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "It implements a set of classes that allow managing the control of states of the input components of the UI.",
   "module": "dist/esm/index.js",
   "main": "dist/cjs/index.js",
@@ -16,6 +16,7 @@
   ],
   "files": [
     "dist/",
+    "arguments/",
     "helpers/"
   ],
   "exports": {
@@ -24,6 +25,12 @@
       "node": "./dist/cjs/index.js",
       "require": "./dist/cjs/index.js",
       "default": "./dist/esm/index.js"
+    },
+    "./arguments": {
+      "types": "./dist/esm/arguments.d.ts",
+      "node": "./dist/cjs/arguments.js",
+      "require": "./dist/cjs/arguments.js",
+      "default": "./dist/esm/arguments.js"
     },
     "./helpers": {
       "types": "./dist/esm/helpers.d.ts",

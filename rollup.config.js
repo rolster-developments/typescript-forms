@@ -8,8 +8,7 @@ const plugins = [
   typescript({
     tsconfig: './tsconfig.app.json',
     declaration: true,
-    declarationDir: 'dist',
-    include: ['node_modules/@rolster/typescript-types/index.d.ts']
+    declarationDir: 'dist'
   })
 ];
 
@@ -30,11 +29,11 @@ const rollupTs = (file) => {
         inlineDynamicImports: true
       }
     ],
-    external: ['@rolster/validators', 'rxjs', 'uuid'],
+    external: ['@rolster/commons', '@rolster/validators', 'rxjs', 'uuid'],
     plugins
   };
 };
 
-const exports = ['index', 'helpers'];
-
-export default [...exports.map((file) => rollupTs(file))];
+export default [
+  ...['index', 'helpers', 'arguments'].map((file) => rollupTs(file))
+];

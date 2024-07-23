@@ -1,9 +1,4 @@
 export {
-  createFormArrayOptions,
-  createFormControlOptions,
-  createFormGroupOptions
-} from './arguments';
-export {
   FormArray,
   FormArrayControl,
   FormArrayControls,

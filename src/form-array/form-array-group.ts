@@ -2,16 +2,11 @@ import { v4 as uuid } from 'uuid';
 import { createFormGroupOptions } from '../arguments';
 import { FormGroup } from '../form-group';
 import {
-  AbstractArrayGroup,
-  AbstractArrayControls,
+  AbstractReactiveArrayGroup,
   FormArrayGroupOptions,
-  ValidatorGroupFn,
-  AbstractReactiveArrayControl
+  ValidatorGroupFn
 } from '../types';
-
-export type FormArrayControls<
-  T extends AbstractReactiveArrayControl = AbstractReactiveArrayControl
-> = AbstractArrayControls<T>;
+import { FormArrayControls } from './types';
 
 type ArrayGroupOptions<T extends FormArrayControls> = Omit<
   FormArrayGroupOptions<T>,
@@ -23,7 +18,7 @@ export class FormArrayGroup<
     R = any
   >
   extends FormGroup<C>
-  implements AbstractArrayGroup<C>
+  implements AbstractReactiveArrayGroup<C>
 {
   public readonly uuid: string;
 

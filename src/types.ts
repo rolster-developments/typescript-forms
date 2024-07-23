@@ -85,6 +85,11 @@ export interface AbstractFormGroup<
   reset: () => void;
   setValidators: (validators: ValidatorGroupFn<C>[]) => void;
   state: StateGroup<C>;
+}
+
+export interface AbstractReactiveGroup<
+  C extends AbstractControls = AbstractControls
+> extends AbstractFormGroup<C> {
   subscribe: (subscriber: SubscriberGroup<C>) => Unsubscription;
 }
 
@@ -105,9 +110,15 @@ export interface AbstractArrayGroup<C extends AbstractArrayControls, R = any>
   extends AbstractGroup<C> {
   setValidators: (validators: ValidatorGroupFn<C>[]) => void;
   state: ArrayStateGroup<C>;
-  subscribe: (subscriber: SubscriberGroup<C>) => Unsubscription;
   uuid: string;
   resource?: R;
+}
+
+export interface AbstractReactiveArrayGroup<
+  C extends AbstractArrayControls,
+  R = any
+> extends AbstractArrayGroup<C, R> {
+  subscribe: (subscriber: SubscriberGroup<C>) => Unsubscription;
 }
 
 export type ArrayStateGroup<C extends AbstractArrayControls> = {
@@ -143,10 +154,17 @@ export interface AbstractArray<
   remove: (group: G) => void;
   set: (groups: G[]) => void;
   setValidators: (validators: ValidatorArrayFn<C, R>[]) => void;
-  subscribe: (subscriber: SubscriberArray<C>) => Unsubscription;
   toucheds: boolean;
   untoucheds: boolean;
   wrong: boolean;
+}
+
+export interface AbstractReactiveArray<
+  C extends AbstractArrayControls = AbstractArrayControls,
+  R = any,
+  G extends AbstractArrayGroup<C, R> = AbstractArrayGroup<C, R>
+> extends AbstractArray<C, R, G> {
+  subscribe: (subscriber: SubscriberArray<C>) => Unsubscription;
 }
 
 export interface FormControlOptions<T = any> {
