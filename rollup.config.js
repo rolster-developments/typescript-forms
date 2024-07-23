@@ -8,7 +8,8 @@ const plugins = [
   typescript({
     tsconfig: './tsconfig.app.json',
     declaration: true,
-    declarationDir: 'dist'
+    declarationDir: 'dist',
+    include: ['node_modules/@rolster/types/index.d.ts']
   })
 ];
 
