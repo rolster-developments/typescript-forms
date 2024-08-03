@@ -3,14 +3,14 @@ import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import { createFormControlOptions } from './arguments';
 import { controlIsValid } from './helpers';
 import {
-  AbstractControl,
+  AbstractReactiveControl,
   FormControlOptions,
   FormStateOptions,
   FormValidatorsOptions,
   SubscriberControl
 } from './types';
 
-export class FormControl<T = any> implements AbstractControl<T> {
+export class FormControl<T = any> implements AbstractReactiveControl<T> {
   private currentFocused = false;
 
   private currentTouched = false;
@@ -131,6 +131,10 @@ export class FormControl<T = any> implements AbstractControl<T> {
 
   public enable(): void {
     this.currentDisabled = false;
+  }
+
+  public touch(): void {
+    this.currentTouched = true;
   }
 
   public setState(state: T): void {
