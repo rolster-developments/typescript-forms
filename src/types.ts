@@ -13,32 +13,30 @@ export interface ValidationFormError<T = any> extends ValidatorError<T> {
 export type SubscriberControl<T> = (state: T) => void;
 
 export interface AbstractControl<T = any> {
-  dirty: boolean;
-  errors: ValidatorError[];
-  invalid: boolean;
-  pristine: boolean;
+  readonly dirty: boolean;
+  readonly disabled: boolean;
+  readonly enabled: boolean;
+  readonly errors: ValidatorError[];
+  readonly invalid: boolean;
+  readonly pristine: boolean;
   reset: () => void;
-  touched: boolean;
-  untouched: boolean;
-  valid: boolean;
-  wrong: boolean;
-  error?: ValidatorError;
-  state?: T;
+  readonly touched: boolean;
+  readonly untouched: boolean;
+  readonly valid: boolean;
+  readonly wrong: boolean;
+  readonly error?: ValidatorError;
+  readonly state?: T;
 }
 
 export interface AbstractFormControl<T = any> extends AbstractControl<T> {
   blur: () => void;
   disable: () => void;
-  disabled: boolean;
   enable: () => void;
-  enabled: boolean;
   focus: () => void;
-  focused: boolean;
+  readonly focused: boolean;
   setState: (state: T) => void;
-  touch: () => void;
-  unfocused: boolean;
-  untouch: () => void;
   setValidators: (validators?: ValidatorFn<T>[]) => void;
+  readonly unfocused: boolean;
 }
 
 export interface AbstractReactiveControl<T = any>
@@ -50,20 +48,20 @@ export type AbstractControls<T extends AbstractControl = AbstractControl> =
   Record<string, T>;
 
 export interface AbstractGroup<T extends AbstractControls = AbstractControls> {
-  controls: T;
-  dirty: boolean;
-  dirties: boolean;
-  errors: ValidatorError[];
-  invalid: boolean;
-  pristine: boolean;
-  pristines: boolean;
-  touched: boolean;
-  toucheds: boolean;
-  untouched: boolean;
-  untoucheds: boolean;
-  valid: boolean;
-  wrong: boolean;
-  error?: ValidatorError;
+  readonly controls: T;
+  readonly dirty: boolean;
+  readonly dirtyAll: boolean;
+  readonly errors: ValidatorError[];
+  readonly invalid: boolean;
+  readonly pristine: boolean;
+  readonly pristineAll: boolean;
+  readonly touched: boolean;
+  readonly touchedAll: boolean;
+  readonly untouched: boolean;
+  readonly untouchedAll: boolean;
+  readonly valid: boolean;
+  readonly wrong: boolean;
+  readonly error?: ValidatorError;
 }
 
 export type StateGroup<C extends AbstractControls = AbstractControls> = {
@@ -84,7 +82,7 @@ export interface AbstractFormGroup<
 > extends AbstractGroup<C> {
   reset: () => void;
   setValidators: (validators: ValidatorGroupFn<C>[]) => void;
-  state: StateGroup<C>;
+  readonly state: StateGroup<C>;
 }
 
 export interface AbstractReactiveGroup<
@@ -94,7 +92,7 @@ export interface AbstractReactiveGroup<
 }
 
 export interface AbstractArrayControl<T = any> extends AbstractFormControl<T> {
-  uuid: string;
+  readonly uuid: string;
 }
 
 export interface AbstractReactiveArrayControl<T = any>
@@ -109,8 +107,8 @@ export type AbstractArrayControls<
 export interface AbstractArrayGroup<C extends AbstractArrayControls, R = any>
   extends AbstractGroup<C> {
   setValidators: (validators: ValidatorGroupFn<C>[]) => void;
-  state: ArrayStateGroup<C>;
-  uuid: string;
+  readonly state: ArrayStateGroup<C>;
+  readonly uuid: string;
   resource?: R;
 }
 
@@ -145,18 +143,20 @@ export interface AbstractArray<
   R = any,
   G extends AbstractArrayGroup<C, R> = AbstractArrayGroup<C, R>
 > extends AbstractControl<ArrayStateGroup<C>[]> {
-  controls: C[];
-  dirties: boolean;
-  groups: G[];
+  readonly controls: C[];
+  readonly dirtyAll: boolean;
+  disable: () => void;
+  enable: () => void;
+  readonly groups: G[];
   merge: (groups: G[]) => void;
-  pristines: boolean;
+  readonly pristineAll: boolean;
   push: (group: G) => void;
   remove: (group: G) => void;
   set: (groups: G[]) => void;
   setValidators: (validators: ValidatorArrayFn<C, R>[]) => void;
-  toucheds: boolean;
-  untoucheds: boolean;
-  wrong: boolean;
+  readonly touchedAll: boolean;
+  readonly untouchedAll: boolean;
+  readonly wrong: boolean;
 }
 
 export interface AbstractReactiveArray<

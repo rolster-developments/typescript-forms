@@ -70,7 +70,7 @@ export class FormGroup<C extends FormControls = FormControls>
     return controlsPartialChecked(this.controls, 'touched');
   }
 
-  public get toucheds(): boolean {
+  public get touchedAll(): boolean {
     return controlsAllChecked(this.controls, 'touched');
   }
 
@@ -78,15 +78,15 @@ export class FormGroup<C extends FormControls = FormControls>
     return !this.touched;
   }
 
-  public get untoucheds(): boolean {
-    return !this.toucheds;
+  public get untouchedAll(): boolean {
+    return !this.touchedAll;
   }
 
   public get dirty(): boolean {
     return controlsPartialChecked(this.controls, 'dirty');
   }
 
-  public get dirties(): boolean {
+  public get dirtyAll(): boolean {
     return controlsAllChecked(this.controls, 'dirty');
   }
 
@@ -94,8 +94,8 @@ export class FormGroup<C extends FormControls = FormControls>
     return !this.dirty;
   }
 
-  public get pristines(): boolean {
-    return this.dirties;
+  public get pristineAll(): boolean {
+    return this.dirtyAll;
   }
 
   public get valid(): boolean {

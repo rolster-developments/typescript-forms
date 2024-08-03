@@ -112,24 +112,17 @@ export class FormControl<T = any> implements AbstractControl<T> {
 
   public reset(): void {
     this.setState(this.initialState);
-    this.untouch();
     this.currentDirty = false;
+    this.currentTouched = false;
   }
 
   public focus(): void {
     this.currentFocused = true;
+    this.currentTouched = true;
   }
 
   public blur(): void {
     this.currentFocused = false;
-  }
-
-  public touch(): void {
-    this.currentTouched = true;
-  }
-
-  public untouch(): void {
-    this.currentTouched = false;
   }
 
   public disable(): void {
@@ -141,12 +134,14 @@ export class FormControl<T = any> implements AbstractControl<T> {
   }
 
   public setState(state: T): void {
-    this.currentState = state;
-    this.currentDirty = true;
+    if (this.enabled) {
+      this.currentState = state;
+      this.currentDirty = true;
 
-    this.updateValueAndValidity(state, this.validators);
+      this.updateValueAndValidity(state, this.validators);
 
-    this.observable.next(state);
+      this.observable.next(state);
+    }
   }
 
   public setValidators(validators: ValidatorFn<T>[] = []): void {
@@ -167,7 +162,6 @@ export class FormControl<T = any> implements AbstractControl<T> {
 
       this.currentError = errors[0];
       this.currentErrors = errors;
-
       this.currentValid = errors.length === 0;
     } else {
       this.currentValid = true;

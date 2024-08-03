@@ -27,6 +27,8 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
 
   private currentValid = true;
 
+  private currentDisabled = false;
+
   private currentError?: ValidatorError;
 
   private currentErrors: ValidatorError[] = [];
@@ -79,32 +81,40 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
     return groupPartialChecked(this.groups, 'touched');
   }
 
-  public get toucheds(): boolean {
-    return groupAllChecked(this.groups, 'toucheds');
+  public get touchedAll(): boolean {
+    return groupAllChecked(this.groups, 'touchedAll');
   }
 
   public get untouched(): boolean {
     return !this.touched;
   }
 
-  public get untoucheds(): boolean {
-    return !this.toucheds;
+  public get untouchedAll(): boolean {
+    return !this.touchedAll;
   }
 
   public get dirty(): boolean {
     return groupPartialChecked(this.groups, 'dirty');
   }
 
-  public get dirties(): boolean {
-    return groupAllChecked(this.groups, 'dirties');
+  public get dirtyAll(): boolean {
+    return groupAllChecked(this.groups, 'dirtyAll');
   }
 
   public get pristine(): boolean {
     return !this.dirty;
   }
 
-  public get pristines(): boolean {
-    return !this.dirties;
+  public get pristineAll(): boolean {
+    return !this.dirtyAll;
+  }
+
+  public get disabled(): boolean {
+    return this.currentDisabled;
+  }
+
+  public get enabled(): boolean {
+    return !this.currentDisabled;
   }
 
   public get valid(): boolean {
@@ -133,6 +143,14 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
 
   public reset(): void {
     this.refresh(this.initialState);
+  }
+
+  public disable(): void {
+    this.currentDisabled = true;
+  }
+
+  public enable(): void {
+    this.currentDisabled = false;
   }
 
   public push(group: AbstractReactiveArrayGroup<C, R>): void {

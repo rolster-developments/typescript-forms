@@ -50,7 +50,8 @@ export const controlsAllChecked = <T extends AbstractControl>(
   key: keyof T
 ): boolean => {
   return Object.values(controls).reduce(
-    (value, control) => value && parseBoolean(control[key]),
+    (value, control) =>
+      control.disabled ? value : value && parseBoolean(control[key]),
     true
   );
 };
@@ -60,7 +61,8 @@ export const controlsPartialChecked = <T extends AbstractControl>(
   key: keyof T
 ): boolean => {
   return Object.values(controls).reduce(
-    (value, control) => value || parseBoolean(control[key]),
+    (value, control) =>
+      control.disabled ? value : value || parseBoolean(control[key]),
     false
   );
 };
