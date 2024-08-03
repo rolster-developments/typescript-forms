@@ -118,11 +118,11 @@ export class FormControl<T = any> implements AbstractControl<T> {
 
   public focus(): void {
     this.currentFocused = true;
-    this.currentTouched = true;
   }
 
   public blur(): void {
     this.currentFocused = false;
+    this.currentTouched = true;
   }
 
   public disable(): void {
