@@ -33,7 +33,7 @@ function itIsFormControlOptions<T, C extends FormControlOptions<T>>(
   props: any
 ): props is C {
   return (
-    typeof props === 'object' && ('state' in props || 'validators' in props)
+    typeof props === 'object' && ('value' in props || 'validators' in props)
   );
 }
 
@@ -61,7 +61,7 @@ export function createFormControlOptions<T, C extends FormControlOptions<T>>(
   const [props, validators] = argsProps;
 
   if (!props) {
-    return { state: props, validators } as C;
+    return { value: props, validators } as C;
   }
 
   if (!validators && itIsFormControlOptions<T, C>(props)) {
@@ -69,7 +69,7 @@ export function createFormControlOptions<T, C extends FormControlOptions<T>>(
   }
 
   return {
-    state: props as T,
+    value: props as T,
     validators
   } as C;
 }

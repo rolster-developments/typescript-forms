@@ -10,7 +10,7 @@ export interface ValidationFormError<T = any> extends ValidatorError<T> {
   type: ValidationFormType;
 }
 
-export type SubscriberControl<T> = (state: T) => void;
+export type SubscriberControl<T> = (value: T) => void;
 
 export interface AbstractControl<T = any> {
   readonly dirty: boolean;
@@ -25,7 +25,7 @@ export interface AbstractControl<T = any> {
   readonly valid: boolean;
   readonly wrong: boolean;
   readonly error?: ValidatorError;
-  readonly state?: T;
+  readonly value?: T;
 }
 
 export interface AbstractFormControl<T = any> extends AbstractControl<T> {
@@ -34,7 +34,7 @@ export interface AbstractFormControl<T = any> extends AbstractControl<T> {
   enable: () => void;
   focus: () => void;
   readonly focused: boolean;
-  setState: (state: T) => void;
+  setValue: (value: T) => void;
   setValidators: (validators?: ValidatorFn<T>[]) => void;
   touch: () => void;
   readonly unfocused: boolean;
@@ -48,8 +48,8 @@ export interface AbstractReactiveControl<T = any>
 export type AbstractControls<T extends AbstractControl = AbstractControl> =
   Record<string, T>;
 
-export interface AbstractGroup<T extends AbstractControls = AbstractControls> {
-  readonly controls: T;
+export interface AbstractGroup<C extends AbstractControls = AbstractControls> {
+  readonly controls: C;
   readonly dirty: boolean;
   readonly dirtyAll: boolean;
   readonly errors: ValidatorError[];
@@ -65,8 +65,8 @@ export interface AbstractGroup<T extends AbstractControls = AbstractControls> {
   readonly error?: ValidatorError;
 }
 
-export type StateGroup<C extends AbstractControls = AbstractControls> = {
-  [K in keyof C]: C[K]['state'];
+export type ValueGroup<C extends AbstractControls = AbstractControls> = {
+  [K in keyof C]: C[K]['value'];
 };
 
 export type ValidatorGroupFn<
@@ -75,7 +75,7 @@ export type ValidatorGroupFn<
 > = (controls: C) => ValidatorResult<V>;
 
 export type SubscriberGroup<C extends AbstractControls = AbstractControls> = (
-  state: StateGroup<C>
+  value: ValueGroup<C>
 ) => void;
 
 export interface AbstractFormGroup<
@@ -83,7 +83,7 @@ export interface AbstractFormGroup<
 > extends AbstractGroup<C> {
   reset: () => void;
   setValidators: (validators: ValidatorGroupFn<C>[]) => void;
-  readonly state: StateGroup<C>;
+  readonly value: ValueGroup<C>;
 }
 
 export interface AbstractReactiveGroup<
@@ -108,7 +108,7 @@ export type AbstractArrayControls<
 export interface AbstractArrayGroup<C extends AbstractArrayControls, R = any>
   extends AbstractGroup<C> {
   setValidators: (validators: ValidatorGroupFn<C>[]) => void;
-  readonly state: ArrayStateGroup<C>;
+  readonly value: ArrayStateGroup<C>;
   readonly uuid: string;
   resource?: R;
 }
@@ -121,7 +121,7 @@ export interface AbstractReactiveArrayGroup<
 }
 
 export type ArrayStateGroup<C extends AbstractArrayControls> = {
-  [K in keyof C]: C[K]['state'];
+  [K in keyof C]: C[K]['value'];
 };
 
 export type ValidatorArrayFn<
@@ -169,12 +169,12 @@ export interface AbstractReactiveArray<
 }
 
 export interface FormControlOptions<T = any> {
-  state: T;
+  value: T;
   validators?: ValidatorFn<T>[];
 }
 
 export type FormStateOptions<T> = Omit<FormControlOptions<T>, 'validators'>;
-export type FormValidatorsOptions<T> = Omit<FormControlOptions<T>, 'state'>;
+export type FormValidatorsOptions<T> = Omit<FormControlOptions<T>, 'value'>;
 
 export interface FormGroupOptions<
   C extends AbstractControls = AbstractControls

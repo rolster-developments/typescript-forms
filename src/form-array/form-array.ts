@@ -62,7 +62,7 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
 
     this.refresh(this.initialState);
 
-    this.observable = observable(this.state);
+    this.observable = observable(this.value);
 
     groups?.forEach((group) => {
       this.subscription(group);
@@ -125,8 +125,8 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
     return !this.currentValid;
   }
 
-  public get state(): ArrayStateGroup<C>[] {
-    return this.groups.map(({ state }) => state);
+  public get value(): ArrayStateGroup<C>[] {
+    return this.groups.map(({ value: state }) => state);
   }
 
   public get error(): ValidatorError | undefined {

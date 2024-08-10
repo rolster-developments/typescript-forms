@@ -12,9 +12,9 @@ import {
   AbstractReactiveControl,
   AbstractReactiveGroup,
   FormGroupOptions,
-  StateGroup,
   SubscriberGroup,
-  ValidatorGroupFn
+  ValidatorGroupFn,
+  ValueGroup
 } from './types';
 
 export type FormControls<
@@ -34,7 +34,7 @@ export class FormGroup<C extends FormControls = FormControls>
 
   private validators?: ValidatorGroupFn<C>[];
 
-  private observable: Observable<StateGroup<C>>;
+  private observable: Observable<ValueGroup<C>>;
 
   constructor(options: FormGroupOptions<C>);
   constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
@@ -52,12 +52,12 @@ export class FormGroup<C extends FormControls = FormControls>
 
     this.updateValueAndValidity(controls, validators);
 
-    this.observable = observable(this.state);
+    this.observable = observable(this.value);
 
     Object.values(controls).forEach((control) => {
       control.subscribe(() => {
         this.updateValueAndValidity(this.controls, this.validators);
-        this.observable.next(this.state);
+        this.observable.next(this.value);
       });
     });
   }
@@ -106,7 +106,7 @@ export class FormGroup<C extends FormControls = FormControls>
     return !this.valid;
   }
 
-  public get state(): StateGroup<C> {
+  public get value(): ValueGroup<C> {
     return controlsToState(this.controls);
   }
 

@@ -19,19 +19,19 @@ export class FormArrayControl<T = any>
     controlOptions?: ArrayControlOptions<T> | T,
     controlValidators?: ValidatorFn<T>[]
   ) {
-    const { state, validators } = createFormControlOptions(
+    const { value, validators } = createFormControlOptions(
       controlOptions,
       controlValidators
     );
 
-    super(state, validators);
+    super(value, validators);
 
     this.uuid = uuid();
   }
 }
 
 type ArrayStateProps<T> = Omit<ArrayControlOptions<T>, 'validators'>;
-type ArrayValidatorsProps<T> = Omit<ArrayControlOptions<T>, 'state'>;
+type ArrayValidatorsProps<T> = Omit<ArrayControlOptions<T>, 'value'>;
 
 export function formArrayControl<T>(): FormArrayControl<T | undefined>;
 export function formArrayControl<T>(
@@ -41,7 +41,7 @@ export function formArrayControl<T>(
   options: ArrayValidatorsProps<T>
 ): FormArrayControl<T | undefined>;
 export function formArrayControl<T>(
-  state: T,
+  value: T,
   validators?: ValidatorFn<T>[]
 ): FormArrayControl<T>;
 export function formArrayControl<T>(

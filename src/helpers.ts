@@ -6,13 +6,13 @@ import {
   AbstractArrayControls,
   AbstractGroup,
   AbstractControls,
-  StateGroup,
   ValidatorArrayFn,
-  ValidatorGroupFn
+  ValidatorGroupFn,
+  ValueGroup
 } from './types';
 
 interface ControlValidOptions<T> {
-  state: T;
+  value: T;
   validators: ValidatorFn<T>[];
 }
 
@@ -31,11 +31,11 @@ interface ArrayValidOptions<
 }
 
 export const controlIsValid = <T>({
-  state,
+  value,
   validators
 }: ControlValidOptions<T>): ValidatorError[] => {
   return validators.reduce((errors, validator) => {
-    const error = validator(state);
+    const error = validator(value);
 
     if (error) {
       errors.push(error);
@@ -69,12 +69,12 @@ export const controlsPartialChecked = <T extends AbstractControl>(
 
 export const controlsToState = <C extends AbstractControls>(
   controls: C
-): StateGroup<C> => {
-  return Object.entries(controls).reduce((result, [key, { state }]) => {
-    result[key as keyof C] = state;
+): ValueGroup<C> => {
+  return Object.entries(controls).reduce((result, [key, { value }]) => {
+    result[key as keyof C] = value;
 
     return result;
-  }, {} as StateGroup<C>);
+  }, {} as ValueGroup<C>);
 };
 
 export const groupIsValid = <C extends AbstractControls>({
