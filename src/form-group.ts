@@ -4,7 +4,7 @@ import { createFormGroupOptions } from './arguments';
 import {
   controlsAllChecked,
   controlsPartialChecked,
-  controlsToState,
+  controlsToValue,
   groupIsValid
 } from './helpers';
 import {
@@ -107,7 +107,7 @@ export class FormGroup<C extends FormControls = FormControls>
   }
 
   public get value(): ValueGroup<C> {
-    return controlsToState(this.controls);
+    return controlsToValue(this.controls);
   }
 
   public get errors(): ValidatorError[] {

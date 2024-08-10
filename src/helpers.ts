@@ -67,7 +67,7 @@ export const controlsPartialChecked = <T extends AbstractControl>(
   );
 };
 
-export const controlsToState = <C extends AbstractControls>(
+export const controlsToValue = <C extends AbstractControls>(
   controls: C
 ): ValueGroup<C> => {
   return Object.entries(controls).reduce((result, [key, { value }]) => {
