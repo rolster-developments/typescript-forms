@@ -157,6 +157,7 @@ export interface AbstractArray<
   setValidators: (validators: ValidatorArrayFn<C, R>[]) => void;
   readonly touchedAll: boolean;
   readonly untouchedAll: boolean;
+  readonly value: ArrayStateGroup<C>[];
   readonly wrong: boolean;
 }
 
