@@ -23,9 +23,9 @@ export interface AbstractControl<T = any> {
   readonly touched: boolean;
   readonly untouched: boolean;
   readonly valid: boolean;
+  readonly value: T;
   readonly wrong: boolean;
   readonly error?: ValidatorError;
-  readonly value?: T;
 }
 
 export interface AbstractFormControl<T = any> extends AbstractControl<T> {
