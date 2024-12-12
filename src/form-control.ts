@@ -111,11 +111,11 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
   }
 
   public hasError(key: string): boolean {
-    return hasError(this, key);
+    return hasError(this.errors, key);
   }
 
   public someErrors(keys: string[]): boolean {
-    return someErrors(this, keys);
+    return someErrors(this.errors, keys);
   }
 
   public reset(): void {
