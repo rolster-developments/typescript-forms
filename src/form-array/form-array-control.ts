@@ -32,12 +32,12 @@ export class FormArrayControl<T = any>
 
 export type FormArrayVoid<T = any> = FormArrayControl<T | undefined>;
 
-type ArrayStateOptions<T> = Omit<ArrayControlOptions<T>, 'validators'>;
+type ArrayValueOptions<T> = Omit<ArrayControlOptions<T>, 'validators'>;
 type ArrayValidatorsOptions<T> = Omit<ArrayControlOptions<T>, 'value'>;
 
 export function formArrayControl<T>(): FormArrayControl<T | undefined>;
 export function formArrayControl<T>(
-  options: ArrayStateOptions<T>
+  options: ArrayValueOptions<T>
 ): FormArrayControl<T>;
 export function formArrayControl<T>(
   options: ArrayValidatorsOptions<T>

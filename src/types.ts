@@ -176,7 +176,7 @@ export interface FormControlOptions<T = any> {
   validators?: ValidatorFn<T>[];
 }
 
-export type FormStateOptions<T> = Omit<FormControlOptions<T>, 'validators'>;
+export type FormValueOptions<T> = Omit<FormControlOptions<T>, 'validators'>;
 export type FormValidatorsOptions<T> = Omit<FormControlOptions<T>, 'value'>;
 
 export interface FormGroupOptions<

@@ -5,7 +5,7 @@ import { controlIsValid, hasError, someErrors } from './helpers';
 import {
   AbstractReactiveControl,
   FormControlOptions,
-  FormStateOptions,
+  FormValueOptions,
   FormValidatorsOptions,
   SubscriberControl
 } from './types';
@@ -186,7 +186,7 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
 export type FormVoid<T = any> = FormControl<T | undefined>;
 
 export function formControl<T>(): FormControl<T | undefined>;
-export function formControl<T>(options: FormStateOptions<T>): FormControl<T>;
+export function formControl<T>(options: FormValueOptions<T>): FormControl<T>;
 export function formControl<T>(
   options: FormValidatorsOptions<T>
 ): FormControl<T | undefined>;

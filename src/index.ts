@@ -3,6 +3,7 @@ export {
   FormArrayControl,
   FormArrayControls,
   FormArrayGroup,
+  FormArrayVoid,
   formArray,
   formArrayControl,
   formArrayGroup
