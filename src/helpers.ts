@@ -30,6 +30,10 @@ interface ArrayValidOptions<
   validators: ValidatorArrayFn<T, R>[];
 }
 
+function reduceErrors(control: AbstractControl): string[] {
+  return control.errors.reduce((keys: string[], { id }) => [...keys, id], []);
+}
+
 export const controlIsValid = <T>({
   value,
   validators
@@ -129,3 +133,11 @@ export const arrayIsValid = <
     return errors;
   }, [] as ValidatorError[]);
 };
+
+export function hasError(control: AbstractControl, key: string): boolean {
+  return reduceErrors(control).includes(key);
+}
+
+export function someErrors(control: AbstractControl, keys: string[]): boolean {
+  return reduceErrors(control).some((key) => keys.includes(key));
+}

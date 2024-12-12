@@ -1,7 +1,13 @@
 import { Observable, observable } from '@rolster/commons';
 import { ValidatorError } from '@rolster/validators';
 import { createFormArrayOptions } from '../arguments';
-import { arrayIsValid, groupAllChecked, groupPartialChecked } from '../helpers';
+import {
+  arrayIsValid,
+  groupAllChecked,
+  groupPartialChecked,
+  hasError,
+  someErrors
+} from '../helpers';
 import {
   AbstractReactiveArray,
   AbstractReactiveArrayGroup,
@@ -139,6 +145,14 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
 
   public get wrong(): boolean {
     return this.touched && this.invalid;
+  }
+
+  public hasError(key: string): boolean {
+    return hasError(this, key);
+  }
+
+  public someErrors(keys: string[]): boolean {
+    return someErrors(this, keys);
   }
 
   public reset(): void {

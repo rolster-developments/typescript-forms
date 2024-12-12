@@ -1,7 +1,7 @@
 import { Observable, observable } from '@rolster/commons';
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import { createFormControlOptions } from './arguments';
-import { controlIsValid } from './helpers';
+import { controlIsValid, hasError, someErrors } from './helpers';
 import {
   AbstractReactiveControl,
   FormControlOptions,
@@ -108,6 +108,14 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
 
   public get wrong(): boolean {
     return this.touched && this.invalid;
+  }
+
+  public hasError(key: string): boolean {
+    return hasError(this, key);
+  }
+
+  public someErrors(keys: string[]): boolean {
+    return someErrors(this, keys);
   }
 
   public reset(): void {

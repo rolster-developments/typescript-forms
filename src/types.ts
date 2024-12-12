@@ -17,9 +17,11 @@ export interface AbstractControl<T = any> {
   readonly disabled: boolean;
   readonly enabled: boolean;
   readonly errors: ValidatorError[];
+  hasError: (key: string) => boolean;
   readonly invalid: boolean;
   readonly pristine: boolean;
   reset: () => void;
+  someErrors: (key: string[]) => boolean;
   readonly touched: boolean;
   readonly untouched: boolean;
   readonly valid: boolean;
