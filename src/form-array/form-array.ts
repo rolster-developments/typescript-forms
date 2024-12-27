@@ -11,7 +11,7 @@ import {
 import {
   AbstractReactiveArray,
   AbstractReactiveArrayGroup,
-  ArrayStateGroup,
+  ArrayControlsValue,
   FormArrayOptions,
   SubscriberArray,
   ValidatorArrayFn
@@ -41,7 +41,7 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
 
   private validators?: ValidatorArrayFn<C, R>[];
 
-  private observable: Observable<ArrayStateGroup<C>[]>;
+  private observable: Observable<ArrayControlsValue<C>[]>;
 
   private unsusbcriptions: Map<string, Unsubscription>;
 
@@ -131,7 +131,7 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
     return !this.currentValid;
   }
 
-  public get value(): ArrayStateGroup<C>[] {
+  public get value(): ArrayControlsValue<C>[] {
     return this.groups.map(({ value: state }) => state);
   }
 

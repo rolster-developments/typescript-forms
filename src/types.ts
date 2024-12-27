@@ -67,7 +67,7 @@ export interface AbstractGroup<C extends AbstractControls = AbstractControls> {
   readonly error?: ValidatorError;
 }
 
-export type ValueGroup<C extends AbstractControls = AbstractControls> = {
+export type ControlsValue<C extends AbstractControls = AbstractControls> = {
   [K in keyof C]: C[K]['value'];
 };
 
@@ -77,7 +77,7 @@ export type ValidatorGroupFn<
 > = (controls: C) => ValidatorResult<V>;
 
 export type SubscriberGroup<C extends AbstractControls = AbstractControls> = (
-  value: ValueGroup<C>
+  value: ControlsValue<C>
 ) => void;
 
 export interface AbstractFormGroup<
@@ -85,7 +85,7 @@ export interface AbstractFormGroup<
 > extends AbstractGroup<C> {
   reset: () => void;
   setValidators: (validators: ValidatorGroupFn<C>[]) => void;
-  readonly value: ValueGroup<C>;
+  readonly value: ControlsValue<C>;
 }
 
 export interface AbstractReactiveGroup<
@@ -107,11 +107,15 @@ export type AbstractArrayControls<
   T extends AbstractArrayControl = AbstractArrayControl
 > = AbstractControls<T>;
 
+export type ArrayControlsValue<C extends AbstractArrayControls> = {
+  [K in keyof C]: C[K]['value'];
+};
+
 export interface AbstractArrayGroup<C extends AbstractArrayControls, R = any>
   extends AbstractGroup<C> {
   setValidators: (validators: ValidatorGroupFn<C>[]) => void;
-  readonly value: ArrayStateGroup<C>;
   readonly uuid: string;
+  readonly value: ArrayControlsValue<C>;
   resource?: R;
 }
 
@@ -121,10 +125,6 @@ export interface AbstractReactiveArrayGroup<
 > extends AbstractArrayGroup<C, R> {
   subscribe: (subscriber: SubscriberGroup<C>) => Unsubscription;
 }
-
-export type ArrayStateGroup<C extends AbstractArrayControls> = {
-  [K in keyof C]: C[K]['value'];
-};
 
 export type ValidatorArrayFn<
   T extends AbstractArrayControls = AbstractArrayControls,
@@ -138,14 +138,14 @@ export type ArrayFormControls<
 > = AbstractArrayControls<T>;
 
 export type SubscriberArray<C extends ArrayFormControls> = SubscriberControl<
-  ArrayStateGroup<C>[]
+  ArrayControlsValue<C>[]
 >;
 
 export interface AbstractArray<
   C extends AbstractArrayControls = AbstractArrayControls,
   R = any,
   G extends AbstractArrayGroup<C, R> = AbstractArrayGroup<C, R>
-> extends AbstractControl<ArrayStateGroup<C>[]> {
+> extends AbstractControl<ArrayControlsValue<C>[]> {
   readonly controls: C[];
   readonly dirtyAll: boolean;
   disable: () => void;
@@ -159,9 +159,19 @@ export interface AbstractArray<
   setValidators: (validators: ValidatorArrayFn<C, R>[]) => void;
   readonly touchedAll: boolean;
   readonly untouchedAll: boolean;
-  readonly value: ArrayStateGroup<C>[];
+  readonly value: ArrayControlsValue<C>[];
   readonly wrong: boolean;
 }
+
+export interface AbstractArrayList<
+  C extends AbstractArrayControls = AbstractArrayControls
+> extends AbstractArrayControl<ArrayControlsValue<C>[]> {
+  controls: C[];
+}
+
+export type ArrayListValueToControls<
+  C extends AbstractArrayControls = AbstractArrayControls
+> = (value: ArrayControlsValue<C>) => C;
 
 export interface AbstractReactiveArray<
   C extends AbstractArrayControls = AbstractArrayControls,
@@ -189,6 +199,12 @@ export interface FormGroupOptions<
 export interface FormArrayControlOptions<T = any>
   extends FormControlOptions<T> {
   uuid: string;
+}
+
+export interface FormArrayListOptions<
+  C extends AbstractArrayControls = AbstractArrayControls
+> extends FormArrayControlOptions<ArrayControlsValue<C>[]> {
+  valueToControl: ArrayListValueToControls<C>;
 }
 
 export interface FormArrayGroupOptions<

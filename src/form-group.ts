@@ -11,10 +11,10 @@ import {
   AbstractControls,
   AbstractReactiveControl,
   AbstractReactiveGroup,
+  ControlsValue,
   FormGroupOptions,
   SubscriberGroup,
-  ValidatorGroupFn,
-  ValueGroup
+  ValidatorGroupFn
 } from './types';
 
 export type FormControls<
@@ -34,7 +34,7 @@ export class FormGroup<C extends FormControls = FormControls>
 
   private validators?: ValidatorGroupFn<C>[];
 
-  private observable: Observable<ValueGroup<C>>;
+  private observable: Observable<ControlsValue<C>>;
 
   constructor(options: FormGroupOptions<C>);
   constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
@@ -106,7 +106,7 @@ export class FormGroup<C extends FormControls = FormControls>
     return !this.valid;
   }
 
-  public get value(): ValueGroup<C> {
+  public get value(): ControlsValue<C> {
     return controlsToValue(this.controls);
   }
 

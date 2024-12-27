@@ -1,7 +1,7 @@
 import { ValidatorFn } from '@rolster/validators';
 import {
-  AbstractArrayGroup,
   AbstractArrayControls,
+  AbstractArrayGroup,
   AbstractControls,
   FormArrayOptions,
   FormControlOptions,
@@ -29,85 +29,87 @@ type ArgsArrayOptions<
   Undefined<ValidatorArrayFn<C, R, G>[]>
 ];
 
-function itIsFormControlOptions<T, C extends FormControlOptions<T>>(
-  props: any
-): props is C {
+function itIsControlOptions<T, O extends FormControlOptions<T>>(
+  options: any
+): options is O {
   return (
-    typeof props === 'object' && ('value' in props || 'validators' in props)
+    typeof options === 'object' &&
+    ('value' in options || 'validators' in options)
   );
 }
 
-function itIsFormGroupOptions<
+function itIsGroupOptions<
   C extends AbstractControls,
-  G extends FormGroupOptions<C>
->(props: any): props is G {
-  return typeof props === 'object' && 'controls' in props;
+  O extends FormGroupOptions<C>
+>(options: any): options is O {
+  return typeof options === 'object' && 'controls' in options;
 }
 
-function itIsFormArrayOptions<
+function itIsArrayOptions<
   C extends AbstractArrayControls,
   R,
   G extends AbstractArrayGroup<C, R>,
-  A extends FormArrayOptions<C, R, G>
->(props: any): props is A {
+  O extends FormArrayOptions<C, R, G>
+>(options: any): options is O {
   return (
-    typeof props === 'object' && ('groups' in props || 'validators' in props)
+    typeof options === 'object' &&
+    ('groups' in options || 'validators' in options)
   );
 }
 
-export function createFormControlOptions<T, C extends FormControlOptions<T>>(
-  ...argsProps: ArgsControlOptions<T>
-): C {
-  const [props, validators] = argsProps;
+export function createFormControlOptions<T, O extends FormControlOptions<T>>(
+  ...controlOptions: ArgsControlOptions<T>
+): O {
+  const [options, validators] = controlOptions;
 
-  if (!props) {
-    return { value: props, validators } as C;
+  if (!options) {
+    return { value: options, validators } as O;
   }
 
-  if (!validators && itIsFormControlOptions<T, C>(props)) {
-    return props;
+  if (!validators && itIsControlOptions<T, O>(options)) {
+    return options;
   }
 
   return {
-    value: props as T,
+    value: options as T,
     validators
-  } as C;
+  } as O;
 }
 
 export function createFormGroupOptions<
   C extends AbstractControls,
-  G extends FormGroupOptions<C>
->(...argsProps: ArgsGroupOptions<C>): G {
-  const [props, validators] = argsProps;
+  O extends FormGroupOptions<C>
+>(...groupOptions: ArgsGroupOptions<C>): O {
+  const [options, validators] = groupOptions;
 
-  if (!validators && itIsFormGroupOptions<C, G>(props)) {
-    return props;
+  if (!validators && itIsGroupOptions<C, O>(options)) {
+    return options;
   }
 
   return {
-    controls: props as C,
+    controls: options as C,
     validators
-  } as G;
+  } as O;
 }
 
 export function createFormArrayOptions<
   C extends AbstractArrayControls,
   R,
   G extends AbstractArrayGroup<C, R>,
-  A extends FormArrayOptions<C, R, G>
->(...argsProps: ArgsArrayOptions<C, R, G>): A {
-  const [props, validators] = argsProps;
+  O extends FormArrayOptions<C, R, G>
+>(...arrayOptions: ArgsArrayOptions<C, R, G>): O {
+  const [options, validators] = arrayOptions;
 
-  if (!props) {
-    return { groups: props, validators } as A;
+  if (!options) {
+    return { groups: options, validators } as O;
   }
 
-  if (!validators && itIsFormArrayOptions<C, R, G, A>(props)) {
-    return props;
+  if (!validators && itIsArrayOptions<C, R, G, O>(options)) {
+    return options;
   }
 
   return {
-    groups: props as AbstractArrayGroup<C, R>[],
+    groups: options as AbstractArrayGroup<C, R>[],
     validators
-  } as A;
+  } as O;
 }

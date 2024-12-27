@@ -14,7 +14,7 @@ export class FormArrayControl<T = any>
 
   constructor();
   constructor(options: ArrayControlOptions<T>);
-  constructor(state: T, validators?: ValidatorFn<T>[]);
+  constructor(value: T, validators?: ValidatorFn<T>[]);
   constructor(
     controlOptions?: ArrayControlOptions<T> | T,
     controlValidators?: ValidatorFn<T>[]

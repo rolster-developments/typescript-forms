@@ -11,37 +11,37 @@ import {
 } from './types';
 
 export class FormControl<T = any> implements AbstractReactiveControl<T> {
-  private currentFocused = false;
+  protected currentFocused = false;
 
-  private currentTouched = false;
+  protected currentTouched = false;
 
-  private currentDirty = false;
+  protected currentDirty = false;
 
-  private currentDisabled = false;
+  protected currentDisabled = false;
 
-  private currentValid = true;
+  protected currentValid = true;
 
-  private initialValue: T;
+  protected initialValue: T;
 
-  private currentValue: T;
+  protected currentValue: T;
 
-  private currentError?: ValidatorError;
+  protected currentError?: ValidatorError;
 
-  private currentErrors: ValidatorError[] = [];
+  protected currentErrors: ValidatorError[] = [];
 
-  private validators?: ValidatorFn<T>[];
+  protected validators?: ValidatorFn<T>[];
 
-  private observable: Observable<T>;
+  protected observable: Observable<T>;
 
   constructor();
-  constructor(props: FormControlOptions<T>);
+  constructor(options: FormControlOptions<T>);
   constructor(value: T, validators?: ValidatorFn<T>[]);
   constructor(
-    controlProps?: FormControlOptions<T> | T,
+    controlOptions?: FormControlOptions<T> | T,
     controlValidators?: ValidatorFn<T>[]
   ) {
     const { value, validators } = createFormControlOptions(
-      controlProps,
+      controlOptions,
       controlValidators
     );
 
@@ -151,7 +151,6 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
       this.currentDirty = true;
 
       this.updateValueAndValidity(value, this.validators);
-
       this.observable.next(value);
     }
   }
@@ -165,7 +164,7 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
     return this.observable.subscribe(subscriber);
   }
 
-  private updateValueAndValidity(
+  protected updateValueAndValidity(
     value: T,
     validators?: ValidatorFn<T>[]
   ): void {
