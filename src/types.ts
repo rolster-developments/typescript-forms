@@ -167,7 +167,7 @@ export interface AbstractArrayList<
   C extends AbstractArrayControls = AbstractArrayControls
 > extends AbstractArrayControl<ArrayControlsValue<C>[]> {
   controls: C[];
-  push(value: ArrayControlsValue<C>): void;
+  push(controls: C): void;
   remove(controls: C): void;
 }
 

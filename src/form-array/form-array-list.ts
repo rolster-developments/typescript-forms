@@ -7,7 +7,11 @@ import {
   ArrayListValueToControls
 } from '../types';
 import { FormArrayControls } from './types';
-import { controlsAllChecked, controlsPartialChecked } from '../helpers';
+import {
+  controlsAllChecked,
+  controlsPartialChecked,
+  controlsToValue
+} from '../helpers';
 
 export class FormArrayList<C extends FormArrayControls = FormArrayControls>
   extends FormControl<ArrayControlsValue<C>[]>
@@ -22,9 +26,11 @@ export class FormArrayList<C extends FormArrayControls = FormArrayControls>
     value?: ArrayControlsValue<C>[],
     validators?: ValidatorFn<ArrayControlsValue<C>[]>[]
   ) {
-    super(value || [], validators);
+    const initialValue = value || [];
 
-    this.currentControls = (value || []).map((value) =>
+    super(initialValue, validators);
+
+    this.currentControls = initialValue.map((value) =>
       this.createControls(value)
     );
 
@@ -59,15 +65,16 @@ export class FormArrayList<C extends FormArrayControls = FormArrayControls>
     );
   }
 
-  public setValue(values: ArrayControlsValue<C>[]): void {
-    this.currentControls = values.map((value) => this.createControls(value));
-    super.setValue(values);
+  public get value(): ArrayControlsValue<C>[] {
+    return this.controls.map((controls) => controlsToValue(controls));
   }
 
-  public push(value: ArrayControlsValue<C>): void {
-    this.currentControls = this.currentControls.concat([
-      this.createControls(value)
-    ]);
+  public setValue(values: ArrayControlsValue<C>[]): void {
+    this.currentControls = values.map((value) => this.createControls(value));
+  }
+
+  public push(controls: C): void {
+    this.currentControls = this.currentControls.concat([controls]);
   }
 
   public remove(controls: C): void {
