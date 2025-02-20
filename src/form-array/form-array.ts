@@ -29,8 +29,6 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
 {
   private currentGroups: AbstractReactiveArrayGroup<C, R>[] = [];
 
-  private initialState?: AbstractReactiveArrayGroup<C, R>[];
-
   private currentValid = true;
 
   private currentDisabled = false;
@@ -38,6 +36,8 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
   private currentError?: ValidatorError;
 
   private currentErrors: ValidatorError[] = [];
+
+  private initialValue?: AbstractReactiveArrayGroup<C, R>[];
 
   private validators?: ValidatorArrayFn<C, R>[];
 
@@ -62,11 +62,11 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
 
     this.unsusbcriptions = new Map();
 
-    this.initialState = groups;
+    this.initialValue = groups;
 
     this.validators = validators;
 
-    this.refresh(this.initialState);
+    this.refresh(this.initialValue);
 
     this.observable = observable(this.value);
 
@@ -156,7 +156,7 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
   }
 
   public reset(): void {
-    this.refresh(this.initialState);
+    this.refresh(this.initialValue);
   }
 
   public disable(): void {
@@ -181,7 +181,12 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
     this.refresh([...this.groups, ...groups]);
   }
 
-  public set(groups: AbstractReactiveArrayGroup<C, R>[]): void {
+  public setInitialValue(groups: AbstractReactiveArrayGroup<C, R>[]): void {
+    this.initialValue = groups;
+    this.setValue(groups);
+  }
+
+  public setValue(groups: AbstractReactiveArrayGroup<C, R>[]): void {
     this.currentGroups.forEach(({ uuid }) => {
       this.unsusbcriptions.delete(uuid);
     });

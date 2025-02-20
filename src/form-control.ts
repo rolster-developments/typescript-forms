@@ -145,6 +145,11 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
     this.currentTouched = true;
   }
 
+  public setInitialValue(value: T): void {
+    this.initialValue = value;
+    this.setValue(value);
+  }
+
   public setValue(value: T): void {
     if (this.enabled) {
       this.currentValue = value;

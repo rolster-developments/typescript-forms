@@ -36,6 +36,7 @@ export interface AbstractFormControl<T = any> extends AbstractControl<T> {
   enable: () => void;
   focus: () => void;
   readonly focused: boolean;
+  setInitialValue: (value: T) => void;
   setValue: (value: T) => void;
   setValidators: (validators?: ValidatorFn<T>[]) => void;
   touch: () => void;
@@ -155,7 +156,8 @@ export interface AbstractArray<
   readonly pristineAll: boolean;
   push: (group: G) => void;
   remove: (group: G) => void;
-  set: (groups: G[]) => void;
+  setInitialValue: (groups: G[]) => void;
+  setValue: (groups: G[]) => void;
   setValidators: (validators: ValidatorArrayFn<C, R>[]) => void;
   readonly touchedAll: boolean;
   readonly untouchedAll: boolean;
