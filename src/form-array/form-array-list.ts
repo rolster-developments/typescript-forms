@@ -19,26 +19,24 @@ export class FormArrayList<C extends FormArrayControls = FormArrayControls>
 {
   public readonly uuid: string;
 
-  private currentControls: C[];
+  private _controls: C[];
 
   constructor(
     private valueToControls: ArrayListValueToControls<C>,
     value?: ArrayControlsValue<C>[],
     validators?: ValidatorFn<ArrayControlsValue<C>[]>[]
   ) {
-    const initialValue = value || [];
+    const _value = value || [];
 
-    super(initialValue, validators);
+    super(_value, validators);
 
-    this.currentControls = initialValue.map((value) =>
-      this.createControls(value)
-    );
+    this._controls = _value.map((value) => this.createControls(value));
 
     this.uuid = uuid();
   }
 
   public get controls(): C[] {
-    return this.currentControls;
+    return this._controls;
   }
 
   public get touched(): boolean {
@@ -57,7 +55,7 @@ export class FormArrayList<C extends FormArrayControls = FormArrayControls>
 
   public get valid(): boolean {
     return (
-      this.currentValid &&
+      this._valid &&
       this.controls.reduce(
         (valid, controls) => valid && controlsAllChecked(controls, 'valid'),
         true
@@ -70,16 +68,16 @@ export class FormArrayList<C extends FormArrayControls = FormArrayControls>
   }
 
   public setValue(values: ArrayControlsValue<C>[]): void {
-    this.currentControls = values.map((value) => this.createControls(value));
+    this._controls = values.map((value) => this.createControls(value));
   }
 
   public push(controls: C): void {
-    this.currentControls = this.currentControls.concat([controls]);
+    this._controls = this._controls.concat([controls]);
   }
 
   public remove(controls: C): void {
-    this.currentControls = this.currentControls.filter(
-      (currentControls) => currentControls !== controls
+    this._controls = this._controls.filter(
+      (_controls) => _controls !== controls
     );
   }
 

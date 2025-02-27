@@ -24,13 +24,13 @@ export type FormControls<
 export class FormGroup<C extends FormControls = FormControls>
   implements AbstractReactiveGroup<C>
 {
-  protected currentControls: C;
+  protected _controls: C;
 
-  private currentError?: ValidatorError;
+  private _errors: ValidatorError[] = [];
 
-  private currentErrors: ValidatorError[] = [];
+  private _error?: ValidatorError;
 
-  private currentValid = true;
+  private _valid = true;
 
   private validators?: ValidatorGroupFn<C>[];
 
@@ -39,22 +39,19 @@ export class FormGroup<C extends FormControls = FormControls>
   constructor(options: FormGroupOptions<C>);
   constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
   constructor(
-    groupOptions: FormGroupOptions<C> | C,
-    groupValidators?: ValidatorGroupFn<C>[]
+    options: FormGroupOptions<C> | C,
+    validators?: ValidatorGroupFn<C>[]
   ) {
-    const { controls, validators } = createFormGroupOptions(
-      groupOptions,
-      groupValidators
-    );
+    const _options = createFormGroupOptions(options, validators);
 
-    this.currentControls = controls;
-    this.validators = validators;
+    this._controls = _options.controls;
+    this.validators = _options.validators;
 
-    this.updateValueAndValidity(controls, validators);
+    this.updateValueAndValidity(_options.controls, _options.validators);
 
     this.observable = observable(this.value);
 
-    Object.values(controls).forEach((control) => {
+    Object.values(_options.controls).forEach((control) => {
       control.subscribe(() => {
         this.updateValueAndValidity(this.controls, this.validators);
         this.observable.next(this.value);
@@ -63,14 +60,14 @@ export class FormGroup<C extends FormControls = FormControls>
   }
 
   public get controls(): C {
-    return this.currentControls;
+    return this._controls;
   }
 
   public get touched(): boolean {
     return controlsPartialChecked(this.controls, 'touched');
   }
 
-  public get touchedAll(): boolean {
+  public get toucheds(): boolean {
     return controlsAllChecked(this.controls, 'touched');
   }
 
@@ -78,15 +75,15 @@ export class FormGroup<C extends FormControls = FormControls>
     return !this.touched;
   }
 
-  public get untouchedAll(): boolean {
-    return !this.touchedAll;
+  public get untoucheds(): boolean {
+    return !this.toucheds;
   }
 
   public get dirty(): boolean {
     return controlsPartialChecked(this.controls, 'dirty');
   }
 
-  public get dirtyAll(): boolean {
+  public get dirties(): boolean {
     return controlsAllChecked(this.controls, 'dirty');
   }
 
@@ -94,12 +91,12 @@ export class FormGroup<C extends FormControls = FormControls>
     return !this.dirty;
   }
 
-  public get pristineAll(): boolean {
-    return this.dirtyAll;
+  public get pristines(): boolean {
+    return this.dirties;
   }
 
   public get valid(): boolean {
-    return this.currentValid && controlsAllChecked(this.controls, 'valid');
+    return this._valid && controlsAllChecked(this.controls, 'valid');
   }
 
   public get invalid(): boolean {
@@ -111,11 +108,11 @@ export class FormGroup<C extends FormControls = FormControls>
   }
 
   public get errors(): ValidatorError[] {
-    return this.currentErrors;
+    return this._errors;
   }
 
   public get error(): ValidatorError | undefined {
-    return this.currentError;
+    return this._error;
   }
 
   public get wrong(): boolean {
@@ -144,13 +141,13 @@ export class FormGroup<C extends FormControls = FormControls>
     if (validators) {
       const errors = groupIsValid({ controls, validators });
 
-      this.currentErrors = errors;
-      this.currentError = errors[0];
-      this.currentValid = errors.length === 0;
+      this._errors = errors;
+      this._error = errors[0];
+      this._valid = errors.length === 0;
     } else {
-      this.currentErrors = [];
-      this.currentError = undefined;
-      this.currentValid = true;
+      this._errors = [];
+      this._error = undefined;
+      this._valid = true;
     }
   }
 }

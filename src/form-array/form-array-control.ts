@@ -16,15 +16,12 @@ export class FormArrayControl<T = any>
   constructor(options: ArrayControlOptions<T>);
   constructor(value: T, validators?: ValidatorFn<T>[]);
   constructor(
-    controlOptions?: ArrayControlOptions<T> | T,
-    controlValidators?: ValidatorFn<T>[]
+    options?: ArrayControlOptions<T> | T,
+    validators?: ValidatorFn<T>[]
   ) {
-    const { value, validators } = createFormControlOptions(
-      controlOptions,
-      controlValidators
-    );
+    const _options = createFormControlOptions(options, validators);
 
-    super(value, validators);
+    super(_options.value, _options.validators);
 
     this.uuid = uuid();
   }

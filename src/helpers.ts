@@ -1,11 +1,12 @@
 import { parseBoolean } from '@rolster/commons';
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import {
-  AbstractControl,
-  AbstractArrayGroup,
   AbstractArrayControls,
-  AbstractGroup,
+  AbstractArrayGroup,
+  AbstractControl,
   AbstractControls,
+  AbstractFormGroup,
+  AbstractGroup,
   ControlsValue,
   ValidatorArrayFn,
   ValidatorGroupFn
@@ -140,4 +141,20 @@ export function hasError(errors: ValidatorError[], key: string): boolean {
 
 export function someErrors(errors: ValidatorError[], keys: string[]): boolean {
   return reduceErrors(errors).some((key) => keys.includes(key));
+}
+
+export function reduceControlsToArray<
+  T extends AbstractControl,
+  C extends AbstractControls<T>,
+  K extends keyof T
+>(controls: C, key: K): T[K][] {
+  return Object.values(controls).map((control) => control[key]);
+}
+
+export function reduceGroupToArray<
+  T extends AbstractControl,
+  C extends AbstractControls<T>,
+  K extends keyof T
+>(group: AbstractFormGroup<C>, key: K): T[K][] {
+  return reduceControlsToArray(group.controls, key);
 }

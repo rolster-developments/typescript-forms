@@ -53,16 +53,16 @@ export type AbstractControls<T extends AbstractControl = AbstractControl> =
 
 export interface AbstractGroup<C extends AbstractControls = AbstractControls> {
   readonly controls: C;
+  readonly dirties: boolean;
   readonly dirty: boolean;
-  readonly dirtyAll: boolean;
   readonly errors: ValidatorError[];
   readonly invalid: boolean;
   readonly pristine: boolean;
-  readonly pristineAll: boolean;
+  readonly pristines: boolean;
   readonly touched: boolean;
-  readonly touchedAll: boolean;
+  readonly toucheds: boolean;
   readonly untouched: boolean;
-  readonly untouchedAll: boolean;
+  readonly untoucheds: boolean;
   readonly valid: boolean;
   readonly wrong: boolean;
   readonly error?: ValidatorError;
@@ -148,19 +148,19 @@ export interface AbstractArray<
   G extends AbstractArrayGroup<C, R> = AbstractArrayGroup<C, R>
 > extends AbstractControl<ArrayControlsValue<C>[]> {
   readonly controls: C[];
-  readonly dirtyAll: boolean;
+  readonly dirties: boolean;
   disable: () => void;
   enable: () => void;
   readonly groups: G[];
   merge: (groups: G[]) => void;
-  readonly pristineAll: boolean;
+  readonly pristines: boolean;
   push: (group: G) => void;
   remove: (group: G) => void;
   setInitialValue: (groups: G[]) => void;
   setValue: (groups: G[]) => void;
   setValidators: (validators: ValidatorArrayFn<C, R>[]) => void;
-  readonly touchedAll: boolean;
-  readonly untouchedAll: boolean;
+  readonly toucheds: boolean;
+  readonly untoucheds: boolean;
   readonly value: ArrayControlsValue<C>[];
   readonly wrong: boolean;
 }

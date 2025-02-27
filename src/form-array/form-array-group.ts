@@ -27,18 +27,18 @@ export class FormArrayGroup<
   constructor(options: ArrayGroupOptions<C>);
   constructor(controls: C, validators?: ValidatorGroupFn<C>[]);
   constructor(
-    groupOptions: ArrayGroupOptions<C> | C,
-    groupValidators?: ValidatorGroupFn<C>[]
+    options: ArrayGroupOptions<C> | C,
+    validators?: ValidatorGroupFn<C>[]
   ) {
-    const { controls, resource, validators } = createFormGroupOptions<
-      C,
-      ArrayGroupOptions<C>
-    >(groupOptions, groupValidators);
+    const _options = createFormGroupOptions<C, ArrayGroupOptions<C>>(
+      options,
+      validators
+    );
 
-    super(controls, validators);
+    super(_options.controls, _options.validators);
 
     this.uuid = uuid();
-    this.resource = resource;
+    this.resource = _options.resource;
   }
 }
 

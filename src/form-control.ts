@@ -5,29 +5,29 @@ import { controlIsValid, hasError, someErrors } from './helpers';
 import {
   AbstractReactiveControl,
   FormControlOptions,
-  FormValueOptions,
   FormValidatorsOptions,
+  FormValueOptions,
   SubscriberControl
 } from './types';
 
 export class FormControl<T = any> implements AbstractReactiveControl<T> {
-  protected currentFocused = false;
+  protected _focused = false;
 
-  protected currentTouched = false;
+  protected _touched = false;
 
-  protected currentDirty = false;
+  protected _dirty = false;
 
-  protected currentDisabled = false;
+  protected _disabled = false;
 
-  protected currentValid = true;
+  protected _valid = true;
 
-  protected initialValue: T;
+  protected _value: T;
+
+  protected _errors: ValidatorError[] = [];
+
+  protected _error?: ValidatorError;
 
   protected currentValue: T;
-
-  protected currentError?: ValidatorError;
-
-  protected currentErrors: ValidatorError[] = [];
 
   protected validators?: ValidatorFn<T>[];
 
@@ -37,73 +37,70 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
   constructor(options: FormControlOptions<T>);
   constructor(value: T, validators?: ValidatorFn<T>[]);
   constructor(
-    controlOptions?: FormControlOptions<T> | T,
-    controlValidators?: ValidatorFn<T>[]
+    options?: FormControlOptions<T> | T,
+    validators?: ValidatorFn<T>[]
   ) {
-    const { value, validators } = createFormControlOptions(
-      controlOptions,
-      controlValidators
-    );
+    const _options = createFormControlOptions(options, validators);
 
-    this.observable = observable(value);
+    this.observable = observable(_options.value);
 
-    this.initialValue = value;
-    this.validators = validators;
+    this.currentValue = _options.value;
+    this.validators = _options.validators;
 
-    this.currentValue = value;
-    this.updateValueAndValidity(value, validators);
+    this._value = _options.value;
+    this.updateValueAndValidity(_options.value, _options.validators);
   }
 
   public get focused(): boolean {
-    return this.currentFocused;
+    return this._focused;
   }
 
   public get unfocused(): boolean {
-    return !this.currentFocused;
+    return !this._focused;
   }
 
   public get touched(): boolean {
-    return this.currentTouched;
+    return this._touched;
   }
 
   public get untouched(): boolean {
-    return !this.currentTouched;
+    return !this._touched;
   }
 
   public get dirty(): boolean {
-    return this.currentDirty;
+    return this._dirty;
   }
 
   public get pristine(): boolean {
-    return !this.currentDirty;
+    return !this._dirty;
   }
 
   public get disabled(): boolean {
-    return this.currentDisabled;
+    return this._disabled;
   }
 
   public get enabled(): boolean {
-    return !this.currentDisabled;
+    return !this._disabled;
   }
 
   public get valid(): boolean {
-    return this.currentValid;
+    return this._valid;
   }
 
   public get invalid(): boolean {
-    return !this.currentValid;
+    return !this._valid;
   }
 
   public get value(): T {
-    return this.currentValue;
+    return this._value;
   }
 
   public get errors(): ValidatorError[] {
-    return this.currentErrors;
+    return this._errors;
   }
 
   public get error(): ValidatorError | undefined {
-    return this.currentError;
+    return this._error;
   }
 
   public get wrong(): boolean {
@@ -119,41 +116,41 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
   }
 
   public reset(): void {
-    this.setValue(this.initialValue);
-    this.currentDirty = false;
-    this.currentTouched = false;
+    this.setValue(this.currentValue);
+    this._dirty = false;
+    this._touched = false;
   }
 
   public focus(): void {
-    this.currentFocused = true;
+    this._focused = true;
   }
 
   public blur(): void {
-    this.currentFocused = false;
-    this.currentTouched = true;
+    this._focused = false;
+    this._touched = true;
   }
 
   public disable(): void {
-    this.currentDisabled = true;
+    this._disabled = true;
   }
 
   public enable(): void {
-    this.currentDisabled = false;
+    this._disabled = false;
   }
 
   public touch(): void {
-    this.currentTouched = true;
+    this._touched = true;
   }
 
   public setInitialValue(value: T): void {
-    this.initialValue = value;
+    this.currentValue = value;
     this.setValue(value);
   }
 
   public setValue(value: T): void {
     if (this.enabled) {
-      this.currentValue = value;
-      this.currentDirty = true;
+      this._value = value;
+      this._dirty = true;
 
       this.updateValueAndValidity(value, this.validators);
       this.observable.next(value);
@@ -176,13 +173,13 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
     if (validators) {
       const errors = controlIsValid({ value, validators });
 
-      this.currentError = errors[0];
-      this.currentErrors = errors;
-      this.currentValid = errors.length === 0;
+      this._error = errors[0];
+      this._errors = errors;
+      this._valid = errors.length === 0;
     } else {
-      this.currentValid = true;
-      this.currentError = undefined;
-      this.currentErrors = [];
+      this._valid = true;
+      this._error = undefined;
+      this._errors = [];
     }
   }
 }

@@ -27,17 +27,17 @@ type ArrayOptions<C extends FormArrayControls, R> = FormArrayOptions<
 export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
   implements AbstractReactiveArray<C, R, AbstractReactiveArrayGroup<C, R>>
 {
-  private currentGroups: AbstractReactiveArrayGroup<C, R>[] = [];
+  private _groups: AbstractReactiveArrayGroup<C, R>[] = [];
 
-  private currentValid = true;
+  private _valid = true;
 
-  private currentDisabled = false;
+  private _disabled = false;
 
-  private currentError?: ValidatorError;
+  private _errors: ValidatorError[] = [];
 
-  private currentErrors: ValidatorError[] = [];
+  private _error?: ValidatorError;
 
-  private initialValue?: AbstractReactiveArrayGroup<C, R>[];
+  private currentValue?: AbstractReactiveArrayGroup<C, R>[];
 
   private validators?: ValidatorArrayFn<C, R>[];
 
@@ -52,31 +52,27 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
     validators?: ValidatorArrayFn<C, R>[]
   );
   constructor(
-    arrayOptions?: ArrayOptions<C, R> | AbstractReactiveArrayGroup<C, R>[],
-    arrayValidators?: ValidatorArrayFn<C, R>[]
+    options?: ArrayOptions<C, R> | AbstractReactiveArrayGroup<C, R>[],
+    validators?: ValidatorArrayFn<C, R>[]
   ) {
-    const { groups, validators } = createFormArrayOptions(
-      arrayOptions,
-      arrayValidators
-    );
+    const _options = createFormArrayOptions(options, validators);
 
     this.unsusbcriptions = new Map();
 
-    this.initialValue = groups;
+    this.currentValue = _options.groups;
+    this.validators = _options.validators;
 
-    this.validators = validators;
-
-    this.refresh(this.initialValue);
+    this.refresh(this.currentValue);
 
     this.observable = observable(this.value);
 
-    groups?.forEach((group) => {
+    _options.groups?.forEach((group) => {
       this.subscription(group);
     });
   }
 
   public get groups(): AbstractReactiveArrayGroup<C, R>[] {
-    return this.currentGroups;
+    return this._groups;
   }
 
   public get controls(): C[] {
@@ -87,48 +83,48 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
     return groupPartialChecked(this.groups, 'touched');
   }
 
-  public get touchedAll(): boolean {
-    return groupAllChecked(this.groups, 'touchedAll');
+  public get toucheds(): boolean {
+    return groupAllChecked(this.groups, 'toucheds');
   }
 
   public get untouched(): boolean {
     return !this.touched;
   }
 
-  public get untouchedAll(): boolean {
-    return !this.touchedAll;
+  public get untoucheds(): boolean {
+    return !this.toucheds;
   }
 
   public get dirty(): boolean {
     return groupPartialChecked(this.groups, 'dirty');
   }
 
-  public get dirtyAll(): boolean {
-    return groupAllChecked(this.groups, 'dirtyAll');
+  public get dirties(): boolean {
+    return groupAllChecked(this.groups, 'dirties');
   }
 
   public get pristine(): boolean {
     return !this.dirty;
   }
 
-  public get pristineAll(): boolean {
-    return !this.dirtyAll;
+  public get pristines(): boolean {
+    return !this.dirties;
   }
 
   public get disabled(): boolean {
-    return this.currentDisabled;
+    return this._disabled;
   }
 
   public get enabled(): boolean {
-    return !this.currentDisabled;
+    return !this._disabled;
   }
 
   public get valid(): boolean {
-    return this.currentValid && groupAllChecked(this.groups, 'valid');
+    return this._valid && groupAllChecked(this.groups, 'valid');
   }
 
   public get invalid(): boolean {
-    return !this.currentValid;
+    return !this._valid;
   }
 
   public get value(): ArrayControlsValue<C>[] {
@@ -136,11 +132,11 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
   }
 
   public get error(): ValidatorError | undefined {
-    return this.currentError;
+    return this._error;
   }
 
   public get errors(): ValidatorError[] {
-    return this.currentErrors;
+    return this._errors;
   }
 
   public get wrong(): boolean {
@@ -156,15 +152,15 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
   }
 
   public reset(): void {
-    this.refresh(this.initialValue);
+    this.refresh(this.currentValue);
   }
 
   public disable(): void {
-    this.currentDisabled = true;
+    this._disabled = true;
   }
 
   public enable(): void {
-    this.currentDisabled = false;
+    this._disabled = false;
   }
 
   public push(group: AbstractReactiveArrayGroup<C, R>): void {
@@ -182,12 +178,12 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
   }
 
   public setInitialValue(groups: AbstractReactiveArrayGroup<C, R>[]): void {
-    this.initialValue = groups;
+    this.currentValue = groups;
     this.setValue(groups);
   }
 
   public setValue(groups: AbstractReactiveArrayGroup<C, R>[]): void {
-    this.currentGroups.forEach(({ uuid }) => {
+    this._groups.forEach(({ uuid }) => {
       this.unsusbcriptions.delete(uuid);
     });
 
@@ -227,20 +223,20 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
     if (validators) {
       const errors = arrayIsValid({ groups, validators });
 
-      this.currentErrors = errors;
-      this.currentError = errors[0];
-      this.currentValid = errors.length === 0;
+      this._errors = errors;
+      this._error = errors[0];
+      this._valid = errors.length === 0;
     } else {
-      this.currentValid = true;
-      this.currentErrors = [];
-      this.currentError = undefined;
+      this._valid = true;
+      this._errors = [];
+      this._error = undefined;
     }
   }
 
   private refresh(newGroups?: AbstractReactiveArrayGroup<C, R>[]): void {
     const groups = newGroups || [];
 
-    this.currentGroups = groups;
+    this._groups = groups;
 
     this.updateValidityStatus(groups, this.validators);
   }
