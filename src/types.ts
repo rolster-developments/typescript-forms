@@ -1,3 +1,4 @@
+import { Observer } from '@rolster/commons';
 import {
   ValidatorError,
   ValidatorFn,
@@ -9,8 +10,6 @@ export type ValidationFormType = 'control' | 'group' | 'array';
 export interface ValidationFormError<T = any> extends ValidatorError<T> {
   type: ValidationFormType;
 }
-
-export type SubscriberControl<T> = (value: T) => void;
 
 export interface AbstractControl<T = any> {
   readonly dirty: boolean;
@@ -45,7 +44,7 @@ export interface AbstractFormControl<T = any> extends AbstractControl<T> {
 
 export interface AbstractReactiveControl<T = any>
   extends AbstractFormControl<T> {
-  subscribe: (subscriber: SubscriberControl<T>) => Unsubscription;
+  subscribe: (subscriber: Observer<T>) => Unsubscription;
 }
 
 export type AbstractControls<T extends AbstractControl = AbstractControl> =
@@ -101,7 +100,7 @@ export interface AbstractArrayControl<T = any> extends AbstractFormControl<T> {
 
 export interface AbstractReactiveArrayControl<T = any>
   extends AbstractArrayControl<T> {
-  subscribe: (subscriber: SubscriberControl<T>) => Unsubscription;
+  subscribe: (subscriber: Observer<T>) => Unsubscription;
 }
 
 export type AbstractArrayControls<
@@ -138,7 +137,7 @@ export type ArrayFormControls<
   T extends AbstractArrayControl = AbstractArrayControl
 > = AbstractArrayControls<T>;
 
-export type SubscriberArray<C extends ArrayFormControls> = SubscriberControl<
+export type SubscriberArray<C extends ArrayFormControls> = Observer<
   ArrayControlsValue<C>[]
 >;
 

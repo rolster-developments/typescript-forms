@@ -1,4 +1,4 @@
-import { Observable, observable } from '@rolster/commons';
+import { Observable, Observer, observable } from '@rolster/commons';
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import { createFormControlOptions } from './arguments';
 import { controlIsValid, hasError, someErrors } from './helpers';
@@ -6,8 +6,7 @@ import {
   AbstractReactiveControl,
   FormControlOptions,
   FormValidatorsOptions,
-  FormValueOptions,
-  SubscriberControl
+  FormValueOptions
 } from './types';
 
 export class FormControl<T = any> implements AbstractReactiveControl<T> {
@@ -162,7 +161,7 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
     this.updateValueAndValidity(this.value, validators);
   }
 
-  public subscribe(subscriber: SubscriberControl<T>): Unsubscription {
+  public subscribe(subscriber: Observer<T>): Unsubscription {
     return this.observable.subscribe(subscriber);
   }
 
