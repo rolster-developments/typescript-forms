@@ -29,7 +29,7 @@ type ArgsArrayOptions<
   Undefined<ValidatorArrayFn<C, R, G>[]>
 ];
 
-function itIsControlOptions<T, O extends FormControlOptions<T>>(
+function controlIsOptions<T, O extends FormControlOptions<T>>(
   options: any
 ): options is O {
   return (
@@ -38,14 +38,14 @@ function itIsControlOptions<T, O extends FormControlOptions<T>>(
   );
 }
 
-function itIsGroupOptions<
+function groupIsOptions<
   C extends AbstractControls,
   O extends FormGroupOptions<C>
 >(options: any): options is O {
   return typeof options === 'object' && 'controls' in options;
 }
 
-function itIsArrayOptions<
+function arrayIsOptions<
   C extends AbstractArrayControls,
   R,
   G extends AbstractArrayGroup<C, R>,
@@ -66,7 +66,7 @@ export function createFormControlOptions<T, O extends FormControlOptions<T>>(
     return { value: options, validators } as O;
   }
 
-  if (!validators && itIsControlOptions<T, O>(options)) {
+  if (!validators && controlIsOptions<T, O>(options)) {
     return options;
   }
 
@@ -82,7 +82,7 @@ export function createFormGroupOptions<
 >(...groupOptions: ArgsGroupOptions<C>): O {
   const [options, validators] = groupOptions;
 
-  if (!validators && itIsGroupOptions<C, O>(options)) {
+  if (!validators && groupIsOptions<C, O>(options)) {
     return options;
   }
 
@@ -104,7 +104,7 @@ export function createFormArrayOptions<
     return { groups: options, validators } as O;
   }
 
-  if (!validators && itIsArrayOptions<C, R, G, O>(options)) {
+  if (!validators && arrayIsOptions<C, R, G, O>(options)) {
     return options;
   }
 

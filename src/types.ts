@@ -150,6 +150,7 @@ export interface AbstractArray<
   readonly dirties: boolean;
   disable: () => void;
   enable: () => void;
+  findByUuid: (uuid: string) => Undefined<G>;
   readonly groups: G[];
   merge: (groups: G[]) => void;
   readonly pristines: boolean;

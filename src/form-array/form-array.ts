@@ -29,6 +29,8 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
 {
   private _groups: AbstractReactiveArrayGroup<C, R>[] = [];
 
+  private mapGroups: Map<string, AbstractReactiveArrayGroup<C, R>>;
+
   private _valid = true;
 
   private _disabled = false;
@@ -37,7 +39,7 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
 
   private _error?: ValidatorError;
 
-  private currentValue?: AbstractReactiveArrayGroup<C, R>[];
+  private _value?: AbstractReactiveArrayGroup<C, R>[];
 
   private validators?: ValidatorArrayFn<C, R>[];
 
@@ -58,11 +60,12 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
     const _options = createFormArrayOptions(options, validators);
 
     this.unsusbcriptions = new Map();
+    this.mapGroups = new Map();
 
-    this.currentValue = _options.groups;
+    this._value = _options.groups;
     this.validators = _options.validators;
 
-    this.refresh(this.currentValue);
+    this.refresh(this._value);
 
     this.observable = observable(this.value);
 
@@ -152,7 +155,7 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
   }
 
   public reset(): void {
-    this.refresh(this.currentValue);
+    this.refresh(this._value);
   }
 
   public disable(): void {
@@ -161,6 +164,10 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
 
   public enable(): void {
     this._disabled = false;
+  }
+
+  public findByUuid(uuid: string): Undefined<AbstractReactiveArrayGroup<C, R>> {
+    return this.mapGroups.get(uuid);
   }
 
   public push(group: AbstractReactiveArrayGroup<C, R>): void {
@@ -178,7 +185,7 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
   }
 
   public setInitialValue(groups: AbstractReactiveArrayGroup<C, R>[]): void {
-    this.currentValue = groups;
+    this._value = groups;
     this.setValue(groups);
   }
 
@@ -233,10 +240,16 @@ export class FormArray<C extends FormArrayControls = FormArrayControls, R = any>
     }
   }
 
-  private refresh(newGroups?: AbstractReactiveArrayGroup<C, R>[]): void {
-    const groups = newGroups || [];
+  private refresh(_groups?: AbstractReactiveArrayGroup<C, R>[]): void {
+    const groups = _groups || [];
+
+    this.mapGroups.clear();
 
     this._groups = groups;
+
+    groups.forEach((group) => {
+      this.mapGroups.set(group.uuid, group);
+    });
 
     this.updateValidityStatus(groups, this.validators);
   }
