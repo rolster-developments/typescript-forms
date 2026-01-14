@@ -26,7 +26,7 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
 
   protected _error?: ValidatorError;
 
-  protected currentValue: T;
+  protected defaultValue: T;
 
   protected validators?: ValidatorFn<T>[];
 
@@ -39,15 +39,15 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
     options?: FormControlOptions<T> | T,
     validators?: ValidatorFn<T>[]
   ) {
-    const _options = createFormControlOptions(options, validators);
+    const formControl = createFormControlOptions(options, validators);
 
-    this.observable = observable(_options.value);
+    this.observable = observable(formControl.value);
 
-    this.currentValue = _options.value;
-    this.validators = _options.validators;
+    this.defaultValue = formControl.value;
+    this.validators = formControl.validators;
 
-    this._value = _options.value;
-    this.updateValueAndValidity(_options.value, _options.validators);
+    this._value = formControl.value;
+    this.updateValueAndValidity(formControl.value, formControl.validators);
   }
 
   public get focused(): boolean {
@@ -115,7 +115,7 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
   }
 
   public reset(): void {
-    this.setValue(this.currentValue);
+    this.refreshValue(this.defaultValue);
     this._dirty = false;
     this._touched = false;
   }
@@ -141,19 +141,18 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
     this._touched = true;
   }
 
-  public setInitialValue(value: T): void {
-    this.currentValue = value;
-    this.setValue(value);
+  public setDefaultValue(value: T): void {
+    this.defaultValue = value;
+    this.refreshValue(value);
+  }
+
+  public setStartValue(value: T): void {
+    this.refreshValue(value);
   }
 
   public setValue(value: T): void {
-    if (this.enabled) {
-      this._value = value;
-      this._dirty = true;
-
-      this.updateValueAndValidity(value, this.validators);
-      this.observable.next(value);
-    }
+    this._dirty = true;
+    this.refreshValue(value);
   }
 
   public setValidators(validators: ValidatorFn<T>[] = []): void {
@@ -180,6 +179,12 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
       this._error = undefined;
       this._errors = [];
     }
+  }
+
+  private refreshValue(value: T): void {
+    this._value = value;
+    this.updateValueAndValidity(value, this.validators);
+    this.observable.next(value);
   }
 }
 

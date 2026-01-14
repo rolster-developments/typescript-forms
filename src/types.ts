@@ -35,7 +35,8 @@ export interface AbstractFormControl<T = any> extends AbstractControl<T> {
   enable: () => void;
   focus: () => void;
   readonly focused: boolean;
-  setInitialValue: (value: T) => void;
+  setDefaultValue: (value: T) => void;
+  setStartValue: (value: T) => void;
   setValue: (value: T) => void;
   setValidators: (validators?: ValidatorFn<T>[]) => void;
   touch: () => void;

@@ -19,9 +19,9 @@ export class FormArrayControl<T = any>
     options?: ArrayControlOptions<T> | T,
     validators?: ValidatorFn<T>[]
   ) {
-    const _options = createFormControlOptions(options, validators);
+    const formControl = createFormControlOptions(options, validators);
 
-    super(_options.value, _options.validators);
+    super(formControl.value, formControl.validators);
 
     this.uuid = uuid();
   }

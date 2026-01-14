@@ -26,11 +26,11 @@ export class FormArrayList<C extends FormArrayControls = FormArrayControls>
     value?: ArrayControlsValue<C>[],
     validators?: ValidatorFn<ArrayControlsValue<C>[]>[]
   ) {
-    const _value = value || [];
+    const formList = value || [];
 
-    super(_value, validators);
+    super(formList, validators);
 
-    this._controls = _value.map((value) => this.createControls(value));
+    this._controls = formList.map((value) => this.createControls(value));
 
     this.uuid = uuid();
   }
@@ -86,10 +86,8 @@ export class FormArrayList<C extends FormArrayControls = FormArrayControls>
 
     Object.values(controls).forEach((control) => {
       control.subscribe(() => {
-        const { value, validators } = this;
-
-        this.updateValueAndValidity(value, validators);
-        this.observable.next(value);
+        this.updateValueAndValidity(this.value, this.validators);
+        this.observable.next(this.value);
       });
     });
 

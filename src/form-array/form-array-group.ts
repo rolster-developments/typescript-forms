@@ -30,15 +30,15 @@ export class FormArrayGroup<
     options: ArrayGroupOptions<C> | C,
     validators?: ValidatorGroupFn<C>[]
   ) {
-    const _options = createFormGroupOptions<C, ArrayGroupOptions<C>>(
+    const formGroup = createFormGroupOptions<C, ArrayGroupOptions<C>>(
       options,
       validators
     );
 
-    super(_options.controls, _options.validators);
+    super(formGroup.controls, formGroup.validators);
 
     this.uuid = uuid();
-    this.resource = _options.resource;
+    this.resource = formGroup.resource;
   }
 }
 

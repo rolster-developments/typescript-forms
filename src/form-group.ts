@@ -42,16 +42,16 @@ export class FormGroup<C extends FormControls = FormControls>
     options: FormGroupOptions<C> | C,
     validators?: ValidatorGroupFn<C>[]
   ) {
-    const _options = createFormGroupOptions(options, validators);
+    const formGroup = createFormGroupOptions(options, validators);
 
-    this._controls = _options.controls;
-    this.validators = _options.validators;
+    this._controls = formGroup.controls;
+    this.validators = formGroup.validators;
 
-    this.updateValueAndValidity(_options.controls, _options.validators);
+    this.updateValueAndValidity(formGroup.controls, formGroup.validators);
 
     this.observable = observable(this.value);
 
-    Object.values(_options.controls).forEach((control) => {
+    Object.values(formGroup.controls).forEach((control) => {
       control.subscribe(() => {
         this.updateValueAndValidity(this.controls, this.validators);
         this.observable.next(this.value);
