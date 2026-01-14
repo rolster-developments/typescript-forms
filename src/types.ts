@@ -157,7 +157,7 @@ export interface AbstractArray<
   readonly pristines: boolean;
   push: (group: G) => void;
   remove: (group: G) => void;
-  setInitialValue: (groups: G[]) => void;
+  setDefaultValue: (groups: G[]) => void;
   setValue: (groups: G[]) => void;
   setValidators: (validators: ValidatorArrayFn<C, R>[]) => void;
   readonly toucheds: boolean;
