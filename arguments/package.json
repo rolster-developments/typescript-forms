@@ -1,8 +1,14 @@
 {
   "name": "@rolster/forms/arguments",
-  "types": "../dist/esm/arguments.d.ts",
-  "main": "../dist/cjs/arguments.js",
-  "module": "../dist/esm/arguments.js",
-  "unpkg": "../dist/es/arguments.js",
+  "exports": {
+    ".": {
+      "types": "../dist/esm/arguments.d.ts",
+      "node": {
+        "require": "../dist/cjs/arguments.js",
+        "import": "../dist/esm/arguments.js"
+      },
+      "default": "../dist/esm/arguments.js"
+    }
+  },
   "sideEffects": false
 }

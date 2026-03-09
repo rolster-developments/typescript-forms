@@ -1,11 +1,8 @@
 {
   "name": "@rolster/forms",
-  "version": "3.1.1",
+  "version": "3.2.0",
+  "type": "module",
   "description": "It implements a set of classes that allow managing the control of states of the input components of the UI.",
-  "module": "dist/esm/index.js",
-  "main": "dist/cjs/index.js",
-  "unpkg": "dist/es/index.js",
-  "types": "dist/esm/index.d.ts",
   "license": "MIT",
   "author": "Rolster Technology <rolster.developments@gmail.com>",
   "contributors": [
@@ -14,56 +11,59 @@
       "email": "ing.dacastillop@gmail.com"
     }
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "node": {
+        "require": "./dist/cjs/index.js",
+        "import": "./dist/esm/index.js"
+      },
+      "default": "./dist/esm/index.js"
+    },
+    "./arguments": {
+      "types": "./dist/esm/arguments.d.ts",
+      "node": {
+        "require": "./dist/cjs/arguments.js",
+        "import": "./dist/esm/arguments.js"
+      },
+      "default": "./dist/esm/arguments.js"
+    },
+    "./helpers": {
+      "types": "./dist/esm/helpers.d.ts",
+      "node": {
+        "require": "./dist/cjs/helpers.js",
+        "import": "./dist/esm/helpers.js"
+      },
+      "default": "./dist/esm/helpers.js"
+    }
+  },
   "files": [
     "dist/",
     "arguments/",
     "helpers/"
   ],
-  "exports": {
-    ".": {
-      "types": "./dist/esm/index.d.ts",
-      "node": "./dist/cjs/index.js",
-      "require": "./dist/cjs/index.js",
-      "default": "./dist/esm/index.js"
-    },
-    "./arguments": {
-      "types": "./dist/esm/arguments.d.ts",
-      "node": "./dist/cjs/arguments.js",
-      "require": "./dist/cjs/arguments.js",
-      "default": "./dist/esm/arguments.js"
-    },
-    "./helpers": {
-      "types": "./dist/esm/helpers.d.ts",
-      "node": "./dist/cjs/helpers.js",
-      "require": "./dist/cjs/helpers.js",
-      "default": "./dist/esm/helpers.js"
-    }
-  },
   "scripts": {
-    "prettier": "prettier . --write",
+    "prettier": "prettier --write \"src/**/*.{ts}\"",
     "clean": "rimraf ./dist",
     "build": "npm run clean && tsc -p tsconfig.app.json && rollup -c rollup.config.js",
-    "test": "jest --coverage",
-    "test:watch": "jest --coverage --watch",
+    "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@rolster/commons": "^3.1.9",
-    "@rolster/validators": "^2.3.2",
-    "uuid": "^9.0.1"
+    "@rolster/commons": "^3.2.0",
+    "@rolster/validators": "^2.4.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.4",
-    "@rollup/plugin-node-resolve": "^15.2.1",
-    "@rollup/plugin-typescript": "^11.1.3",
-    "@rolster/rollup": "^1.0.8",
+    "@rolster/rollup": "^1.0.10",
     "@rolster/types": "^1.1.0",
-    "@types/uuid": "^9.0.7",
-    "prettier": "^3.0.3",
+    "@vitest/ui": "^3.2.4",
+    "jsdom": "^27.0.0",
+    "prettier": "^3.8.1",
     "rimraf": "^3.0.2",
-    "rollup": "^2.32.0",
     "tslib": "^2.4.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.4"
   },
   "repository": {
     "type": "git",
