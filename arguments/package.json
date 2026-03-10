@@ -1,5 +1,9 @@
 {
   "name": "@rolster/forms/arguments",
+  "type": "module",
+  "types": "../dist/esm/arguments.d.ts",
+  "main": "../dist/cjs/arguments.js",
+  "module": "../dist/esm/arguments.js",
   "exports": {
     ".": {
       "types": "../dist/esm/arguments.d.ts",

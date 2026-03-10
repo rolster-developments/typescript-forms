@@ -1,6 +1,6 @@
 {
   "name": "@rolster/forms",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "type": "module",
   "description": "It implements a set of classes that allow managing the control of states of the input components of the UI.",
   "license": "MIT",
@@ -11,6 +11,9 @@
       "email": "ing.dacastillop@gmail.com"
     }
   ],
+  "types": "./dist/esm/index.d.ts",
+  "main": "./dist/esm/index.js",
+  "module": "./dist/esm/index.js",
   "exports": {
     ".": {
       "types": "./dist/esm/index.d.ts",
@@ -50,8 +53,8 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@rolster/commons": "^3.2.0",
-    "@rolster/validators": "^2.4.0",
+    "@rolster/commons": "^3.2.1",
+    "@rolster/validators": "^2.4.1",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

@@ -1,5 +1,9 @@
 {
   "name": "@rolster/forms/helpers",
+  "type": "module",
+  "types": "../dist/esm/helpers.d.ts",
+  "main": "../dist/cjs/helpers.js",
+  "module": "../dist/esm/helpers.js",
   "exports": {
     ".": {
       "types": "../dist/esm/helpers.d.ts",
