@@ -2,16 +2,16 @@ import { ValidatorFn } from '@rolster/validators';
 import { v4 as uuid } from 'uuid';
 import { FormControl } from '../form-control';
 import {
+  controlsAllChecked,
+  controlsPartialChecked,
+  controlsToValue
+} from '../helpers';
+import {
   AbstractArrayList,
   ArrayControlsValue,
   ArrayListValueToControls
 } from '../types';
 import { FormArrayControls } from './types';
-import {
-  controlsAllChecked,
-  controlsPartialChecked,
-  controlsToValue
-} from '../helpers';
 
 export class FormArrayList<C extends FormArrayControls = FormArrayControls>
   extends FormControl<ArrayControlsValue<C>[]>
