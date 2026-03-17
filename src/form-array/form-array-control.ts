@@ -1,14 +1,17 @@
 import { ValidatorFn } from '@rolster/validators';
 import { v4 as uuid } from 'uuid';
-import { createFormControlOptions } from '../arguments';
-import { FormControl } from '../form-control';
-import { AbstractArrayControl, FormArrayControlOptions } from '../types';
+import { createFormControlOptions } from '../form-control/form-control.helper';
+import { FormControl } from '../form-control/form-control';
+import {
+  FormArrayControlOptions,
+  ReactiveArrayControl
+} from './form-array-control.type';
 
 type ArrayControlOptions<T> = Omit<FormArrayControlOptions<T>, 'uuid'>;
 
 export class FormArrayControl<T = any>
   extends FormControl<T>
-  implements AbstractArrayControl<T>
+  implements ReactiveArrayControl<T>
 {
   public readonly uuid: string;
 

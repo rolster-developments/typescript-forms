@@ -1,15 +1,18 @@
 import { Observable, Observer, observable } from '@rolster/commons';
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
-import { createFormControlOptions } from './arguments';
-import { controlIsValid, hasError, someErrors } from './helpers';
+import { hasError, someErrors } from '../helpers';
 import {
-  AbstractReactiveControl,
+  formControlIsValid,
+  createFormControlOptions
+} from './form-control.helper';
+import {
+  ReactiveFormControl,
   FormControlOptions,
   FormValidatorsOptions,
   FormValueOptions
-} from './types';
+} from './form-control.type';
 
-export class FormControl<T = any> implements AbstractReactiveControl<T> {
+export class FormControl<T = any> implements ReactiveFormControl<T> {
   protected _focused = false;
 
   protected _touched = false;
@@ -169,7 +172,7 @@ export class FormControl<T = any> implements AbstractReactiveControl<T> {
     validators?: ValidatorFn<T>[]
   ): void {
     if (validators) {
-      const errors = controlIsValid({ value, validators });
+      const errors = formControlIsValid({ value, validators });
 
       this._error = errors[0];
       this._errors = errors;

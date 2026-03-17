@@ -1,29 +1,28 @@
-import { Observable, observable } from '@rolster/commons';
+import { observable, Observable } from '@rolster/commons';
 import { ValidatorError } from '@rolster/validators';
-import { createFormGroupOptions } from './arguments';
+import { ReactiveFormControl } from '../form-control/form-control.type';
 import {
-  controlsAllChecked,
-  controlsPartialChecked,
   controlsToValue,
-  groupIsValid
-} from './helpers';
+  createFormGroupOptions,
+  formGroupIsValid,
+  verifyAllTrueInControls,
+  verifyAnyTrueInControls
+} from './form-group.helper';
 import {
   AbstractControls,
-  AbstractReactiveControl,
-  AbstractReactiveGroup,
   ControlsValue,
   FormGroupOptions,
+  ReactiveFormGroup,
   SubscriberGroup,
   ValidatorGroupFn
-} from './types';
+} from './form-group.type';
 
-export type FormControls<
-  T extends AbstractReactiveControl = AbstractReactiveControl
-> = AbstractControls<T>;
+export type FormControls<T extends ReactiveFormControl = ReactiveFormControl> =
+  AbstractControls<T>;
 
-export class FormGroup<C extends FormControls = FormControls>
-  implements AbstractReactiveGroup<C>
-{
+export class FormGroup<
+  C extends FormControls = FormControls
+> implements ReactiveFormGroup<C> {
   protected _controls: C;
 
   private _errors: ValidatorError[] = [];
@@ -64,11 +63,11 @@ export class FormGroup<C extends FormControls = FormControls>
   }
 
   public get touched(): boolean {
-    return controlsPartialChecked(this.controls, 'touched');
+    return verifyAnyTrueInControls(this.controls, 'touched');
   }
 
   public get toucheds(): boolean {
-    return controlsAllChecked(this.controls, 'touched');
+    return verifyAllTrueInControls(this.controls, 'touched');
   }
 
   public get untouched(): boolean {
@@ -80,11 +79,11 @@ export class FormGroup<C extends FormControls = FormControls>
   }
 
   public get dirty(): boolean {
-    return controlsPartialChecked(this.controls, 'dirty');
+    return verifyAnyTrueInControls(this.controls, 'dirty');
   }
 
   public get dirties(): boolean {
-    return controlsAllChecked(this.controls, 'dirty');
+    return verifyAllTrueInControls(this.controls, 'dirty');
   }
 
   public get pristine(): boolean {
@@ -96,7 +95,7 @@ export class FormGroup<C extends FormControls = FormControls>
   }
 
   public get valid(): boolean {
-    return this._valid && controlsAllChecked(this.controls, 'valid');
+    return this._valid && verifyAllTrueInControls(this.controls, 'valid');
   }
 
   public get invalid(): boolean {
@@ -139,7 +138,7 @@ export class FormGroup<C extends FormControls = FormControls>
     validators?: ValidatorGroupFn<C>[]
   ): void {
     if (validators) {
-      const errors = groupIsValid({ controls, validators });
+      const errors = formGroupIsValid({ controls, validators });
 
       this._errors = errors;
       this._error = errors[0];

@@ -1,17 +1,16 @@
 import { ValidatorFn } from '@rolster/validators';
 import { v4 as uuid } from 'uuid';
-import { FormControl } from '../form-control';
+import { FormControl } from '../form-control/form-control';
 import {
-  controlsAllChecked,
-  controlsPartialChecked,
-  controlsToValue
-} from '../helpers';
+  controlsToValue,
+  verifyAllTrueInControls,
+  verifyAnyTrueInControls
+} from '../form-group/form-group.helper';
+import { ArrayControlsValue, FormArrayControls } from './form-array-group.type';
 import {
   AbstractArrayList,
-  ArrayControlsValue,
   ArrayListValueToControls
-} from '../types';
-import { FormArrayControls } from './types';
+} from './form-array-list.type';
 
 export class FormArrayList<C extends FormArrayControls = FormArrayControls>
   extends FormControl<ArrayControlsValue<C>[]>
@@ -26,11 +25,11 @@ export class FormArrayList<C extends FormArrayControls = FormArrayControls>
     value?: ArrayControlsValue<C>[],
     validators?: ValidatorFn<ArrayControlsValue<C>[]>[]
   ) {
-    const formList = value || [];
+    const formValue = value || [];
 
-    super(formList, validators);
+    super(formValue, validators);
 
-    this._controls = formList.map((value) => this.createControls(value));
+    this._controls = formValue.map((value) => this.createControls(value));
 
     this.uuid = uuid();
   }
@@ -41,14 +40,15 @@ export class FormArrayList<C extends FormArrayControls = FormArrayControls>
 
   public get touched(): boolean {
     return this.controls.reduce(
-      (valid, controls) => valid && controlsPartialChecked(controls, 'touched'),
+      (valid, controls) =>
+        valid && verifyAnyTrueInControls(controls, 'touched'),
       true
     );
   }
 
   public get dirty(): boolean {
     return this.controls.reduce(
-      (valid, controls) => valid && controlsPartialChecked(controls, 'dirty'),
+      (valid, controls) => valid && verifyAnyTrueInControls(controls, 'dirty'),
       true
     );
   }
@@ -57,7 +57,8 @@ export class FormArrayList<C extends FormArrayControls = FormArrayControls>
     return (
       this._valid &&
       this.controls.reduce(
-        (valid, controls) => valid && controlsAllChecked(controls, 'valid'),
+        (valid, controls) =>
+          valid && verifyAllTrueInControls(controls, 'valid'),
         true
       )
     );

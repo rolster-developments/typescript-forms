@@ -1,6 +1,6 @@
 {
   "name": "@rolster/forms",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "type": "module",
   "description": "It implements a set of classes that allow managing the control of states of the input components of the UI.",
   "license": "MIT",
@@ -23,14 +23,6 @@
       },
       "default": "./dist/esm/index.js"
     },
-    "./arguments": {
-      "types": "./dist/esm/arguments.d.ts",
-      "node": {
-        "require": "./dist/cjs/arguments.js",
-        "import": "./dist/esm/arguments.js"
-      },
-      "default": "./dist/esm/arguments.js"
-    },
     "./helpers": {
       "types": "./dist/esm/helpers.d.ts",
       "node": {
@@ -42,7 +34,6 @@
   },
   "files": [
     "dist/",
-    "arguments/",
     "helpers/"
   ],
   "scripts": {

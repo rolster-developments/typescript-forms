@@ -1,12 +1,12 @@
 import { v4 as uuid } from 'uuid';
-import { createFormGroupOptions } from '../arguments';
-import { FormGroup } from '../form-group';
+import { createFormGroupOptions } from '../form-group/form-group.helper';
+import { ValidatorGroupFn } from '../form-group/form-group.type';
+import { FormGroup } from '../form-group/form-group';
 import {
-  AbstractReactiveArrayGroup,
+  FormArrayControls,
   FormArrayGroupOptions,
-  ValidatorGroupFn
-} from '../types';
-import { FormArrayControls } from './types';
+  ReactiveArrayGroup
+} from './form-array-group.type';
 
 type ArrayGroupOptions<T extends FormArrayControls> = Omit<
   FormArrayGroupOptions<T>,
@@ -14,11 +14,11 @@ type ArrayGroupOptions<T extends FormArrayControls> = Omit<
 >;
 
 export class FormArrayGroup<
-    C extends FormArrayControls = FormArrayControls,
-    R = any
-  >
+  C extends FormArrayControls = FormArrayControls,
+  R = any
+>
   extends FormGroup<C>
-  implements AbstractReactiveArrayGroup<C>
+  implements ReactiveArrayGroup<C>
 {
   public readonly uuid: string;
 
