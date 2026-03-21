@@ -2,13 +2,13 @@
   "name": "@rolster/forms/helpers",
   "type": "module",
   "types": "../dist/esm/helpers.d.ts",
-  "main": "../dist/cjs/helpers.js",
+  "main": "../dist/cjs/helpers.cjs",
   "module": "../dist/esm/helpers.js",
   "exports": {
     ".": {
       "types": "../dist/esm/helpers.d.ts",
       "node": {
-        "require": "../dist/cjs/helpers.js",
+        "require": "../dist/cjs/helpers.cjs",
         "import": "../dist/esm/helpers.js"
       },
       "default": "../dist/esm/helpers.js"
