@@ -118,6 +118,14 @@ export class FormGroup<
     return this.touched && this.invalid;
   }
 
+  public setValue(value: Partial<ControlsValue<C>>): void {
+    Object.entries(value).forEach(([key, valueControl]) => {
+      const formControl = this._controls[key as keyof C];
+
+      formControl?.setValue(valueControl);
+    });
+  }
+
   public reset(): void {
     Object.values(this.controls).forEach((control) => {
       control.reset();

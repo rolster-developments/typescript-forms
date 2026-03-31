@@ -1,6 +1,6 @@
 {
   "name": "@rolster/forms",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "type": "module",
   "description": "It implements a set of classes that allow managing the control of states of the input components of the UI.",
   "license": "MIT",

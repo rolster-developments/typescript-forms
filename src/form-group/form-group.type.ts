@@ -39,6 +39,7 @@ export interface AbstractFormGroup<
 > extends AbstractGroup<C> {
   reset: () => void;
   setValidators: (validators: ValidatorGroupFn<C>[]) => void;
+  setValue(value: Partial<ControlsValue<C>>): void;
   readonly value: ControlsValue<C>;
 }
 
