@@ -19,15 +19,21 @@ export interface AbstractControl<T = any> {
   readonly error?: ValidatorError;
 }
 
-export interface AbstractFormControl<T = any> extends AbstractControl<T> {
+export interface AbstractValueControl<
+  T = any,
+  V = T
+> extends AbstractControl<T> {
+  setDefaultValue: (value: V) => void;
+  setStartValue: (value: V) => void;
+  setValue: (value: V) => void;
+}
+
+export interface AbstractFormControl<T = any> extends AbstractValueControl<T> {
   blur: () => void;
   disable: () => void;
   enable: () => void;
   focus: () => void;
   readonly focused: boolean;
-  setDefaultValue: (value: T) => void;
-  setStartValue: (value: T) => void;
-  setValue: (value: T) => void;
   setValidators: (validators?: ValidatorFn<T>[]) => void;
   touch: () => void;
   readonly unfocused: boolean;

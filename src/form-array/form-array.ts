@@ -191,6 +191,10 @@ export class FormArray<
     this.setValue(groups);
   }
 
+  public setStartValue(groups: ReactiveArrayGroup<C, R>[]): void {
+    this.setValue(groups);
+  }
+
   public setValue(groups: ReactiveArrayGroup<C, R>[]): void {
     this._groups.forEach(({ uuid }) => {
       this.unsusbcriptions.delete(uuid);

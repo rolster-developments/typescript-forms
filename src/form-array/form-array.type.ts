@@ -1,6 +1,6 @@
 import { Observer } from '@rolster/commons';
 import { ValidatorResult } from '@rolster/validators';
-import { AbstractControl } from '../form-control/form-control.type';
+import { AbstractValueControl } from '../form-control/form-control.type';
 import {
   AbstractArrayControls,
   AbstractArrayGroup,
@@ -19,7 +19,7 @@ export interface AbstractArray<
   C extends AbstractArrayControls = AbstractArrayControls,
   R = any,
   G extends AbstractArrayGroup<C, R> = AbstractArrayGroup<C, R>
-> extends AbstractControl<ArrayControlsValue<C>[]> {
+> extends AbstractValueControl<ArrayControlsValue<C>[], G[]> {
   readonly controls: C[];
   readonly dirties: boolean;
   disable: () => void;
@@ -30,8 +30,6 @@ export interface AbstractArray<
   readonly pristines: boolean;
   push: (group: G) => void;
   remove: (group: G) => void;
-  setDefaultValue: (groups: G[]) => void;
-  setValue: (groups: G[]) => void;
   setValidators: (validators: ValidatorArrayFn<C, R>[]) => void;
   readonly toucheds: boolean;
   readonly untoucheds: boolean;
