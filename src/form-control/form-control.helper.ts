@@ -1,4 +1,5 @@
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
+
 import { FormControlOptions } from './form-control.type';
 
 type ControlArgsOptions<T = any> = [
@@ -7,8 +8,8 @@ type ControlArgsOptions<T = any> = [
 ];
 
 interface ControlValidOptions<T> {
-  value: T;
   validators: ValidatorFn<T>[];
+  value: T;
 }
 
 function valueIsControlOptions<T, O extends FormControlOptions<T>>(

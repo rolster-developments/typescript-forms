@@ -1,11 +1,7 @@
 import { Observable, observable } from '@rolster/commons';
 import { ValidatorError } from '@rolster/validators';
+
 import { hasError, someErrors } from '../helpers';
-import {
-  ArrayControlsValue,
-  FormArrayControls,
-  ReactiveArrayGroup
-} from './form-array-group.type';
 import {
   createFormArrayOptions,
   formArrayIsValid,
@@ -18,6 +14,11 @@ import {
   SubscriberArray,
   ValidatorArrayFn
 } from './form-array.type';
+import {
+  ArrayControlsValue,
+  FormArrayControls,
+  ReactiveArrayGroup
+} from './form-array-group.type';
 
 type ArrayOptions<C extends FormArrayControls, R> = FormArrayOptions<
   C,
