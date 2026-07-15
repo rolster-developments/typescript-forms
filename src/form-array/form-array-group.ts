@@ -1,5 +1,4 @@
 import { v4 as uuid } from 'uuid';
-
 import { FormGroup } from '../form-group/form-group';
 import { createFormGroupOptions } from '../form-group/form-group.helper';
 import { ValidatorGroupFn } from '../form-group/form-group.type';

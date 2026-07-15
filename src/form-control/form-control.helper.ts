@@ -1,5 +1,4 @@
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
-
 import { FormControlOptions } from './form-control.type';
 
 type ControlArgsOptions<T = any> = [

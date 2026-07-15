@@ -1,5 +1,4 @@
 import { ValidatorError, ValidatorResult } from '@rolster/validators';
-
 import { AbstractControl } from '../form-control/form-control.type';
 
 export type AbstractControls<T extends AbstractControl = AbstractControl> =

@@ -1,6 +1,5 @@
 import { parseBoolean } from '@rolster/commons';
 import { ValidatorError } from '@rolster/validators';
-
 import { AbstractControls, AbstractGroup } from '../form-group/form-group.type';
 import { FormArrayOptions, ValidatorArrayFn } from './form-array.type';
 import {
