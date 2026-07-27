@@ -28,12 +28,12 @@ validators and notifies subscribers automatically. Validation rules come from
 Each building block has a class and a matching factory function (the factory is
 the recommended way to create them):
 
-| Class             | Factory              | Purpose                                   |
-| ----------------- | -------------------- | ----------------------------------------- |
-| `FormControl`     | `formControl()`      | A single field                            |
-| `FormGroup`       | `formGroup()`        | A set of named controls (a form)          |
-| `FormArray`       | `formArray()`        | A dynamic list of groups                  |
-| `FormArrayGroup`  | `formArrayGroup()`   | A group item inside a `FormArray`         |
+| Class            | Factory            | Purpose                           |
+| ---------------- | ------------------ | --------------------------------- |
+| `FormControl`    | `formControl()`    | A single field                    |
+| `FormGroup`      | `formGroup()`      | A set of named controls (a form)  |
+| `FormArray`      | `formArray()`      | A dynamic list of groups          |
+| `FormArrayGroup` | `formArrayGroup()` | A group item inside a `FormArray` |
 
 ### FormControl
 

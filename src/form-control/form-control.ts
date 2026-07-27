@@ -1,14 +1,16 @@
-import { Observable, observable,Observer } from '@rolster/commons';
+import { Observable, observable, Observer } from '@rolster/commons';
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import { hasError, someErrors } from '../helpers';
 import {
   createFormControlOptions,
-  formControlIsValid} from './form-control.helper';
+  formControlIsValid
+} from './form-control.helper';
 import {
   FormControlOptions,
   FormValidatorsOptions,
   FormValueOptions,
-  ReactiveFormControl} from './form-control.type';
+  ReactiveFormControl
+} from './form-control.type';
 
 export class FormControl<T = any> implements ReactiveFormControl<T> {
   protected _focused = false;

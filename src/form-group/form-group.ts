@@ -1,4 +1,4 @@
-import { Observable,observable } from '@rolster/commons';
+import { Observable, observable } from '@rolster/commons';
 import { ValidatorError } from '@rolster/validators';
 import { ReactiveFormControl } from '../form-control/form-control.type';
 import {
