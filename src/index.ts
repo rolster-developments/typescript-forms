@@ -18,3 +18,4 @@ export {
 export * from './form-control/form-control.type';
 export { FormControls, FormGroup, formGroup } from './form-group/form-group';
 export * from './form-group/form-group.type';
+export { FormList, formList } from './form-list/form-list';
