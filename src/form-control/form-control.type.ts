@@ -1,6 +1,15 @@
 import { Observer } from '@rolster/commons';
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
 
+export type FormatterFn<T = any> = (value: T) => T;
+
+export type FormatOn = 'input' | 'blur';
+
+export interface FormatterOptions<T = any> {
+  formatOn?: FormatOn;
+  formatter?: FormatterFn<T>;
+}
+
 export interface AbstractControl<T = any> {
   readonly dirty: boolean;
   readonly disabled: boolean;
@@ -37,13 +46,15 @@ export interface AbstractFormControl<T = any> extends AbstractValueControl<T> {
   setValidators: (validators?: ValidatorFn<T>[]) => void;
   touch: () => void;
   readonly unfocused: boolean;
+  readonly formatOn?: FormatOn;
+  readonly formatter?: FormatterFn<T>;
 }
 
 export interface ReactiveFormControl<T = any> extends AbstractFormControl<T> {
   subscribe: (subscriber: Observer<T>) => Unsubscription;
 }
 
-export interface FormControlOptions<T = any> {
+export interface FormControlOptions<T = any> extends FormatterOptions<T> {
   value: T;
   validators?: ValidatorFn<T>[];
 }

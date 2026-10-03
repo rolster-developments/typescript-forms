@@ -3,9 +3,13 @@ import { ValidatorError, ValidatorFn } from '@rolster/validators';
 import { hasError, someErrors } from '../helpers';
 import {
   createFormControlOptions,
+  formatBlurValue,
+  formatInputValue,
   formControlIsValid
 } from './form-control.helper';
 import {
+  FormatOn,
+  FormatterFn,
   FormControlOptions,
   FormValidatorsOptions,
   FormValueOptions,
@@ -13,6 +17,10 @@ import {
 } from './form-control.type';
 
 export class FormControl<T = any> implements ReactiveFormControl<T> {
+  public readonly formatter?: FormatterFn<T>;
+
+  public readonly formatOn?: FormatOn;
+
   protected _focused = false;
 
   protected _touched = false;
@@ -44,13 +52,18 @@ export class FormControl<T = any> implements ReactiveFormControl<T> {
   ) {
     const formControl = createFormControlOptions(options, validators);
 
-    this.observable = observable(formControl.value);
+    this.formatter = formControl.formatter;
+    this.formatOn = formControl.formatOn;
 
-    this.defaultValue = formControl.value;
+    const value = formatInputValue(formControl.value, formControl);
+
+    this.observable = observable(value);
+
+    this.defaultValue = value;
     this.validators = formControl.validators;
 
-    this._value = formControl.value;
-    this.updateValueAndValidity(formControl.value, formControl.validators);
+    this._value = value;
+    this.updateValueAndValidity(value, formControl.validators);
   }
 
   public get focused(): boolean {
@@ -130,6 +143,12 @@ export class FormControl<T = any> implements ReactiveFormControl<T> {
   public blur(): void {
     this._focused = false;
     this._touched = true;
+
+    const value = formatBlurValue(this._value, this);
+
+    if (!Object.is(value, this._value)) {
+      this.refreshValue(value);
+    }
   }
 
   public disable(): void {
@@ -145,17 +164,17 @@ export class FormControl<T = any> implements ReactiveFormControl<T> {
   }
 
   public setDefaultValue(value: T): void {
-    this.defaultValue = value;
-    this.refreshValue(value);
+    this.defaultValue = formatInputValue(value, this);
+    this.refreshValue(this.defaultValue);
   }
 
   public setStartValue(value: T): void {
-    this.refreshValue(value);
+    this.refreshValue(formatInputValue(value, this));
   }
 
   public setValue(value: T): void {
     this._dirty = true;
-    this.refreshValue(value);
+    this.refreshValue(formatInputValue(value, this));
   }
 
   public setValidators(validators: ValidatorFn<T>[] = []): void {

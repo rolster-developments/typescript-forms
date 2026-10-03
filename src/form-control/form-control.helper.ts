@@ -1,5 +1,5 @@
 import { ValidatorError, ValidatorFn } from '@rolster/validators';
-import { FormControlOptions } from './form-control.type';
+import { FormatterOptions, FormControlOptions } from './form-control.type';
 
 type ControlArgsOptions<T = any> = [
   FormControlOptions<T> | T | undefined,
@@ -11,12 +11,15 @@ interface ControlValidOptions<T> {
   value: T;
 }
 
+const CONTROL_OPTIONS_KEYS = ['value', 'validators', 'formatter', 'formatOn'];
+
 function valueIsControlOptions<T, O extends FormControlOptions<T>>(
   options: any
 ): options is O {
   return (
     typeof options === 'object' &&
-    ('value' in options || 'validators' in options)
+    options !== null &&
+    CONTROL_OPTIONS_KEYS.some((key) => key in options)
   );
 }
 
@@ -53,3 +56,23 @@ export const formControlIsValid = <T>({
     return errors;
   }, [] as ValidatorError[]);
 };
+
+/**
+ * Aplica el formateador cuando el control formatea en `input` (modo por defecto).
+ */
+export function formatInputValue<T>(
+  value: T,
+  { formatter, formatOn }: FormatterOptions<T>
+): T {
+  return formatter && formatOn !== 'blur' ? formatter(value) : value;
+}
+
+/**
+ * Aplica el formateador cuando el control formatea en `blur`.
+ */
+export function formatBlurValue<T>(
+  value: T,
+  { formatter, formatOn }: FormatterOptions<T>
+): T {
+  return formatter && formatOn === 'blur' ? formatter(value) : value;
+}

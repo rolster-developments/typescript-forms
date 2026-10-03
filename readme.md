@@ -39,7 +39,7 @@ the recommended way to create them):
 | `FormArrayList`    | `formArrayList()`    | A control whose value is a list of control sets |
 
 Every factory (and constructor) also accepts a single options object instead of
-positional arguments: `formControl({ value, validators })`,
+positional arguments: `formControl({ value, validators, formatter, formatOn })`,
 `formGroup({ controls, validators })`, `formArray({ groups, validators })` and
 `formArrayGroup({ controls, validators, resource })`. The option types are
 `FormControlOptions`, `FormGroupOptions`, `FormArrayOptions` and
@@ -78,6 +78,45 @@ const unsubscribe = emailControl.subscribe((value) => console.log(value));
 `setValidators(validators)`, `reset()`, `disable()` / `enable()`,
 `focus()` / `blur()`, `touch()`, `hasError(id)`, `someErrors(ids)`,
 `subscribe(observer)`.
+
+#### Formatter
+
+A control can normalize its value with a `formatter`, a pure
+`(value: T) => T` function applied before the value is stored, so validators
+and subscribers always see the formatted value. `formatOn` decides when it runs:
+
+| `formatOn`          | When the formatter is applied                                                     |
+| ------------------- | --------------------------------------------------------------------------------- |
+| `'input'` (default) | On the initial value and on every `setValue`, `setStartValue`, `setDefaultValue`. |
+| `'blur'`            | Only when `blur()` is called; the raw value is kept while the user types.         |
+
+```typescript
+import { formControl } from '@rolster/forms';
+
+const code = formControl({
+  value: '',
+  formatter: (value: string) => value.replace(/\D/g, '')
+});
+
+code.setValue('12a3');
+code.value; // '123'
+
+const name = formControl({
+  value: '',
+  formatter: (value: string) => value.trim(),
+  formatOn: 'blur'
+});
+
+name.setValue(' Daniel ');
+name.value; // ' Daniel '
+name.blur();
+name.value; // 'Daniel'
+```
+
+The formatter must be **idempotent** (`formatter(formatter(v))` equals
+`formatter(v)`): UI components apply it before writing the DOM and the control
+applies it again when it receives the value. The control exposes `formatter`
+and `formatOn` as read-only members so a component can read them.
 
 ### FormGroup
 
@@ -250,6 +289,8 @@ useful when building your own controls or framework bindings:
 | `reduceGroupToArray(group, key)`                        | Same as above, reading `group.controls`.                              |
 | `createFormControlOptions(valueOrOptions, validators)`  | Normalizes `formControl` arguments into a `FormControlOptions`.       |
 | `formControlIsValid({ value, validators })`             | Runs the validators against a value and returns the errors.           |
+| `formatInputValue(value, { formatter, formatOn })`      | Applies the formatter when `formatOn` is `'input'` (the default).     |
+| `formatBlurValue(value, { formatter, formatOn })`       | Applies the formatter when `formatOn` is `'blur'`.                    |
 | `createFormGroupOptions(controlsOrOptions, validators)` | Normalizes `formGroup` arguments into a `FormGroupOptions`.           |
 | `formGroupIsValid({ controls, validators })`            | Runs the group validators and returns the errors.                     |
 | `controlsToValue(controls)`                             | Maps a controls record to its `{ key: value }` object.                |
@@ -273,7 +314,10 @@ hasError(emailControl.errors, 'required');
 | ----------------------------- | ----------------------------------------------------------------------------- |
 | `AbstractFormControl<T>`      | Contract of a single control: value, state flags, `setValue`, `focus`/`blur`. |
 | `ReactiveFormControl<T>`      | `AbstractFormControl` plus `subscribe`; implemented by `FormControl`.         |
-| `FormControlOptions<T>`       | `{ value, validators? }` accepted by `formControl`.                           |
+| `FormControlOptions<T>`       | `{ value, validators?, formatter?, formatOn? }` accepted by `formControl`.    |
+| `FormatterFn<T>`              | `(value: T) => T`: the function that normalizes the value of a control.       |
+| `FormatOn`                    | `'input' \| 'blur'`: when the formatter of a control runs.                    |
+| `FormatterOptions<T>`         | `{ formatter?, formatOn? }`, shared by the options and the control itself.    |
 | `AbstractFormGroup<C>`        | Contract of a group: `controls`, aggregated flags, `setValue`, `reset`.       |
 | `FormGroupOptions<C>`         | `{ controls, validators? }` accepted by `formGroup`.                          |
 | `FormArrayOptions<C, R, G>`   | `{ groups?, validators? }` accepted by `formArray`.                           |
