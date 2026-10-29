@@ -327,4 +327,4 @@ hasError(emailControl.errors, 'required');
 
 ## Contributing
 
-- Daniel Andrés Castillo Pedroza :rocket:
+:sparkles: Daniel Andrés Castillo Pedroza
